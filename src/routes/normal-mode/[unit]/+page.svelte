@@ -129,14 +129,14 @@ import { goto } from '$app/navigation';
 <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">
   <header class="bg-teal-300 shadow-lg w-full p-6 rounded-md relative">
     <div class="flex items-center justify-between">
-      <h1 class="text-4xl font-bold text-gray-700">演習 : {unitName}</h1>
+      <h1 class="text-4xl font-bold text-stone-700">演習 : {unitName}</h1>
       <button class="focus:outline-none" on:click={toggleMenu} aria-label="メニューを開閉">
         <IconHamburger width="48" height="48" isOpen={isOpen} color="#374151" />
       </button>
     </div>
     {#if isOpen}
       <nav transition:slide={{ duration: 200 }} class="absolute top-[calc(100%-1rem)] right-[1rem] w-1/3 bg-white shadow-lg rounded-md z-10">
-        <button class="block text-gray-700 py-4 px-6 hover:bg-stone-200 rounded-md w-full text-left" on:click={goToTop}>ホーム</button>
+        <button class="block text-stone-700 py-4 px-6 hover:bg-stone-200 rounded-md w-full text-left" on:click={goToTop}>ホーム</button>
         </nav>
     {/if}
   </header>
@@ -144,10 +144,10 @@ import { goto } from '$app/navigation';
   {#if problems.length > 0 && currentProblemIndex < problems.length}
   <div class="w-full h-full">
     <div class="flex items-center mt-6 mb-6">
-      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-300 text-gray-700 text-3xl font-thin mr-4">
+      <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-300 text-stone-700 text-3xl font-thin mr-4">
         {currentProblemIndex + 1}
       </span>
-      <p class="text-2xl text-gray-700 font-light">{problems[currentProblemIndex].question}</p>
+      <p class="text-2xl text-stone-700 font-light">{problems[currentProblemIndex].question}</p>
     </div>
 
     <div class="mb-4">
@@ -157,7 +157,7 @@ import { goto } from '$app/navigation';
             <p class="text-2xl text-teal-500">{expression}</p>
           </div>
           <div transition:fly="{{x: 200}}" class="w-1/2 text-left bg-white rounded-md p-3 ml-4 shadow-md">
-            <p class="text-lg  text-gray-700 ">
+            <p class="text-lg  text-stone-700 ">
               {hintTexts[index]}
             </p>
           </div>
@@ -171,13 +171,13 @@ import { goto } from '$app/navigation';
         <div class="ml-10 text-2xl w-1/2">
           <h3 class="font-bold text-teal-500">解答</h3>
           <hr class="border-t border-solid my-2 border-teal-400" />
-          <p class="text-gray-600 mb-2">{problems[currentProblemIndex].answer}</p>
+          <p class="text-stone-600 mb-2">{problems[currentProblemIndex].answer}</p>
         </div>
         <div class="w-1/2 flex flex-grow flex-col items-center justify-center">
-          <h2 class="text-2xl font-bold text-gray-700">正誤を記録してください。</h2>
+          <h2 class="text-2xl font-bold text-stone-700">正誤を記録してください。</h2>
           <div class="flex justify-center space-x-4 my-2 w-full">
-            <button class="bg-red-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#ef4444,0_15px_0_0_#e5e7eb] active:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841] active:border-b-[0px] active:translate-y-2 border-red-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow" on:click={() => recordAnswer(true)}><IconCircle width="48" height="48" /></button>
-            <button class="bg-blue-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#e5e7eb] active:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841] active:border-b-[0px] active:translate-y-2 border-blue-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow" on:click={() => recordAnswer(false)}><IconClose width="48" height="48" /></button>
+            <button class="bg-red-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#ef4444,0_15px_0_0_#e5e7eb] hover:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841] hover:border-b-[0px] hover:translate-y-2 border-red-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow" on:click={() => recordAnswer(true)}><IconCircle width="48" height="48" /></button>
+            <button class="bg-blue-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#e5e7eb] hover:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841] hover:border-b-[0px] hover:translate-y-2 border-blue-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow" on:click={() => recordAnswer(false)}><IconClose width="48" height="48" /></button>
           </div>
         </div>
       </div>
@@ -187,7 +187,7 @@ import { goto } from '$app/navigation';
     <div class="flex justify-end space-x-4 mb-4 text-lg">
       {#if !showAnswerArea && currentHintIndex < problems[currentProblemIndex].hints.length}
         <button
-          class="w-[calc(25%-1.5rem)] bg-yellow-300 border-yellow-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#facc15] active:[box-shadow:0_0px_0_0_#facc15] active:border-b-[0px] active:translate-y-2 text-gray-800 font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
+          class="w-[calc(25%-1.5rem)] bg-yellow-300 border-yellow-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#facc15] hover:[box-shadow:0_0px_0_0_#facc15] hover:border-b-[0px] hover:translate-y-2 text-stone-800 text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
           on:click={showNextHint}
         >
           ヒント
@@ -195,7 +195,7 @@ import { goto } from '$app/navigation';
       {/if}
       {#if !showAnswerArea}
       <button
-        class="w-[calc(25%-1.5rem)] bg-teal-300 border-teal-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#14b8a6] active:[box-shadow:0_0px_0_0_#14b8a6] active:border-b-[0px] active:translate-y-2 text-gray-800  font-bold py-2 px-4 rounded-md focus:outline-none focus:shadow-outline"
+        class="w-[calc(25%-1.5rem)] bg-teal-300 border-teal-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#14b8a6] hover:[box-shadow:0_0px_0_0_#14b8a6] hover:border-b-[0px] hover:translate-y-2 text-stone-800 text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
         on:click={showAnswer}
       >
         解答を見る

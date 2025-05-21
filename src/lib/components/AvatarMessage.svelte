@@ -57,7 +57,7 @@
       max-width: 100%; /* 親のmessages divの幅いっぱいに広がるように変更 */
       word-wrap: break-word; /* 長い単語の折り返し */
       background-color: #ffffff; /* 背景色 */
-      color: #4b5563; /* text-gray-700 相当 */
+      color: #44403c; /* text-stone-700 相当 */
       position: relative;
       /* ドロップシャドウを追加 */
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
@@ -83,7 +83,7 @@
       left: -10px;
       width: 10px;
       height: 20px;
-      background: #d6d3d1; /* 親の背景色（bg-stone-100）と同じ */
+      background: #f5f5f4; /* 親の背景色（bg-stone-100）と同じ */
       border-bottom-right-radius: 10px;
     }
   </style>

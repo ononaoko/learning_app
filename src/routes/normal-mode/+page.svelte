@@ -20,7 +20,7 @@
   </header>
 
   <h1 class="text-4xl font-bold text-blue-600 mb-8">通常モード</h1>
-  <p class="text-gray-700 text-base mb-4">学習する単元を選んでください。</p>
+  <p class="text-stone-700 text-base mb-4">学習する単元を選んでください。</p>
   <div class="flex justify-center space-x-4 mb-4">
     <button on:click={() => goto('/normal-mode/algebra')}>代数</button>
     <button on:click={() => goto('/normal-mode/geometry')}>図形</button>
