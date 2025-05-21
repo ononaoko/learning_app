@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "question": "x + 2 = 5 の x を求めなさい",
+        "hints": [
+            { "text": "x を求める", "explanation": "2 を引く", "image": null },
+            { "text": "計算する", "explanation": "5 - 2 = 3", "image": null },
+            { "text": "答えを確認", "explanation": "x = 3 を代入", "image": "/images/equation.png" }
+        ],
+        "answer": "3",
+        "image": null,
+        "unit": "代数"
+    },
+    {
+        "id": 2,
+        "question": "三角形の内角の和は何度？",
+        "hints": [
+            { "text": "基本を思い出す", "explanation": "三角形の角度", "image": null },
+            { "text": "公式を確認", "explanation": "180度", "image": null },
+            { "text": "他の図形で試す", "explanation": "四角形は 360度", "image": "/images/triangle.png" }
+        ],
+        "answer": "180",
+        "image": null,
+        "unit": "図形"
+    }
+]

@@ -1,0 +1,10 @@
+[
+    { "question": "底辺が4cm、高さが3cmの三角形の面積は何cm²ですか？", "answer": "6cm²", "hints": [{ "expression": "面積 = (底辺 × 高さ) ÷ 2", "explanation": "三角形の面積の公式を思い出してみよう。", "isLast": true }] },
+    { "question": "一辺が5cmの正方形の面積は何cm²ですか？", "answer": "25cm²", "hints": [{ "expression": "面積 = 辺の長さ × 辺の長さ", "explanation": "正方形の面積の公式を思い出してみよう。", "isLast": true }] },
+    { "question": "半径が2cmの円の円周は何cmですか？ (πを使用)", "answer": "4πcm", "hints": [{ "expression": "円周 = 2 × π × 半径", "explanation": "円周を求める公式を思い出してみよう。", "isLast": true }] },
+    { "question": "直径が6cmの円の面積は何cm²ですか？ (πを使用)", "answer": "9πcm²", "hints": [{ "expression": "面積 = π × (半径の2乗)", "explanation": "円の面積を求める公式を思い出してみよう。直径から半径を求められるかな？", "isLast": true }] },
+    { "question": "縦が3cm、横が7cmの長方形の面積は何cm²ですか？", "answer": "21cm²", "hints": [{ "expression": "面積 = 縦 × 横", "explanation": "長方形の面積を求める公式を思い出してみよう。", "isLast": true }] },
+    { "question": "体積が24cm³、底面積が6cm²の四角柱の高さは何cmですか？", "answer": "4cm", "hints": [{ "expression": "体積 = 底面積 × 高さ", "explanation": "四角柱の体積を求める公式を思い出してみよう。高さを求めるにはどうすれば良いかな？", "isLast": true }] },
+    { "question": "一辺が3cmの立方体の体積は何cm³ですか？", "answer": "27cm³", "hints": [{ "expression": "体積 = 辺の長さ × 辺の長さ × 辺の長さ", "explanation": "立方体の体積を求める公式を思い出してみよう。", "isLast": true }] },
+    { "question": "半径が3cmの球の表面積は何cm²ですか？ (πを使用)", "answer": "36πcm²", "hints": [{ "expression": "表面積 = 4 × π × (半径の2乗)", "explanation": "球の表面積を求める公式を思い出してみよう。", "isLast": true }] }
+  ]

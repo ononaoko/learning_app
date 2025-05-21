@@ -1,0 +1,74 @@
+[
+    {
+      "question": "2x - 4 = 6を解きなさい",
+      "answer": "x=5",
+      "hints": [
+        { "expression": "", "explanation": "x=の式にするために、-4を=の反対側に移動してみよう。" },
+        { "expression": "2x=6+4", "explanation": "=の反対側に移動すると符号が逆転するよ。次は2を=の反対側に移動しよう。" },
+        { "expression": "x=10/2", "explanation": "2xとはxが２個ある状態、つまり2×xだよ。掛け算は=の反対側に移動すると割り算に変わるよ。", "isLast": true }
+      ]
+    },
+    {
+      "question": "3y + 1 = 10を解きなさい",
+      "answer": "y=3",
+      "hints": [
+        { "expression": "", "explanation": "y=の式にするために、+1を=の反対側に移動してみよう。" },
+        { "expression": "3y=10-1", "explanation": "=の反対側に移動すると符号が逆転するよ。次は3を=の反対側に移動しよう。" },
+        { "expression": "y=9/3", "explanation": "3yとはyが３個ある状態、つまり3×yだよ。掛け算は=の反対側に移動すると割り算に変わるよ。", "isLast": true }
+      ]
+    },
+    {
+      "question": "4a + 8 = 0を解きなさい",
+      "answer": "a=-2",
+      "hints": [
+        { "expression": "", "explanation": "a=の式にするために、+8を=の反対側に移動してみよう。" },
+        { "expression": "4a=-8", "explanation": "=の反対側に移動すると符号が逆転するよ。次は4を=の反対側に移動しよう。" },
+        { "expression": "a=-8/4", "explanation": "4aとはaが４個ある状態、つまり4×aだよ。掛け算は=の反対側に移動すると割り算に変わるよ。", "isLast": true }
+      ]
+    },
+    {
+      "question": "5b - 3 = 12を解きなさい",
+      "answer": "b=3",
+      "hints": [
+        { "expression": "", "explanation": "b=の式にするために、-3を=の反対側に移動してみよう。" },
+        { "expression": "5b=12+3", "explanation": "=の反対側に移動すると符号が逆転するよ。次は5を=の反対側に移動しよう。" },
+        { "expression": "b=15/5", "explanation": "5bとはbが５個ある状態、つまり5×bだよ。掛け算は=の反対側に移動すると割り算に変わるよ。", "isLast": true }
+      ]
+    },
+    {
+      "question": "x / 2 = 7を解きなさい",
+      "answer": "x=14",
+      "hints": [
+        { "expression": "", "explanation": "x=の式にするために、/2を=の反対側に移動してみよう。" },
+        { "expression": "x=7*2", "explanation": "割り算は=の反対側に移動すると掛け算に変わるよ。", "isLast": true }
+      ]
+    },
+    {
+      "question": "y / 3 + 2 = 5を解きなさい",
+      "answer": "y=9",
+      "hints": [
+        { "expression": "", "explanation": "y=の式にするために、+2を=の反対側に移動してみよう。" },
+        { "expression": "y/3=5-2", "explanation": "=の反対側に移動すると符号が逆転するよ。次は/3を=の反対側に移動しよう。" },
+        { "expression": "y=3*3", "explanation": "割り算は=の反対側に移動すると掛け算に変わるよ。", "isLast": true }
+      ]
+    },
+    {
+      "question": "2(a + 1) = 8を解きなさい",
+      "answer": "a=3",
+      "hints": [
+        { "expression": "", "explanation": "a=の式にするために、最初に括弧を外してみよう。" },
+        { "expression": "2a + 2 = 8", "explanation": "括弧の中のそれぞれに2を掛けるよ。次は+2を=の反対側に移動しよう。" },
+        { "expression": "2a = 8 - 2", "explanation": "=の反対側に移動すると符号が逆転するよ。次は2を=の反対側に移動しよう。" },
+        { "expression": "a = 6 / 2", "explanation": "2aとはaが２個ある状態、つまり2×aだよ。掛け算は=の反対側に移動すると割り算に変わるよ。", "isLast": true }
+      ]
+    },
+    {
+      "question": "(b - 3) / 4 = 1を解きなさい",
+      "answer": "b=7",
+      "hints": [
+        { "expression": "", "explanation": "b=の式にするために、最初に/4を=の反対側に移動してみよう。" },
+        { "expression": "b - 3 = 1 * 4", "explanation": "割り算は=の反対側に移動すると掛け算に変わるよ。次は-3を=の反対側に移動しよう。" },
+        { "expression": "b = 4 + 3", "explanation": "=の反対側に移動すると符号が逆転するよ。", "isLast": true }
+      ]
+    }
+  ]
