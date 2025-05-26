@@ -91,63 +91,36 @@
 	  isLoggedIn.set(false);
 	  nickname.set('');
 	  localStorage.removeItem('users'); // LocalStorageのユーザー情報もクリア
-<<<<<<< HEAD
-	  // ログアウトしたらこのページに留まる
-=======
 	  // ログインページなので、ログアウト後はこのページに留まる
->>>>>>> e878e68e18862518a7117debe8c966dd0a0e4563
 	}
   </script>
 
   <svelte:head>
 	<title>算数学習アプリ - ログイン</title>
   </svelte:head>
-<<<<<<< HEAD
-
-  <main class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8">
-	<header class="mb-8 w-full max-w-md flex justify-between items-center">
-	  <h1 class="text-5xl font-bold text-green-600">算数学習アプリ</h1>
-=======
   <main class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-16">
 	<header class="mb-8 w-full max-w-md flex justify-between items-center">
->>>>>>> e878e68e18862518a7117debe8c966dd0a0e4563
 	  {#if $isLoggedIn}
 		<button class="text-red-500 hover:underline" on:click={logoutUser}>ログアウト</button>
 	  {/if}
 	</header>
 
-<<<<<<< HEAD
-	<div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-5xl">
-	  <h1 class="text-5xl font-bold text-stone-700 text-center mb-6">ONO学習アプリ</h1>
-=======
 	<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-5xl min-h-[500px]">
 	  <h1 class="text-5xl font-bold text-stone-700 text-center mb-8">ONO学習アプリ</h1>
->>>>>>> e878e68e18862518a7117debe8c966dd0a0e4563
 
 	  <div class="md:flex md:space-x-16 md:max-w-4xl md:mx-auto">
 
 		<div class="md:w-1/2 flex flex-col items-center">
-<<<<<<< HEAD
-		  <div class="w-full text-left">
-			<h2 class="text-2xl font-bold text-stone-700 mb-4">ニックネームを選択:</h2>
-		  </div>
-=======
 			<div class="w-full text-left">
 						  <h2 class="text-2xl font-bold text-teal-500 mb-2 ">ログイン:</h2>
 			</div>
->>>>>>> e878e68e18862518a7117debe8c966dd0a0e4563
 		  <div class="mb-4 w-full">
 			<label class="block text-stone-700 text-sm font-bold mb-2" for="existing-nickname">
 			  ニックネームを選択:
 			</label>
 			<select
-<<<<<<< HEAD
-			  class="shadow appearance-none border rounded w-full py-2 px-3 text-stone-700 leading-tight focus:outline-none focus:shadow-outline"
-			  id="existing-nickname"
-=======
 			class="shadow appearance-none border rounded w-full py-2 px-3 text-stone-700 leading-tight focus:outline-none focus:shadow-outline"
 			id="existing-nickname"
->>>>>>> e878e68e18862518a7117debe8c966dd0a0e4563
 			  bind:value={existingUserNickname}
 			>
 			  <option value="">選択してください</option>
@@ -161,13 +134,8 @@
 			  ピンコード:
 			</label>
 			<input
-<<<<<<< HEAD
-			  class="shadow appearance-none border rounded w-full py-2 px-3 text-stone-700 leading-tight focus:outline-none focus:shadow-outline"
-			  id="existing-pincode"
-=======
 			class="shadow appearance-none border rounded w-full py-2 px-3 text-stone-700 leading-tight focus:outline-none focus:shadow-outline"
 			id="existing-pincode"
->>>>>>> e878e68e18862518a7117debe8c966dd0a0e4563
 			  type="text"
 			  pattern="\d{4}"
 			  placeholder="ピンコード（4桁）"
@@ -177,68 +145,6 @@
 			  <p class="text-red-500 text-xs italic">{loginError}</p>
 			{/if}
 		  </div>
-<<<<<<< HEAD
-		  <button
-			class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-			type="button"
-			on:click={loginExistingUser}
-			disabled={!existingUserNickname}
-		  >
-			ログイン
-		  </button>
-		</div>
-
-		<hr class="my-6 border-t border-stone-400 border-dashed md:hidden" />
-		<div class="hidden md:block border-l border-stone-400 border-dashed h-auto mx-8"></div>
-
-		<div class="mt-8 md:mt-0 md:w-1/2 flex flex-col items-center">
-		  <div class="w-full text-left">
-			<h2 class="text-2xl font-bold text-stone-700 mb-4">新規登録:</h2>
-		  </div>
-		  <div class="mb-4 w-full">
-			<label class="block text-stone-700 text-sm font-bold mb-2" for="new-nickname">
-			  ニックネームを入力:
-			</label>
-			<input
-			  class="shadow appearance-none border rounded w-full py-2 px-3 text-stone-700 leading-tight focus:outline-none focus:shadow-outline"
-			  id="new-nickname"
-			  type="text"
-			  placeholder="ニックネームを入力"
-			  bind:value={newUserNickname}
-			/>
-		  </div>
-		  <div class="mb-6 w-full">
-			<label class="block text-stone-700 text-sm font-bold mb-2" for="new-pincode">
-			  ピンコード（4桁）:
-			</label>
-			<input
-			  class="shadow appearance-none border rounded w-full py-2 px-3 text-stone-700 leading-tight focus:outline-none focus:shadow-outline"
-			  id="new-pincode"
-			  type="text"
-			  pattern="\d{4}"
-			  placeholder="ピンコード（4桁）"
-			  bind:value={newUserPincode}
-			/>
-			{#if registrationError}
-			  <p class="text-red-500 text-xs italic">{registrationError}</p>
-			{/if}
-		  </div>
-		  <button
-			class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-			type="button"
-			on:click={registerNewUser}
-		  >
-			新規登録
-		  </button>
-		</div>
-	  </div>
-
-	  <p class="mt-4 text-center text-gray-600 text-sm">
-		または <button class="text-blue-500 hover:underline" on:click={() => { nickname.set(generateAnonymousId()); isLoggedIn.set(true); goto('/dashboard'); }}>匿名で始める</button>
-	  </p>
-	</div>
-  </main>
-=======
 		  <button
 		  class=" bg-teal-400 text-white w-1/2 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#14b8a6,0_10px_0_0_#d1d5db] hover:[box-shadow:0_0px_0_0_#14b8a6,0_0px_0_0_#d1d5db] hover:border-b-[0px] hover:translate-y-2 border-teal-400  font-bold py-4 rounded-md focus:outline-none focus:shadow-outline"
 		  			type="button"
@@ -301,4 +207,3 @@
 		<br><span class="text-stone-700 text-xs">※匿名では学習データが蓄積されません。</span>
 	  </p>
 	</main>
->>>>>>> e878e68e18862518a7117debe8c966dd0a0e4563
