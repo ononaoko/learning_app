@@ -8,6 +8,7 @@ import { goto } from '$app/navigation';
   import IconClose from '$lib/components/IconClose.svelte'; // コンポーネントをインポート
   import IconCircle from '$lib/components/IconCircle.svelte'; // コンポーネントをインポート
   import IconHamburger from '$lib/components/IconHamburger.svelte';
+  import AppNavigation from '$lib/components/AppNavigation.svelte'; // 新しいナビゲーションコンポーネントをインポート
 
 
   let unit = $page.params.unit;
@@ -129,16 +130,12 @@ import { goto } from '$app/navigation';
 <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">
   <header class="bg-teal-300 shadow-lg w-full p-6 rounded-md relative">
     <div class="flex items-center justify-between">
-      <h1 class="text-4xl font-bold text-gray-700">演習 : {unitName}</h1>
+      <h1 class="text-4xl font-bold text-stone-700">通常モード</h1>
       <button class="focus:outline-none" on:click={toggleMenu} aria-label="メニューを開閉">
-        <IconHamburger width="48" height="48" isOpen={isOpen} color="#374151" />
+        <IconHamburger width="48" height="48" isOpen={isOpen} />
       </button>
     </div>
-    {#if isOpen}
-      <nav transition:slide={{ duration: 200 }} class="absolute top-[calc(100%-1rem)] right-[1rem] w-1/3 bg-white shadow-lg rounded-md z-10">
-        <button class="block text-gray-700 py-4 px-6 hover:bg-stone-200 rounded-md w-full text-left" on:click={goToTop}>ホーム</button>
-        </nav>
-    {/if}
+    <AppNavigation isOpen={isOpen} />
   </header>
 
   {#if problems.length > 0 && currentProblemIndex < problems.length}
