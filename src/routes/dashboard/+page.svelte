@@ -86,13 +86,16 @@ function toggleMenu() {
 
     <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-8 space-y-8">
         <section class="w-full flex flex-col items-center space-y-6 pb-6 border-b border-gray-200">
-            <h2 class="text-3xl font-bold text-gray-700 cursor-pointer" on:click={toggleEbbinghausList}>
+          <h2 class="text-3xl font-bold text-gray-700">
+            <button class="focus:outline-none cursor-pointer p-2 rounded-md hover:bg-gray-100" on:click={toggleEbbinghausList}>
               エビングハウス通知
               {#if showEbbinghausList}
                 <span class="ml-2">▲</span>
+              {:else}
                 <span class="ml-2">▼</span>
               {/if}
-            </h2>
+            </button>
+          </h2>
             {#if showEbbinghausList}
               <ul transition:slide={{ duration: 300 }} class="flex flex-col space-y-4 w-full max-w-xl">
                 <li class="flex items-center justify-between border border-solid border-stone-400 bg-stone-50 hover:bg-stone-100 rounded-full py-2 pl-6 pr-2">

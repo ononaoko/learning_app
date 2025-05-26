@@ -44,7 +44,6 @@
     {/if}
   </header>
 
-<<<<<<< HEAD
   <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-8 mt-8">
     <h2 class="text-3xl font-bold text-gray-700 text-center mb-6">単元選択</h2>
 
@@ -78,12 +77,5 @@
         {/if}
       </div>
     {/each}
-=======
-  <h1 class="text-4xl font-bold text-blue-600 mb-8">通常モード</h1>
-  <p class="text-stone-700 text-base mb-4">学習する単元を選んでください。</p>
-  <div class="flex justify-center space-x-4 mb-4">
-    <button on:click={() => goto('/normal-mode/algebra')}>代数</button>
-    <button on:click={() => goto('/normal-mode/geometry')}>図形</button>
->>>>>>> e878e68e18862518a7117debe8c966dd0a0e4563
   </div>
 </main>
