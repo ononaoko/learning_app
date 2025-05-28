@@ -70,6 +70,7 @@
   let results = []; // 各問題の正誤を記録する配列
 
   function recordAnswer(isCorrect) {
+    console.log('正解:', isCorrect);
     results = [...results, isCorrect]; // 結果を配列に追加
     nextProblem();
   }
@@ -105,14 +106,8 @@
         <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-300 text-stone-700 text-3xl font-thin mr-4">
           {currentProblemIndex + 1}
         </span>
-        <p class="text-2xl text-stone-700 font-light">
-          {#each problems[currentProblemIndex].question as part}
-            {#if part.type === 'text'}
-              {part.value}
-            {:else if part.type === 'math'}
-              <KaTeXDisplay textContent={part.value} displayMode={false} fontSizeClass="text-2xl" textColor="text-stone-700" />
-            {/if}
-          {/each}
+        <p class="text-2xl text-stone-700 font-light leading-loose">
+          <KaTeXDisplay textContent={problems[currentProblemIndex].question} displayMode={false} fontSizeClass="text-2xl" textColor="text-stone-700" />
         </p>
       </div>
 
@@ -122,21 +117,13 @@
                style="display: {index < currentHintIndex ? 'flex' : 'none'};"
           >
             <div class="w-1/2 ml-14">
-              <p class="text-2xl text-teal-500">
-                {#if hint.expression && hint.expression.value}
-                  <KaTeXDisplay textContent={hint.expression.value} displayMode={false} fontSizeClass="text-2xl" textColor="text-teal-500" />
-                {/if}
+              <p class="text-2xl text-teal-500 leading-loose">
+                <KaTeXDisplay textContent={hint.expression} displayMode={false} fontSizeClass="text-2xl" textColor="text-teal-500" />
               </p>
             </div>
             <div class="w-1/2 text-left bg-white rounded-md p-3 ml-4 shadow-md">
-              <p class="text-lg text-stone-700">
-                {#each hint.explanation as part}
-                  {#if part.type === 'text'}
-                    {part.value}
-                  {:else if part.type === 'math'}
-                    <KaTeXDisplay textContent={part.value} displayMode={false} fontSizeClass="text-lg" textColor="text-stone-700" />
-                  {/if}
-                {/each}
+              <p class="text-lg text-stone-700 leading-loose">
+                <KaTeXDisplay textContent={hint.explanation} displayMode={false} fontSizeClass="text-lg" textColor="text-stone-700" />
               </p>
             </div>
           </div>
@@ -172,14 +159,8 @@
           <div class="ml-10 text-2xl w-1/2">
             <h3 class="font-bold text-teal-500">解答</h3>
             <hr class="border-t border-solid my-2 border-teal-400" />
-            <p class="text-stone-600 mb-2">
-              {#each problems[currentProblemIndex].answer as part}
-                {#if part.type === 'text'}
-                  {part.value}
-                {:else if part.type === 'math'}
-                  <KaTeXDisplay textContent={part.value} displayMode={false} fontSizeClass="text-stone-600" textColor="text-stone-600" />
-                {/if}
-              {/each}
+            <p class="text-stone-600 mb-2 leading-loose">
+              <KaTeXDisplay textContent={problems[currentProblemIndex].answer} displayMode={false} fontSizeClass="text-stone-600" textColor="text-stone-600" />
             </p>
           </div>
           <div class="w-1/2 flex flex-grow flex-col items-center justify-center">

@@ -12,12 +12,10 @@
     "hints": [
       {
         "explanation": [
-          { "type": "math", "value": "x" },
-          { "type": "text", "value": "=の式にするために、" },
-          { "type": "math", "value": "-4" },
-          { "type": "text", "value": " を " },
-          { "type": "math", "value": "=" },
-          { "type": "text", "value": " の反対側に移動してみよう。" }
+          { "type": "math", "value": "2x - 4 = 6" },
+          { "type": "text", "value": "。両辺に " },
+          { "type": "math", "value": "4" },
+          { "type": "text", "value": " を足してみよう。" }
         ],
         "expression": [
           { "type": "math", "value": "2x - 4 + 4 = 6 + 4" }
@@ -66,45 +64,347 @@
     "hints": [
       {
         "explanation": [
-          { "type": "math", "value": "y" },
-          { "type": "text", "value": "=の式にするために、" },
-          { "type": "math", "value": "+1" },
-          { "type": "text", "value": " を " },
-          { "type": "math", "value": "=" },
-          { "type": "text", "value": " の反対側に移動してみよう。" }
+          { "type": "math", "value": "3y + 1 = 10" },
+          { "type": "text", "value": "。両辺から " },
+          { "type": "math", "value": "1" },
+          { "type": "text", "value": " を引いてみよう。" }
         ],
         "expression": [
-          { "type": "math", "value": "" }
+          { "type": "math", "value": "3y = 10 - 1" }
         ]
       },
       {
         "explanation": [
-          { "type": "math", "value": "=" },
-          { "type": "text", "value": " の反対側に移動すると符号が逆転するよ。次は " },
+          { "type": "math", "value": "3y = 9" },
+          { "type": "text", "value": "。両辺を " },
           { "type": "math", "value": "3" },
-          { "type": "text", "value": " を " },
-          { "type": "math", "value": "=" },
-          { "type": "text", "value": " の反対側に移動しよう。" }
+          { "type": "text", "value": " で割ってみよう。" }
         ],
         "expression": [
-          { "type": "math", "value": "3y=10-1" }
+          { "type": "math", "value": "y = \\frac{9}{3}" }
         ]
       },
       {
         "explanation": [
-          { "type": "math", "value": "3y" },
-          { "type": "text", "value": " とは " },
-          { "type": "math", "value": "y" },
-          { "type": "text", "value": " が " },
-          { "type": "math", "value": "3" },
-          { "type": "text", "value": " 個ある状態、つまり " },
-          { "type": "math", "value": "3 \\times y" },
-          { "type": "text", "value": " だよ。掛け算は " },
-          { "type": "math", "value": "=" },
-          { "type": "text", "value": " の反対側に移動すると割り算に変わるよ。" }
+          { "type": "math", "value": "y = \\frac{9}{3}" },
+          { "type": "text", "value": "。分数を計算しよう。" }
         ],
         "expression": [
-          { "type": "math", "value": "y=\\frac{9}{3}" }
+          { "type": "math", "value": "y = 3" }
+        ]
+      }
+    ]
+  },
+  {
+    "question": [
+      { "type": "text", "value": "次の計算を行いなさい: " },
+      { "type": "math", "value": "-5 + 8 - 2 = ?" }
+    ],
+    "answer": [
+      { "type": "text", "value": "答えは" },
+      { "type": "math", "value": "-1" },
+      { "type": "text", "value": "です。" }
+    ],
+    "hints": [
+      {
+        "explanation": [
+          { "type": "text", "value": "左から順に計算してみよう。" },
+          { "type": "math", "value": "-5 + 8 = 3" }
+        ],
+        "expression": [
+          { "type": "math", "value": "3 - 2" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "math", "value": "3 - 2" },
+          { "type": "text", "value": " を計算しよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "-1" }
+        ]
+      }
+    ]
+  },
+  {
+    "question": [
+      { "type": "text", "value": "次の計算を行いなさい: " },
+      { "type": "math", "value": "(-2)^3 + 7 = ?" }
+    ],
+    "answer": [
+      { "type": "text", "value": "答えは" },
+      { "type": "math", "value": "-1" },
+      { "type": "text", "value": "です。" }
+    ],
+    "hints": [
+      {
+        "explanation": [
+          { "type": "text", "value": "まず指数を計算しよう。" },
+          { "type": "math", "value": "(-2)^3 = (-2) \\times (-2) \\times (-2)" }
+        ],
+        "expression": [
+          { "type": "math", "value": "-8 + 7" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "math", "value": "-8 + 7" },
+          { "type": "text", "value": " を計算しよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "-1" }
+        ]
+      }
+    ]
+  },
+  {
+    "question": [
+      { "type": "text", "value": "底辺が " },
+      { "type": "math", "value": "6 \\text{cm}" },
+      { "type": "text", "value": "、高さが " },
+      { "type": "math", "value": "5 \\text{cm}" },
+      { "type": "text", "value": " の三角形の面積は何 " },
+      { "type": "math", "value": "\\text{cm}^2" },
+      { "type": "text", "value": " ですか？" }
+    ],
+    "answer": [
+      { "type": "text", "value": "答えは" },
+      { "type": "math", "value": "15 \\text{cm}^2" },
+      { "type": "text", "value": "です。" }
+    ],
+    "hints": [
+      {
+        "explanation": [
+          { "type": "text", "value": "三角形の面積は「底辺 " },
+          { "type": "math", "value": "\\times" },
+          { "type": "text", "value": " 高さ " },
+          { "type": "math", "value": "\\div" },
+          { "type": "text", "value": " 2 」で求められるよ。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "\\frac{6 \\times 5}{2}" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "text", "value": "計算してみよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "15" }
+        ]
+      }
+    ]
+  },
+  {
+    "question": [
+      { "type": "text", "value": "ある数を " },
+      { "type": "math", "value": "3" },
+      { "type": "text", "value": " 倍して " },
+      { "type": "math", "value": "7" },
+      { "type": "text", "value": " を足すと " },
+      { "type": "math", "value": "22" },
+      { "type": "text", "value": " になります。ある数を求めなさい。" }
+    ],
+    "answer": [
+      { "type": "text", "value": "答えは" },
+      { "type": "math", "value": "5" },
+      { "type": "text", "value": "です。" }
+    ],
+    "hints": [
+      {
+        "explanation": [
+          { "type": "text", "value": "ある数を " },
+          { "type": "math", "value": "x" },
+          { "type": "text", "value": " とおいて式を立ててみよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "3x + 7 = 22" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "math", "value": "3x + 7 = 22 " },
+          { "type": "math", "value": "7" },
+          { "type": "text", "value": "を右辺に移動しよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "3x = 22 - 7" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "math", "value": "3x = 15" },
+          { "type": "text", "value": "。両辺を " },
+          { "type": "math", "value": "3" },
+          { "type": "text", "value": " で割ろう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "x = \\frac{15}{3}" }
+        ]
+      }
+    ]
+  },
+  {
+    "question": [
+      { "type": "text", "value": "袋の中に赤玉が " },
+      { "type": "math", "value": "4" },
+      { "type": "text", "value": " 個、白玉が " },
+      { "type": "math", "value": "6" },
+      { "type": "text", "value": " 個入っています。この袋から玉を " },
+      { "type": "math", "value": "1" },
+      { "type": "text", "value": " 個取り出すとき、それが赤玉である確率はいくらですか？" }
+    ],
+    "answer": [
+      { "type": "text", "value": "答えは" },
+      { "type": "math", "value": "\\frac{2}{5}" },
+      { "type": "text", "value": "です。" }
+    ],
+    "hints": [
+      {
+        "explanation": [
+          { "type": "text", "value": "まず、袋の中の玉の合計数を数えよう。" }
+        ],
+        "expression": [
+          { "type": "text", "value": "合計の玉の数: " },
+          { "type": "math", "value": "4 + 6 = 10" },
+          { "type": "text", "value": " 個" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "text", "value": "確率は「求めたい場合の数 " },
+          { "type": "math", "value": "\\div" },
+          { "type": "text", "value": " 全ての場合の数」だよ。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "\\frac{\\text{赤玉の数}}{\\text{全体の玉の数}} = \\frac{4}{10}" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "text", "value": "分数を最も簡単な形にしよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "\\frac{4}{10} = \\frac{2}{5}" }
+        ]
+      }
+    ]
+  },
+  {
+    "question": [
+      { "type": "text", "value": "半径 " },
+      { "type": "math", "value": "3 \\text{cm}" },
+      { "type": "text", "value": " の円の円周を求めなさい。(" },
+      { "type": "math", "value": " \\pi" },
+      { "type": "text", "value": " を使用)" }
+    ],
+    "answer": [
+      { "type": "text", "value": "答えは" },
+      { "type": "math", "value": "6\\pi \\text{cm}" },
+      { "type": "text", "value": "です。" }
+    ],
+    "hints": [
+      {
+        "explanation": [
+          { "type": "text", "value": "円周を求める公式は「直径 " },
+          { "type": "math", "value": "\\times  \\pi" },
+          { "type": "text", "value": "」または「" },
+          { "type": "math", "value": "2 \\times" },
+          { "type": "text", "value": " 半径 " },
+          { "type": "math", "value": "\\times \\pi" },
+          { "type": "text", "value": " 」だよ。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "C = 2\\pi r" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "text", "value": "半径が " },
+          { "type": "math", "value": "3 \\text{cm}" },
+          { "type": "text", "value": " だから、式に代入してみよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "C = 2 \\times \\pi \\times 3" }
+        ]
+      }
+    ]
+  },
+  {
+    "question": [
+      { "type": "text", "value": "ある池の周りを時速 " },
+      { "type": "math", "value": "4 \\text{km}" },
+      { "type": "text", "value": " で歩くと " },
+      { "type": "math", "value": "3" },
+      { "type": "text", "value": " 時間かかります。この池の周りの長さは何 " },
+      { "type": "math", "value": "\\text{km}" },
+      { "type": "text", "value": " ですか？" }
+    ],
+    "answer": [
+      { "type": "text", "value": "答えは" },
+      { "type": "math", "value": "12 \\text{km}" },
+      { "type": "text", "value": "です。" }
+    ],
+    "hints": [
+      {
+        "explanation": [
+          { "type": "text", "value": "道のりを求める公式は「速さ " },
+          { "type": "math", "value": "\\times" },
+          { "type": "text", "value": " 時間」だよ。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "\\text{道のり} = \\text{速さ} \\times \\text{時間}" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "text", "value": "与えられた値を式に代入してみよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "4 \\text{km/h} \\times 3 \\text{h}" }
+        ]
+      }
+    ]
+  },
+  {
+    "question": [
+      { "type": "text", "value": "ある学校の生徒数は " },
+      { "type": "math", "value": "800" },
+      { "type": "text", "value": " 人です。男子生徒と女子生徒の比が " },
+      { "type": "math", "value": "3:5" },
+      { "type": "text", "value": " のとき、女子生徒は何人ですか？" }
+    ],
+    "answer": [
+      { "type": "text", "value": "答えは" },
+      { "type": "math", "value": "500" },
+      { "type": "text", "value": "人" },
+      { "type": "text", "value": "です。" }
+    ],
+    "hints": [
+      {
+        "explanation": [
+          { "type": "text", "value": "比の合計は何になるか考えてみよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "3 + 5 = 8" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "text", "value": "全体を " },
+          { "type": "math", "value": "8" },
+          { "type": "text", "value": " と考えたとき、女子の割合はいくらになるかな？" }
+        ],
+        "expression": [
+          { "type": "math", "value": "\\frac{5}{8}" }
+        ]
+      },
+      {
+        "explanation": [
+          { "type": "text", "value": "全生徒数に女子の割合を掛けてみよう。" }
+        ],
+        "expression": [
+          { "type": "math", "value": "800 \\times \\frac{5}{8}" }
         ]
       }
     ]

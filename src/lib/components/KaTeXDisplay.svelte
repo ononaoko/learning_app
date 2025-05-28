@@ -8,54 +8,62 @@
   export let textColor = 'text-gray-800';
   export let fontSizeClass = 'text-base';
 
-  let container;
-  let hasRenderedOnce = false;
+  let container; // 数式をレンダリングするDOM要素への参照
+  let lastProcessedContent = ''; // 最後に処理したtextContent (配列のJSON文字列)
 
+  // 数式とテキストを分離してレンダリングするメインの関数
   function parseAndRenderContent() {
-    // textContent が配列であることを確認
+    // ブラウザ環境でない、またはコンテナがない、またはtextContentが配列でない/空の場合は何もしない
     if (!browser || !container || !Array.isArray(textContent) || textContent.length === 0) {
       if (container) container.innerHTML = ''; // コンテナがあれば内容をクリア
+      lastProcessedContent = JSON.stringify(textContent); // 空の状態も記憶しておく
       return;
     }
 
-    // 無限ループ対策 (コンテナのDOM内容を直接比較)
-    const currentContainerHTML = container.innerHTML; // DOMのHTML内容を記憶
-    // 新しいコンテンツのHTMLを予測し、比較する（より複雑な比較になる）
-    // シンプルにするため、ここでは文字列化したJSONで比較を試みる
-    const newContentString = JSON.stringify(textContent);
-
-    if (hasRenderedOnce && container.dataset.lastRenderedContent === newContentString) {
-        // console.log('KaTeXDisplay: Content unchanged, skipping re-render.');
-        return;
+    // 無限ループ対策: 最後に処理したコンテンツと現在のコンテンツが同じならスキップ
+    const currentContentJson = JSON.stringify(textContent);
+    if (hasRenderedOnce && currentContentJson === lastProcessedContent) {
+      return;
     }
 
     container.innerHTML = ''; // 古い内容をクリア
 
     // textContent (オブジェクトの配列) を直接ループして各パートをレンダリング
     textContent.forEach(part => {
-      if (part.type === 'text') {
-        container.appendChild(document.createTextNode(part.value));
-      } else if (part.type === 'math') {
-        const mathSpan = document.createElement('span');
-        container.appendChild(mathSpan);
+      // part がオブジェクトで、type と value プロパティを持つことを確認
+      if (typeof part === 'object' && part !== null && 'type' in part && 'value' in part) {
+        if (part.type === 'text') {
+          container.appendChild(document.createTextNode(part.value));
+        } else if (part.type === 'math') {
+          const mathSpan = document.createElement('span');
+          container.appendChild(mathSpan);
 
-        try {
-          katex.render(part.value, mathSpan, {
-            throwOnError: false, // エラーがあってもレンダリングを続行
-            displayMode: displayMode, // $$...$$ 形式か $...$ 形式か
-          });
-        } catch (e) {
-          console.error('KaTeX: Rendering error:', e, 'Formula:', part.value);
-          mathSpan.innerHTML = `<span style="color: red; font-size: inherit;">[数式エラー: ${part.value}]</span>`; // エラー表示
+          try {
+            // KaTeX.render には $ や $$ を含まない純粋な TeX を渡す
+            katex.render(part.value, mathSpan, { // part.valueを直接渡す
+              throwOnError: false,
+              displayMode: displayMode,
+            });
+          } catch (e) {
+            console.error('KaTeX: Rendering error:', e, 'Formula:', part.value);
+            mathSpan.innerHTML = `<span style="color: red; font-size: inherit;">[数式エラー: ${part.value}]</span>`;
+          }
         }
+      } else {
+        console.warn('KaTeXDisplay: Invalid part in array:', part);
+        // 無効なパートは無視するか、エラー文字列を追加する
       }
     });
 
     hasRenderedOnce = true; // 初回レンダリングが完了
-    container.dataset.lastRenderedContent = newContentString; // 最後にレンダリングした内容をデータ属性に保存
+    lastProcessedContent = currentContentJson; // 正常にレンダリングされた内容を記憶
   }
 
+  // 初回レンダリングと、コンテンツ変更時のレンダリングをトリガー
+  let hasRenderedOnce = false; // レンダリングが一度行われたかのフラグ
+
   onMount(() => {
+    // コンポーネントが DOM にマウントされたら初回レンダリング
     setTimeout(() => {
       parseAndRenderContent();
     }, 50); // 50ms 遅延
@@ -71,14 +79,9 @@
   /* スタイルは変更なし */
   :global(.katex),
   :global(.katex-display) {
-
   }
-
   :global(.katex-display) {
-
   }
-
   :global(.katex span) {
-
   }
 </style>
