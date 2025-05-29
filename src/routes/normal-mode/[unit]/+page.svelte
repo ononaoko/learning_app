@@ -167,11 +167,11 @@
             <h2 class="text-2xl font-bold text-stone-700">正誤を記録してください。</h2>
             <div class="flex justify-center space-x-4 my-2 w-full">
               <button
-                class="bg-red-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#ef4444,0_15px_0_0_#e5e7eb] hover:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841] hover:border-b-[0px] hover:translate-y-2 border-red-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow"
+                class="bg-red-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#ef4444,0_15px_0_0_#e5e7eb] hover:[box-shadow:0_0px_0_0_#ef4444,0_0px_0_0_#e5e7eb] hover:border-b-[0px] hover:translate-y-2 border-red-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow"
                 on:click={() => recordAnswer(true)}><IconCircle width="48" height="48" /></button
               >
               <button
-                class="bg-blue-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#e5e7eb] hover:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841] hover:border-b-[0px] hover:translate-y-2 border-blue-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow"
+                class="bg-blue-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#e5e7eb] hover:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#e5e7eb] hover:border-b-[0px] hover:translate-y-2 border-blue-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow"
                 on:click={() => recordAnswer(false)}><IconClose width="48" height="48" /></button
               >
             </div>

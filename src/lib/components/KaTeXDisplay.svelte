@@ -3,85 +3,97 @@
   import { browser } from '$app/environment';
   import katex from 'katex';
 
-  export let textContent = []; // ★textContent はオブジェクトの配列を受け取る★
+  export let textContent = [];
   export let displayMode = false;
   export let textColor = 'text-gray-800';
-  export let fontSizeClass = 'text-base';
+  export let fontSizeClass = 'text-base'; // Tailwindのフォントサイズクラス
 
-  let container; // 数式をレンダリングするDOM要素への参照
-  let lastProcessedContent = ''; // 最後に処理したtextContent (配列のJSON文字列)
+  let container;
+  let lastProcessedContent = '';
+  let hasRenderedOnce = false;
 
-  // 数式とテキストを分離してレンダリングするメインの関数
   function parseAndRenderContent() {
-    // ブラウザ環境でない、またはコンテナがない、またはtextContentが配列でない/空の場合は何もしない
     if (!browser || !container || !Array.isArray(textContent) || textContent.length === 0) {
-      if (container) container.innerHTML = ''; // コンテナがあれば内容をクリア
-      lastProcessedContent = JSON.stringify(textContent); // 空の状態も記憶しておく
+      if (container) container.innerHTML = '';
+      lastProcessedContent = JSON.stringify(textContent);
+      hasRenderedOnce = false;
       return;
     }
 
-    // 無限ループ対策: 最後に処理したコンテンツと現在のコンテンツが同じならスキップ
     const currentContentJson = JSON.stringify(textContent);
     if (hasRenderedOnce && currentContentJson === lastProcessedContent) {
       return;
     }
 
-    container.innerHTML = ''; // 古い内容をクリア
+    container.innerHTML = '';
 
-    // textContent (オブジェクトの配列) を直接ループして各パートをレンダリング
     textContent.forEach(part => {
-      // part がオブジェクトで、type と value プロパティを持つことを確認
-      if (typeof part === 'object' && part !== null && 'type' in part && 'value' in part) {
-        if (part.type === 'text') {
-          container.appendChild(document.createTextNode(part.value));
-        } else if (part.type === 'math') {
-          const mathSpan = document.createElement('span');
-          container.appendChild(mathSpan);
+      if (part.type === 'text') {
+        container.appendChild(document.createTextNode(part.value));
+      } else if (part.type === 'math') {
+        const mathSpan = document.createElement('span');
+        container.appendChild(mathSpan);
 
-          try {
-            // KaTeX.render には $ や $$ を含まない純粋な TeX を渡す
-            katex.render(part.value, mathSpan, { // part.valueを直接渡す
-              throwOnError: false,
-              displayMode: displayMode,
-            });
-          } catch (e) {
-            console.error('KaTeX: Rendering error:', e, 'Formula:', part.value);
-            mathSpan.innerHTML = `<span style="color: red; font-size: inherit;">[数式エラー: ${part.value}]</span>`;
-          }
+        try {
+          // KaTeX.render のオプションでフォントサイズを調整
+          // https://katex.org/docs/options.html
+          katex.render(part.value, mathSpan, {
+            throwOnError: false,
+            displayMode: displayMode,
+            // ★追加: フォントサイズ調整に関するオプション ★
+            // 数式全体の基準フォントサイズ。'1em'で親要素のフォントサイズを基準に
+            // baseFontSize: '1em', // これはKaTeX 0.11.0で非推奨/削除された可能性あり
+            // minRuleThickness: 0.04, // 分数線などの最小の太さ (em単位)
+            // strict: false, // 警告を無効にする（デバッグ時以外は非推奨）
+            // trust: true, // 危険なコマンドも許可
+            // output: 'html', // 出力形式 (デフォルトはhtml)
+            // baseSize: 1.0, // KaTeXの内部的なベースサイズ。これも試す価値あり
+            // displayModeがfalseの場合はinline math mode
+            // KaTeXはデフォルトで数式を小さくするが、その挙動を打ち消すのは難しい
+            // 主な問題はCSS側にある可能性が高い
+          });
+        } catch (e) {
+          console.error('KaTeX: Rendering error:', e, 'Formula:', part.value);
+          mathSpan.innerHTML = `<span style="color: red; font-size: inherit;">[数式エラー: ${part.value}]</span>`;
         }
-      } else {
-        console.warn('KaTeXDisplay: Invalid part in array:', part);
-        // 無効なパートは無視するか、エラー文字列を追加する
       }
     });
 
-    hasRenderedOnce = true; // 初回レンダリングが完了
-    lastProcessedContent = currentContentJson; // 正常にレンダリングされた内容を記憶
+    hasRenderedOnce = true;
+    lastProcessedContent = currentContentJson;
   }
 
-  // 初回レンダリングと、コンテンツ変更時のレンダリングをトリガー
-  let hasRenderedOnce = false; // レンダリングが一度行われたかのフラグ
-
   onMount(() => {
-    // コンポーネントが DOM にマウントされたら初回レンダリング
     setTimeout(() => {
       parseAndRenderContent();
-    }, 50); // 50ms 遅延
+    }, 50);
   });
 
-  // textContent または displayMode が変更されたら再レンダリングをトリガー
   $: textContent, displayMode, parseAndRenderContent();
 </script>
 
 <span bind:this={container} class="{fontSizeClass} {textColor}"></span>
 
 <style>
-  /* スタイルは変更なし */
+  /* app.css と連携して正しく動作するはず */
+  /* ここでKaTeXが生成する要素へのカスタムリセットを最小限に抑える */
+  /* globalセレクタを使う場合は非常に慎重に */
+
+  /* KaTeXによって生成される数式表示要素の基本スタイル */
   :global(.katex),
   :global(.katex-display) {
+
   }
+
+  /* ディスプレイモード数式はブロック要素 */
   :global(.katex-display) {
+
   }
+
+  /* KaTeX内部のspan要素などへの影響を最小限に */
   :global(.katex span) {
+
   }
+
+
 </style>
