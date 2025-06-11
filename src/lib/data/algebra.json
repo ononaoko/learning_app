@@ -48,7 +48,7 @@
           { "type": "text", "value": " の反対側に移動すると割り算に変わるよ。" }
         ],
         "expression": [
-          { "type": "math", "value": "x=\\frac{10}{2}" }
+          { "type": "math", "value": "x=\\dfrac{10}{2}" }
         ]
       }
     ]
@@ -81,12 +81,12 @@
           { "type": "text", "value": " で割ってみよう。" }
         ],
         "expression": [
-          { "type": "math", "value": "y = \\frac{9}{3}" }
+          { "type": "math", "value": "y = \\dfrac{9}{3}" }
         ]
       },
       {
         "explanation": [
-          { "type": "math", "value": "y = \\frac{9}{3}" },
+          { "type": "math", "value": "y = \\dfrac{9}{3}" },
           { "type": "text", "value": "。分数を計算しよう。" }
         ],
         "expression": [
@@ -182,7 +182,7 @@
           { "type": "text", "value": " 2 」で求められるよ。" }
         ],
         "expression": [
-          { "type": "math", "value": "\\frac{6 \\times 5}{2}" }
+          { "type": "math", "value": "\\dfrac{6 \\times 5}{2}" }
         ]
       },
       {
@@ -239,7 +239,7 @@
           { "type": "text", "value": " で割ろう。" }
         ],
         "expression": [
-          { "type": "math", "value": "x = \\frac{15}{3}" }
+          { "type": "math", "value": "x = \\dfrac{15}{3}" }
         ]
       }
     ]
@@ -256,7 +256,7 @@
     ],
     "answer": [
       { "type": "text", "value": "答えは" },
-      { "type": "math", "value": "\\frac{2}{5}" },
+      { "type": "math", "value": "\\dfrac{2}{5}" },
       { "type": "text", "value": "です。" }
     ],
     "hints": [
@@ -277,7 +277,7 @@
           { "type": "text", "value": " 全ての場合の数」だよ。" }
         ],
         "expression": [
-          { "type": "math", "value": "\\frac{\\text{赤玉の数}}{\\text{全体の玉の数}} = \\frac{4}{10}" }
+          { "type": "math", "value": "\\dfrac{\\text{赤玉の数}}{\\text{全体の玉の数}} = \\dfrac{4}{10}" }
         ]
       },
       {
@@ -285,7 +285,7 @@
           { "type": "text", "value": "分数を最も簡単な形にしよう。" }
         ],
         "expression": [
-          { "type": "math", "value": "\\frac{4}{10} = \\frac{2}{5}" }
+          { "type": "math", "value": "\\dfrac{4}{10} = \\dfrac{2}{5}" }
         ]
       }
     ]
@@ -396,7 +396,7 @@
           { "type": "text", "value": " と考えたとき、女子の割合はいくらになるかな？" }
         ],
         "expression": [
-          { "type": "math", "value": "\\frac{5}{8}" }
+          { "type": "math", "value": "\\dfrac{5}{8}" }
         ]
       },
       {
@@ -404,7 +404,7 @@
           { "type": "text", "value": "全生徒数に女子の割合を掛けてみよう。" }
         ],
         "expression": [
-          { "type": "math", "value": "800 \\times \\frac{5}{8}" }
+          { "type": "math", "value": "800 \\times \\dfrac{5}{8}" }
         ]
       }
     ]

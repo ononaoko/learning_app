@@ -2,12 +2,13 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { slide, fly, scale } from 'svelte/transition';
+  import { slide, fly, scale } from 'svelte/transition'; // slide, fly, scaleをインポート
   import IconClose from '$lib/components/IconClose.svelte';
   import IconCircle from '$lib/components/IconCircle.svelte';
   import IconHamburger from '$lib/components/IconHamburger.svelte';
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import KaTeXDisplay from '$lib/components/KaTeXDisplay.svelte'; // KaTeXDisplayをインポート
+  import KaTeXDisplay from '$lib/components/KaTeXDisplay.svelte';
+  import ProgressBar from '$lib/components/ProgressBar.svelte';
 
   let unit = $page.params.unit;
   let unitName = '';
@@ -103,7 +104,7 @@
   {#if problems.length > 0 && currentProblemIndex < problems.length}
     <div class="w-full h-full">
       <div class="flex items-center mt-6 mb-6">
-        <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-300 text-stone-700 text-3xl font-thin mr-4">
+        <span class="inline-flex items-center justify- Adin w-10 h-10 rounded-full bg-teal-300 text-stone-700 text-3xl font-thin mr-4">
           {currentProblemIndex + 1}
         </span>
         <p class="text-2xl text-stone-700 font-light leading-loose">
@@ -113,28 +114,34 @@
 
       <div class="mb-4">
         {#each problems[currentProblemIndex].hints as hint, index}
-          <div class="flex items-start mb-3"
-               style="display: {index < currentHintIndex ? 'flex' : 'none'};"
-          >
-            <div class="w-1/2 ml-14">
-              <p class="text-2xl text-teal-500 leading-loose">
-                <KaTeXDisplay textContent={hint.expression} displayMode={false} fontSizeClass="text-2xl" textColor="text-teal-500" />
-              </p>
+          {#if index < currentHintIndex}
+            <div
+              class="flex items-center py-4"
+              in:slide={{ duration: 300 }}
+              out:slide={{ duration: 300 }}
+            >
+              <div class="w-1/2 ml-14">
+                <p class="text-2xl text-teal-500 leading-loose">
+                  <KaTeXDisplay textContent={hint.expression} displayMode={false} fontSizeClass="text-2xl" textColor="text-teal-500" />
+                </p>
+              </div>
+              <div
+                class="w-1/2 text-left bg-white rounded-md p-3 ml-4 shadow-md"
+                in:fly="{{ x: 200, duration: 400 }}"
+              >
+                <p class="text-lg text-stone-700 leading-loose">
+                  <KaTeXDisplay textContent={hint.explanation} displayMode={false} fontSizeClass="text-lg" textColor="text-stone-700" />
+                </p>
+              </div>
             </div>
-            <div class="w-1/2 text-left bg-white rounded-md p-3 ml-4 shadow-md">
-              <p class="text-lg text-stone-700 leading-loose">
-                <KaTeXDisplay textContent={hint.explanation} displayMode={false} fontSizeClass="text-lg" textColor="text-stone-700" />
-              </p>
-            </div>
-          </div>
-          {#if index < problems[currentProblemIndex].hints.length - 1}
-            <hr class="border-t border-dashed my-2 border-gray-400"
-                style="display: {index < currentHintIndex - 1 ? 'block' : 'none'};"
-            />
+            {#if index < problems[currentProblemIndex].hints.length - 1}
+              <hr class="border-t border-dashed my-2 border-gray-400"
+                  style="display: {index < currentHintIndex - 1 ? 'block' : 'none'};"
+              />
+            {/if}
           {/if}
         {/each}
       </div>
-
       <div class="flex justify-end space-x-4 mb-4 text-lg self-end">
         {#if !showAnswerArea && currentHintIndex < problems[currentProblemIndex].hints.length}
           <button
@@ -155,7 +162,7 @@
       </div>
 
       {#if showAnswerArea}
-        <div in:scale={{ start: 0.5 }} class="rounded-md shadow-lg p-4 mt-4 bg-white flex flex-row space-x-8">
+        <div in:scale={{ start: 0.5 }} class="rounded-md shadow-lg p-4 bg-white flex flex-row space-x-8">
           <div class="ml-10 text-2xl w-1/2">
             <h3 class="font-bold text-teal-500">解答</h3>
             <hr class="border-t border-solid my-2 border-teal-400" />
@@ -185,4 +192,12 @@
   {:else}
     <p class="p-16">問題がありません。</p>
   {/if}
+
+  <ProgressBar current={currentProblemIndex + 1} total={problems.length} />
 </main>
+
+<style>
+  :global(body) {
+    overflow-x: hidden;
+  }
+</style>
