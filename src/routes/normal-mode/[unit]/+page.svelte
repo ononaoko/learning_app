@@ -9,6 +9,10 @@
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import KaTeXDisplay from '$lib/components/KaTeXDisplay.svelte';
   import ProgressBar from '$lib/components/ProgressBar.svelte';
+  import SpeechInputButton from '$lib/components/SpeechInputButton.svelte';
+  import ProblemDisplay from '$lib/components/ProblemDisplay.svelte';
+  import HintSection from '$lib/components/HintSection.svelte';
+  import AnswerInputAndEvaluation from '$lib/components/AnswerInputAndEvaluation.svelte';
 
   let unit = $page.params.unit;
   let unitName = '';
@@ -25,6 +29,8 @@
   let showAnswerArea = false;
   let currentHintIndex = 0; // 現在表示されているヒントの数
   let errorMessage = '';
+  let showAllHints = false;
+  let results = []; // 各問題の正誤を記録する配列
 
   async function loadProblems(unit) {
     try {
@@ -57,32 +63,50 @@
     isOpen = false;
   }
 
-  function showNextHint() {
+    // HintSection からのイベントハンドラ
+    function handleShowNextHintEvent() {
+    // currentHintIndex の更新は、引き続きこの親コンポーネントで行います
     if (problems[currentProblemIndex].hints && currentHintIndex < problems[currentProblemIndex].hints.length) {
       currentHintIndex++; // 表示するヒントの数を増やす
     }
   }
 
-  function showAnswer() {
+  // 回答入力エリアを表示する関数
+  function showAnswerInput() {
     showAnswerArea = true;
-    currentHintIndex = problems[currentProblemIndex].hints.length; // 解答表示時は全てのヒントを表示済みにする
+    // AnswerInputAndEvaluation 内で状態がリセットされるため、ここでは不要
+    // userAnswer = '';
+    // showResult = false;
+    // recognitionError = '';
   }
 
-  let results = []; // 各問題の正誤を記録する配列
-
-  function recordAnswer(isCorrect) {
+  // AnswerInputAndEvaluation から呼ばれる recordAnswer 関数
+  function recordAnswer(event) {
+    const isCorrect = event.detail.isCorrect;
     console.log('正解:', isCorrect);
-    results = [...results, isCorrect]; // 結果を配列に追加
-    nextProblem();
-  }
 
+    if (!isCorrect) {
+      results = [...results, isCorrect];
+      nextProblem(); // 正解の場合のみ次の問題へ
+    } else {
+
+      }
+  }
+  // AnswerInputAndEvaluation から呼ばれる nextProblem 関数 (AnswerInputAndEvaluation内からは直接呼ばれない)
   function nextProblem() {
     currentProblemIndex++;
-    showAnswerArea = false;
+    showAnswerArea = false; // 次の問題へ進む際に回答エリアを非表示
     currentHintIndex = 0; // 次の問題のためにヒントカウンターをリセット
+    // AnswerInputAndEvaluation 内で showResult はリセットされるため、ここでは不要
+    // showResult = false;
     if (currentProblemIndex >= problems.length) {
+      showAllHints = false;
       goto('/normal-mode/result', { state: { results: results, totalQuestions: problems.length, unitName: unitName} });
     }
+  }
+
+  function proceedToNextProblem() { // 関数名を変更し、より明確に
+    nextProblem();
   }
 </script>
 
@@ -91,6 +115,7 @@
 </svelte:head>
 
 <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">
+  <!-- ヘッダー -->
   <header class="bg-teal-300 shadow-lg w-full p-6 rounded-md relative">
     <div class="flex items-center justify-between">
       <h1 class="text-4xl font-bold text-stone-700">演習 : {unitName}</h1>
@@ -101,90 +126,43 @@
     <AppNavigation isOpen={isOpen} />
   </header>
 
+  <!-- 問題表示 -->
   {#if problems.length > 0 && currentProblemIndex < problems.length}
     <div class="w-full h-full">
-      <div class="flex items-center mt-6 mb-6">
-        <span class="inline-flex items-center justify- Adin w-10 h-10 rounded-full bg-teal-300 text-stone-700 text-3xl font-thin mr-4">
-          {currentProblemIndex + 1}
-        </span>
-        <p class="text-2xl text-stone-700 font-light leading-loose">
-          <KaTeXDisplay textContent={problems[currentProblemIndex].question} displayMode={false} fontSizeClass="text-2xl" textColor="text-stone-700" />
-        </p>
-      </div>
+      <ProblemDisplay
+        problemNumber={currentProblemIndex + 1}
+        questionContent={problems[currentProblemIndex].question}
+      />
 
-      <div class="mb-4">
-        {#each problems[currentProblemIndex].hints as hint, index}
-          {#if index < currentHintIndex}
-            <div
-              class="flex items-center py-4"
-              in:slide={{ duration: 300 }}
-              out:slide={{ duration: 300 }}
-            >
-              <div class="w-1/2 ml-14">
-                <p class="text-2xl text-teal-500 leading-loose">
-                  <KaTeXDisplay textContent={hint.expression} displayMode={false} fontSizeClass="text-2xl" textColor="text-teal-500" />
-                </p>
-              </div>
-              <div
-                class="w-1/2 text-left bg-white rounded-md p-3 ml-4 shadow-md"
-                in:fly="{{ x: 200, duration: 400 }}"
-              >
-                <p class="text-lg text-stone-700 leading-loose">
-                  <KaTeXDisplay textContent={hint.explanation} displayMode={false} fontSizeClass="text-lg" textColor="text-stone-700" />
-                </p>
-              </div>
-            </div>
-            {#if index < problems[currentProblemIndex].hints.length - 1}
-              <hr class="border-t border-dashed my-2 border-gray-400"
-                  style="display: {index < currentHintIndex - 1 ? 'block' : 'none'};"
-              />
-            {/if}
-          {/if}
-        {/each}
-      </div>
+      <HintSection
+        hints={problems[currentProblemIndex].hints}
+        currentHintIndex={currentHintIndex}
+        showAnswerArea={showAnswerArea}
+        showAllHints={showAllHints}
+        on:showNextHint={handleShowNextHintEvent}
+      />
+      <!-- 回答ボタン -->
       <div class="flex justify-end space-x-4 mb-4 text-lg self-end">
-        {#if !showAnswerArea && currentHintIndex < problems[currentProblemIndex].hints.length}
-          <button
-            class="w-[calc(25%-1.5rem)] bg-yellow-300 border-yellow-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#facc15] hover:[box-shadow:0_0px_0_0_#facc15] hover:border-b-[0px] hover:translate-y-2 text-stone-800 text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
-            on:click={showNextHint}
-          >
-            ヒント
-          </button>
-        {/if}
         {#if !showAnswerArea}
           <button
             class="w-[calc(25%-1.5rem)] bg-teal-300 border-teal-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#14b8a6] hover:[box-shadow:0_0px_0_0_#14b8a6] hover:border-b-[0px] hover:translate-y-2 text-stone-800 text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
-            on:click={showAnswer}
+            on:click={showAnswerInput}
           >
-            解答を見る
+            回答をする
           </button>
         {/if}
       </div>
 
+      <!-- 回答入力 -->
       {#if showAnswerArea}
-        <div in:scale={{ start: 0.5 }} class="rounded-md shadow-lg p-4 bg-white flex flex-row space-x-8">
-          <div class="ml-10 text-2xl w-1/2">
-            <h3 class="font-bold text-teal-500">解答</h3>
-            <hr class="border-t border-solid my-2 border-teal-400" />
-            <p class="text-stone-600 mb-2 leading-loose">
-              <KaTeXDisplay textContent={problems[currentProblemIndex].answer} displayMode={false} fontSizeClass="text-stone-600" textColor="text-stone-600" />
-            </p>
-          </div>
-          <div class="w-1/2 flex flex-grow flex-col items-center justify-center">
-            <h2 class="text-2xl font-bold text-stone-700">正誤を記録してください。</h2>
-            <div class="flex justify-center space-x-4 my-2 w-full">
-              <button
-                class="bg-red-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#ef4444,0_15px_0_0_#e5e7eb] hover:[box-shadow:0_0px_0_0_#ef4444,0_0px_0_0_#e5e7eb] hover:border-b-[0px] hover:translate-y-2 border-red-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow"
-                on:click={() => recordAnswer(true)}><IconCircle width="48" height="48" /></button
-              >
-              <button
-                class="bg-blue-400 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#e5e7eb] hover:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#e5e7eb] hover:border-b-[0px] hover:translate-y-2 border-blue-500 text-white font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow"
-                on:click={() => recordAnswer(false)}><IconClose width="48" height="48" /></button
-              >
-            </div>
-          </div>
-        </div>
+        <AnswerInputAndEvaluation
+          currentProblemAnswer={problems[currentProblemIndex].answer}
+          handleProceedToNextProblem={proceedToNextProblem}
+          handleShowAllHints={() => { showAllHints = true; showAnswerArea = false; }}
+          on:recordAnswer={recordAnswer}
+        />
       {/if}
+
     </div>
   {:else if problems.length > 0}
     <p class="text-xl font-semibold">単元クリア！お疲れ様でした。</p>

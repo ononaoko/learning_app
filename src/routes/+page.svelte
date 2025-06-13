@@ -146,7 +146,7 @@
 			{/if}
 		  </div>
 		  <button
-		  class=" bg-teal-400 text-white w-1/2 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#14b8a6,0_10px_0_0_#d1d5db] hover:[box-shadow:0_0px_0_0_#14b8a6,0_0px_0_0_#d1d5db] hover:border-b-[0px] hover:translate-y-2 border-teal-400  font-bold py-4 rounded-md focus:outline-none focus:shadow-outline"
+		  class=" bg-teal-400 text-white w-1/2 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#14b8a6,0_10px_0_0_#d1d5db] hover:[box-shadow:0_0px_0_0_#14b8a6,0_0px_0_0_#d1d5db] hover:border-b-[0px] hover:translate-y-2 border-teal-500  font-bold py-4 rounded-md focus:outline-none focus:shadow-outline"
 		  			type="button"
 			on:click={loginExistingUser}
 			disabled={!existingUserNickname}
