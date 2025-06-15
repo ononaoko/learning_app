@@ -3,15 +3,15 @@
   import { scale } from 'svelte/transition';
   import KaTeXDisplay from '$lib/components/KaTeXDisplay.svelte';
   import MicrophoneButton from '$lib/components/MicrophoneButton.svelte';
-  // IconClose と IconCircle はもう使わないので、IconClose2 と IconCircle2 をインポートします
   import IconClose from '$lib/components/IconClose.svelte';
   import IconCircle from '$lib/components/IconCircle.svelte';
+  import TealButton from '$lib/components/TealButton.svelte';
 
   const dispatch = createEventDispatcher();
 
   export let currentProblemAnswer = [];
   export let handleProceedToNextProblem; // 親から受け取る「次の問題へ進む」関数
-  export let handleShowAllHints; // 親から受け取る「すべてのヒントを表示する」関数
+  export let currentProblemAcceptableAnswers = [];
 
   let userAnswer = '';
   let showResult = false;
@@ -26,29 +26,28 @@
   }
 
   function checkAnswer() {
-    const correctAnswerParts = currentProblemAnswer;
-    let normalizedCorrectAnswer = '';
+    const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
 
-    correctAnswerParts.forEach(part => {
-        normalizedCorrectAnswer += part.value;
+    isCorrectAnswer = currentProblemAcceptableAnswers.some(acceptableAnswer => {
+      const normalizedAcceptableAnswer = acceptableAnswer.trim().toLowerCase().replace(/\s/g, '');
+      return normalizedUserAnswer === normalizedAcceptableAnswer;
     });
 
-    const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
-    const normalizedProblemAnswer = normalizedCorrectAnswer.trim().toLowerCase().replace(/\s/g, '');
-
-    if (normalizedUserAnswer === normalizedProblemAnswer) {
-        isCorrectAnswer = true;
-    } else {
-        isCorrectAnswer = false;
-    }
-
-    showResult = true;
+    showResult = true; // ★正解・不正解にかかわらず結果を表示する★
+    // ここではまだ dispatch('recordAnswer') しない。
+    // ボタンがクリックされたときに dispatch して親に伝える。
   }
 
   function resetState(){ // 新しい関数
     userAnswer = '';
     showResult = false;
     isCorrectAnswer = false;
+  }
+
+  function handleNextButtonClick() {
+    dispatch('recordAnswer', { isCorrect: isCorrectAnswer });
+    handleProceedToNextProblem(); // 親から渡された次の問題へ進む関数を実行
+    resetState(); // このコンポーネントの状態をリセット
   }
 
   $: currentProblemAnswer, resetState();
@@ -70,13 +69,12 @@
       />
     </div>
 
-    <button
-    class="bg-teal-400 border-teal-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#14b8a6] hover:[box-shadow:0_0px_0_0_#14b8a6] hover:border-b-[0px] hover:translate-y-2 text-white text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
-    on:click={checkAnswer}
-      disabled={!userAnswer.trim() || showResult}
-    >
-      回答を送信
-    </button>
+    <TealButton
+  text="回答を送信"
+  onClick={checkAnswer}
+  disabled={!userAnswer.trim() || showResult}
+/>
+
   {/if}
 
   {#if showResult}
@@ -95,25 +93,9 @@
           </p>
         </div>
         {#if isCorrectAnswer}
-      <button
-        class=" bg-teal-400 border-teal-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#14b8a6] hover:[box-shadow:0_0px_0_0_#14b8a6] hover:border-b-[0px] hover:translate-y-2 text-white text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
-        on:click={() => { dispatch('recordAnswer', { isCorrect: true }); handleProceedToNextProblem(); resetState(); }}
-      >
-        次の問題へ
-      </button>
+        <TealButton text="次の問題へ" onClick={handleNextButtonClick} />
       {:else}
-            <button
-        class="bg-blue-400 border-blue-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#2563eb] hover:[box-shadow:0_0px_0_0_#2563eb] hover:border-b-[0px] hover:translate-y-2 text-white text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
-        on:click={() => { handleShowAllHints(); resetState(); }}
-      >
-        解説を見る
-      </button>
-      <button
-        class="mt-4 bg-gray-400 border-gray-500 border-b-[1px] transition-all duration-150 [box-shadow:0_5px_0_0_#6b7280] hover:[box-shadow:0_0px_0_0_#6b7280] hover:border-b-[0px] hover:translate-y-2 text-white text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
-        on:click={() => { handleProceedToNextProblem(); resetState(); }}
-      >
-        次の問題へ
-      </button>
+      <TealButton text="次の問題へ" onClick={handleNextButtonClick} />
       {/if}
     </div>
   {/if}

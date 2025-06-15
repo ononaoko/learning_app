@@ -9,6 +9,14 @@
       { "type": "math", "value": "x=5" },
       { "type": "text", "value": "です。" }
     ],
+    "acceptableAnswers": [
+      "x=5",
+      "5",
+      "ご",
+      "エックスイコールご",
+      "エックスはご",
+      "ファイブ"
+    ],
     "hints": [
       {
         "explanation": [
@@ -61,6 +69,14 @@
     "answer": [
       { "type": "math", "value": "y=3" }
     ],
+    "acceptableAnswers": [
+      "y=3",
+      "3",
+      "さん",
+      "ワイイコールさん",
+      "ワイはさん",
+      "スリー"
+    ],
     "hints": [
       {
         "explanation": [
@@ -105,6 +121,12 @@
       { "type": "math", "value": "-1" },
       { "type": "text", "value": "です。" }
     ],
+    "acceptableAnswers": [
+      "-1",
+      "マイナス1",
+      "いち",
+      "マイナスいち"
+    ],
     "hints": [
       {
         "explanation": [
@@ -135,6 +157,12 @@
       { "type": "text", "value": "答えは" },
       { "type": "math", "value": "-1" },
       { "type": "text", "value": "です。" }
+    ],
+    "acceptableAnswers": [
+      "-1",
+      "マイナス1",
+      "いち",
+      "マイナスいち"
     ],
     "hints": [
       {
@@ -171,6 +199,15 @@
       { "type": "text", "value": "答えは" },
       { "type": "math", "value": "15 \\text{cm}^2" },
       { "type": "text", "value": "です。" }
+    ],
+    "acceptableAnswers": [
+      "15",
+      "じゅうご",
+      "いちご",
+      "じゅうご平方センチメートル",
+      "15平方センチメートル",
+      "15cm2",
+      "じゅうごしーえむにじょう"
     ],
     "hints": [
       {
@@ -209,6 +246,11 @@
       { "type": "text", "value": "答えは" },
       { "type": "math", "value": "5" },
       { "type": "text", "value": "です。" }
+    ],
+    "acceptableAnswers": [
+      "5",
+      "ご",
+      "ファイブ"
     ],
     "hints": [
       {
@@ -259,6 +301,12 @@
       { "type": "math", "value": "\\dfrac{2}{5}" },
       { "type": "text", "value": "です。" }
     ],
+    "acceptableAnswers": [
+      "2/5",
+      "ごぶんのに",
+      "5分の2",
+      "0.4"
+    ],
     "hints": [
       {
         "explanation": [
@@ -303,6 +351,13 @@
       { "type": "math", "value": "6\\pi \\text{cm}" },
       { "type": "text", "value": "です。" }
     ],
+    "acceptableAnswers": [
+      "6pi",
+      "6パイ",
+      "ろくパイ",
+      "6pi cm",
+      "ろくパイシーエム"
+    ],
     "hints": [
       {
         "explanation": [
@@ -345,6 +400,15 @@
       { "type": "math", "value": "12 \\text{km}" },
       { "type": "text", "value": "です。" }
     ],
+    "acceptableAnswers": [
+      "12",
+      "じゅうに",
+      "いちに",
+      "12キロ",
+      "じゅうにキロ",
+      "12km",
+      "じゅうにけーえむ"
+    ],
     "hints": [
       {
         "explanation": [
@@ -379,6 +443,12 @@
       { "type": "math", "value": "500" },
       { "type": "text", "value": "人" },
       { "type": "text", "value": "です。" }
+    ],
+    "acceptableAnswers": [
+      "500",
+      "ごひゃく",
+      "500人",
+      "ごひゃくにん"
     ],
     "hints": [
       {
