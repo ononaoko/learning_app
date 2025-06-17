@@ -37,14 +37,10 @@
         <IconHamburger width="48" height="48" isOpen={isOpen} />
       </button>
     </div>
-    {#if isOpen}
-      <nav transition:slide={{ duration: 200 }} class="absolute top-[calc(100%-1rem)] right-[1rem] w-1/3 bg-white shadow-lg rounded-md z-10">
-        <button class="block text-gray-700 py-4 px-6 hover:bg-gray-100 rounded-md w-full text-left" on:click={goToTop}>ホーム</button>
-      </nav>
-    {/if}
+    <AppNavigation isOpen={isOpen} />
   </header>
 
-  <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-8 mt-8">
+  <div class="w-full bg-white shadow-lg rounded-lg p-8 mt-8">
     <h2 class="text-3xl font-bold text-gray-700 text-center mb-6">単元選択</h2>
 
     {#each units as category (category.name)}
@@ -53,7 +49,7 @@
           {category.name}
         </h3>
         {#if category.sub_units}
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {#each category.sub_units as subcategory (subcategory.name)}
               <div class="bg-gray-100 p-4 rounded-lg shadow-sm">
                 <h4 class="text-xl font-semibold text-gray-800 mb-3">{subcategory.name}</h4>

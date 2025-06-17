@@ -20,8 +20,13 @@
     isOpen = !isOpen;
   }
 
-  function goToTop() {
-    goto('/');
+  function goToDashboard() {
+    goto('/dashboard');
+    isOpen = false; // メニューを閉じる
+  }
+
+  function goToNormalMode() {
+    goto('/normal-mode');
     isOpen = false; // メニューを閉じる
   }
 
@@ -114,10 +119,10 @@
           <AvatarMessage message={resultMessage} />
         </div>
         <div class="w-[calc(33.33%-1rem)] space-x-4 flex">
-          <button on:click={goToTop} class=" bg-teal-400 text-white w-1/2 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#14b8a6,0_15px_0_0_#d1d5db] hover:[box-shadow:0_0px_0_0_#14b8a6,0_0px_0_0_#d1d5db] hover:border-b-[0px] hover:translate-y-2 border-teal-400 text-2xl font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow">
+          <button on:click={goToNormalMode} class=" bg-teal-400 text-white w-1/2 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#14b8a6,0_15px_0_0_#d1d5db] hover:[box-shadow:0_0px_0_0_#14b8a6,0_0px_0_0_#d1d5db] hover:border-b-[0px] hover:translate-y-2 border-teal-400 text-2xl font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow">
             ユニット選択へ戻る
         </button>
-        <button on:click={goToTop} class=" bg-teal-600 text-white w-1/2 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#0f766e,0_15px_0_0_#a8a29e] hover:[box-shadow:0_0px_0_0_#0f766e,0_0px_0_0_#1b70f841] hover:border-b-[0px] hover:translate-y-2 border-teal-600 text-2xl font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow">
+        <button on:click={goToDashboard} class=" bg-teal-600 text-white w-1/2 border-b-[1px] transition-all duration-150 [box-shadow:0_10px_0_0_#0f766e,0_15px_0_0_#a8a29e] hover:[box-shadow:0_0px_0_0_#0f766e,0_0px_0_0_#1b70f841] hover:border-b-[0px] hover:translate-y-2 border-teal-600 text-2xl font-bold py-4 rounded-md focus:outline-none focus:shadow-outline flex items-center justify-center flex-grow">
           トップへ戻る
         </button></div>
       </div>

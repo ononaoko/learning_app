@@ -5,6 +5,8 @@
     import { slide } from 'svelte/transition'; // slide トランジションをインポート
     import IconHamburger from '$lib/components/IconHamburger.svelte';
     import AppNavigation from '$lib/components/AppNavigation.svelte'; // 新しいナビゲーションコンポーネントをインポート
+    import IconGhost from '$lib/components/IconGhost.svelte';
+    import TealButton from '$lib/components/TealButton.svelte';
 
     let isOpen = false; // メニューの開閉状態
 
@@ -12,44 +14,45 @@ function toggleMenu() {
   isOpen = !isOpen;
 }
 
-    let showEbbinghausList = true; // リストの表示/非表示を管理する変数
+    // 学習記録データ (初期値は空かデフォルト値)
+    let totalLearningSessions = 0;
+    let consecutiveLearningDays = 0;
+    let unitStats = [];
+    let problemCorrectness = [];
+    let learningTime = {};
+    let achievements = [];
+    let progressRates = [];
+    let weakestProblems = [];
 
-  function toggleEbbinghausList() {
-    showEbbinghausList = !showEbbinghausList; // クリックで表示状態を反転
-  }
-    // ユーザー表示欄の仮データ（後で実際のデータに置き換えます）
-    let totalLearningSessions = 15; // 累計学習回数
-    let consecutiveLearningDays = 7; // 連続学習日数
-
-    // 学習統計データ表示欄の仮データ（後でChart.jsなどと連携します）
-    let unitStats = [
-      { unit: '代数', sessions: 10, correctness: 70, hintsUsed: 1.5 },
-      { unit: '図形', sessions: 5, correctness: 85, hintsUsed: 0.8 }
-    ];
-    let problemCorrectness = [
-      { problem: '問題1', correctness: 80 },
-      { problem: '問題2', correctness: 20 }, // 苦手問題の例
-      { problem: '問題3', correctness: 95 }
-    ];
-    let learningTime = {
-      '2025/05/15': '30分',
-      '2025/05/16': '25分',
-      average: '15分'
-    };
-    let achievements = ['5回連続正解', '代数マスター']; // 達成バッジ
-    let progressRates = [{ unit: '代数', covered: 8, total: 10 }]; // 進捗率
-    let weakestProblems = [
-      { problem: '問題2', correctness: 20 },
-      { problem: '問題4', correctness: 40 }
-    ]; // 苦手問題ランキング
+    // ★追加: 学習統計データをロードする関数★
+    async function loadLearningStats() {
+        try {
+            const response = await fetch('/api/learning-stats'); // APIエンドポイントからデータをフェッチ
+            if (response.ok) {
+                const data = await response.json();
+                totalLearningSessions = data.totalLearningSessions;
+                consecutiveLearningDays = data.consecutiveLearningDays;
+                unitStats = data.unitStats;
+                problemCorrectness = data.problemCorrectness;
+                learningTime = data.learningTime;
+                achievements = data.achievements;
+                progressRates = data.progressRates;
+                weakestProblems = data.weakestProblems;
+                console.log('学習統計データをロードしました:', data);
+            } else {
+                console.error('学習統計データのロードに失敗しました:', response.statusText);
+            }
+        } catch (error) {
+            console.error('学習統計データのロード中にエラーが発生しました:', error);
+        }
+    }
 
     onMount(() => {
-      // ダッシュボードロード時に必要なデータをフェッチまたは計算する
-      // 例: updateLearningStats(); // 後で実装
+      loadLearningStats(); // コンポーネントがマウントされたときにデータをロード
     });
 
     function goToNormalMode() {
-      goto('/normal-mode'); // 通常モード（単元選択ページ）へ遷移
+      goto('/normal-mode');
     }
 
     function goToReviewMode() {
@@ -72,10 +75,13 @@ function toggleMenu() {
     <title>算数学習アプリ - ダッシュボード</title>
   </svelte:head>
 
-  <main class="flex flex-col items-center min-h-screen bg-gray-100 p-8">
+  <main class="flex flex-col gap-8 items-center min-h-screen bg-gray-100 p-8">
     <header class="bg-teal-300 shadow-lg w-full p-6 rounded-md relative">
         <div class="flex items-center justify-between">
-          <h1 class="text-4xl font-bold text-stone-700">通常モード</h1>
+          <div class="flex items-center">
+            <IconGhost />
+            <h1 class="text-4xl font-bold text-stone-700">ようこそ、{$nickname} さん！</h1>
+          </div>
           <button class="focus:outline-none" on:click={toggleMenu} aria-label="メニューを開閉">
             <IconHamburger width="48" height="48" isOpen={isOpen} />
           </button>
@@ -84,70 +90,48 @@ function toggleMenu() {
       </header>
 
 
-    <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg p-8 space-y-8">
-        <section class="w-full flex flex-col items-center space-y-6 pb-6 border-b border-gray-200">
-          <h2 class="text-3xl font-bold text-gray-700">
-            <button class="focus:outline-none cursor-pointer p-2 rounded-md hover:bg-gray-100" on:click={toggleEbbinghausList}>
-              エビングハウス通知
-              {#if showEbbinghausList}
-                <span class="ml-2">▲</span>
-              {:else}
-                <span class="ml-2">▼</span>
-              {/if}
-            </button>
-          </h2>
-            {#if showEbbinghausList}
-              <ul transition:slide={{ duration: 300 }} class="flex flex-col space-y-4 w-full max-w-xl">
-                <li class="flex items-center justify-between border border-solid border-stone-400 bg-stone-50 hover:bg-stone-100 rounded-full py-2 pl-6 pr-2">
-                  <p class="text-md text-gray-700">1回目の復習単元が○個あります</p>
-                  <button class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-1 px-3 rounded-full text-sm">復習</button>
-                </li>
-                <li class="flex items-center justify-between border border-solid border-stone-400 bg-stone-50 hover:bg-stone-100 rounded-full py-2 px-6 pr-2">
-                  <p class="text-md text-gray-700">2回目の復習単元の○個あります</p>
-                  <button class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-1 px-3 rounded-full text-sm">復習</button>
-                </li>
-                <li class="flex items-center justify-between border border-solid border-stone-400 bg-stone-50 hover:bg-stone-100 rounded-full py-2 px-6 pr-2">
-                  <p class="text-md text-gray-700">3回目の復習単元が○個あります</p>
-                  <button class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-1 px-3 rounded-full text-sm">復習</button>
-                </li>
-                <li class="flex items-center justify-between border border-solid border-stone-400 bg-stone-50 hover:bg-stone-100 rounded-full py-2 px-6 pr-2">
-                  <p class="text-md text-gray-700">4回目の復習単元が○個あります</p>
-                  <button class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-1 px-3 rounded-full text-sm">復習</button>
-                </li>
-              </ul>
-            {/if}
-          </section>
-      <section class="text-center border-b pb-6 border-gray-200">
-        <h2 class="text-3xl font-bold text-teal-500 mb-4">ようこそ、{$nickname} さん！</h2>
-        <div class="flex justify-center space-x-8">
-          <div class="p-4 bg-teal-100 rounded-lg shadow-sm">
-            <p class="text-xl font-semibold text-gray-700">累計学習回数</p>
-            <p class="text-4xl font-bold text-teal-700">{totalLearningSessions} 回</p>
+    <div class="w-full bg-white shadow-lg rounded-lg p-8 space-y-8">
+
+      <section class="flex flex-col items-center pb-8 border-b border-gray-200">
+        <div class="max-w-2xl space-y-8 md:space-y-0 w-full">
+          <div class="flex flex-col md:flex-row items-center gap-4 h-24">
+            <TealButton
+            text="演習モード"
+            onClick={goToNormalMode}
+            widthClass="w-[300px]"
+            buttonColorClass="bg-teal-300"
+            borderColorClass="border-teal-500"     shadowColorClass="[box-shadow:0_5px_0_0_#14b8a6]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#14b8a6]"
+            textColorClass="text-stone-700"
+          />
+          <p class="text-stone-700">過去問を演習して実力を測定</p>
           </div>
-          <div class="p-4 bg-teal-100 rounded-lg shadow-sm">
-            <p class="text-xl font-semibold text-gray-700">連続学習日数</p>
-            <p class="text-4xl font-bold text-teal-700">{consecutiveLearningDays} 日</p>
+          <div class="flex flex-col md:flex-row items-center gap-4 h-24">
+            <TealButton
+            text="エビングハウスモード"
+            onClick={goToReviewMode}
+            widthClass="w-[300px]"
+            buttonColorClass="bg-yellow-300"
+            borderColorClass="border-yellow-400"
+            shadowColorClass="[box-shadow:0_5px_0_0_#eab308]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#eab308]"
+            textColorClass="text-stone-700"
+          />
+          <p class="text-stone-700">忘却曲線に沿った最適な復習問題を出題（未実装）</p>
+          </div>
+          <div class="flex flex-col md:flex-row items-center gap-4 h-24">
+            <TealButton
+            text="弱点克服モード"
+            onClick={goToReviewMode}
+            widthClass="w-[300px]"
+            buttonColorClass="bg-red-300"          borderColorClass="border-red-400"       shadowColorClass="[box-shadow:0_5px_0_0_#f87171]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#f87171]"
+            textColorClass="text-stone-700"
+          />
+          <p class="text-stone-700">正答率が低い問題を重点的に復習</p>
           </div>
         </div>
       </section>
 
-      <section class="flex justify-center space-x-6 pb-6 border-b border-gray-200">
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-md text-xl"
-          on:click={goToNormalMode}
-        >
-          新しい問題に挑戦！ (通常モード)
-        </button>
-        <button
-          class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-lg shadow-md text-xl"
-          on:click={goToReviewMode}
-        >
-          復習する！ (復習モード)
-        </button>
-      </section>
-
       <section class="space-y-6">
-        <h2 class="text-3xl font-bold text-gray-700 text-center mb-6">あなたの学習統計</h2>
+        <h2 class="text-3xl font-bold text-gray-700 text-center mb-6">{$nickname}さんの学習統計</h2>
 
         <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
           <h3 class="text-2xl font-semibold text-gray-700 mb-4">単元別パフォーマンス</h3>
@@ -163,26 +147,14 @@ function toggleMenu() {
           </div>
         </div>
 
-        <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
-          <h3 class="text-2xl font-semibold text-gray-700 mb-4">問題別正答率</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {#each problemCorrectness as pStat}
-              <div class="p-3 bg-white rounded-lg shadow-sm flex justify-between items-center">
-                <p class="text-lg text-gray-700">{pStat.problem}</p>
-                <p class="text-xl font-bold text-teal-500">{pStat.correctness}%</p>
-              </div>
-            {/each}
-          </div>
-        </div>
-
-        <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
+        <!-- <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
           <h3 class="text-2xl font-semibold text-gray-700 mb-4">学習時間</h3>
           <p class="text-lg text-gray-700">最終学習日: {learningTime['2025/05/15']}</p>
           <p class="text-lg text-gray-700">平均学習時間: {learningTime.average}</p>
           <div class="bg-white h-48 mt-4 rounded-lg flex items-center justify-center text-gray-400">
             (ここに学習時間の折れ線グラフ Chart.js)
           </div>
-        </div>
+        </div> -->
 
         <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
           <h3 class="text-2xl font-semibold text-gray-700 mb-4">達成バッジ</h3>
@@ -204,14 +176,14 @@ function toggleMenu() {
             </div>
             <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
               <div
-                class="bg-teal-500 h-4 rounded-full"
-                style="width: {(pRate.covered / pRate.total) * 100}%"
-              ></div>
+              class="h-4 rounded-full bg-teal-500"
+              style={`width: ${pRate.total > 0 ? (pRate.covered / pRate.total) * 100 : 0}%;`}
+              class:hidden={pRate.covered === 0}               ></div>
             </div>
           {/each}
         </div>
 
-        <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
+        <!-- <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
           <h3 class="text-2xl font-semibold text-gray-700 mb-4">苦手問題ランキング</h3>
           {#if weakestProblems.length > 0}
             <ol class="list-decimal list-inside space-y-2">
@@ -225,13 +197,7 @@ function toggleMenu() {
           {:else}
             <p class="text-gray-600">まだ苦手な問題はありません。</p>
           {/if}
-        </div>
+        </div> -->
       </section>
-
-      <div class="text-center mt-8">
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md text-xl" on:click={goToStats}>
-          詳細な学習統計を見る
-        </button>
-      </div>
     </div>
   </main>

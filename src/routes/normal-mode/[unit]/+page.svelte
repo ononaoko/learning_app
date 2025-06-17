@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { slide, fly, scale } from 'svelte/transition'; // slide, fly, scaleをインポート
+  import { slide, fly, scale } from 'svelte/transition';
   import IconClose from '$lib/components/IconClose.svelte';
   import IconCircle from '$lib/components/IconCircle.svelte';
   import IconHamburger from '$lib/components/IconHamburger.svelte';
@@ -14,6 +14,11 @@
   import HintSection from '$lib/components/HintSection.svelte';
   import AnswerInputAndEvaluation from '$lib/components/AnswerInputAndEvaluation.svelte';
   import TealButton from '$lib/components/TealButton.svelte';
+  import { nickname } from '$lib/authStore';
+
+  // ★変更点1: data から userId を受け取る部分をコメントアウト★
+  export let data;
+  let currentUserId = data.userId;
 
   let unit = $page.params.unit;
   let unitName = '';
@@ -33,10 +38,13 @@
   let showAllHints = false;
   let results = []; // 各問題の正誤を記録する配列
 
+  // デバッグ用: showAnswerArea の状態を監視
+  $: console.log('showAnswerArea is now:', showAnswerArea);
+
   async function loadProblems(unit) {
     try {
       console.log('Fetching unit:', unit);
-      const response = await fetch(`/api/problems/${unit}`); // .json を削除
+      const response = await fetch(`/api/problems/${unit}`);
       if (response.ok) {
         const data = await response.json();
         const shuffled = [...data].sort(() => 0.5 - Math.random());
@@ -64,55 +72,82 @@
     isOpen = false;
   }
 
-    // HintSection からのイベントハンドラ
-    function handleShowNextHintEvent() {
-    // currentHintIndex の更新は、引き続きこの親コンポーネントで行います
+  // HintSection からのイベントハンドラ
+  function handleShowNextHintEvent() {
     if (problems[currentProblemIndex].hints && currentHintIndex < problems[currentProblemIndex].hints.length) {
-      currentHintIndex++; // 表示するヒントの数を増やす
+      currentHintIndex++;
     }
   }
 
   // 回答入力エリアを表示する関数
-  function showAnswerInput() {
+  function showAnswerInput(event) {
+    event.preventDefault();
+    console.log('showAnswerInput called. Setting showAnswerArea to true.');
     showAnswerArea = true;
-    // AnswerInputAndEvaluation 内で状態がリセットされるため、ここでは不要
-    // userAnswer = '';
-    // showResult = false;
-    // recognitionError = '';
   }
 
-   function recordAnswer(event) {
+  // AnswerInputAndEvaluation からの 'recordAnswer' イベントを受け取る
+  async function handleRecordAnswer(event) {
     const isCorrect = event.detail.isCorrect;
     console.log('正解:', isCorrect);
 
-    results = [...results, isCorrect]; // 正誤を記録する行は共通化
+    results = [...results, isCorrect];
+    console.log('Current Problem object being processed:', JSON.parse(JSON.stringify(problems[currentProblemIndex])));
 
-    if (isCorrect) {
+    // 学習記録をサーバーに送信
+    if (problems[currentProblemIndex]) {
+      const currentProblem = problems[currentProblemIndex];
+
+      const recordData = {
+        userId: currentUserId, // userIdを送信
+        problemId: currentProblem.id, // problemIdを送信
+        isCorrect: isCorrect,
+        hintsUsedCount: currentHintIndex,
+        duration: 0
+      };
+
+      console.log('Saving record with problemId:', recordData.problemId);
+
+      try {
+        const response = await fetch('/api/learning-record', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(recordData)
+        });
+
+        if (response.ok) {
+          console.log('学習記録を保存しました。');
+        } else {
+          console.error('学習記録の保存に失敗しました:', response.statusText);
+        }
+      } catch (error) {
+        console.error('学習記録の送信中にエラーが発生しました:', error);
+      }
+    }
+
+    if (!isCorrect) {
       showAllHints = true;
     }
   }
 
-
-  // AnswerInputAndEvaluation から呼ばれる nextProblem 関数 (AnswerInputAndEvaluation内からは直接呼ばれない)
-  function nextProblem() {
+  // AnswerInputAndEvaluation からの 'nextProblem' イベントを受け取る
+  async function nextProblem() {
+    console.log('nextProblem called. Setting showAnswerArea to false.');
     currentProblemIndex++;
-    showAnswerArea = false; // 次の問題へ進む際に回答エリアを非表示
-    currentHintIndex = 0; // 次の問題のためにヒントカウンターをリセット
-    showAllHints = false; // 次の問題のために全てのヒント表示フラグをリセット
-    // AnswerInputAndEvaluation 内で showResult はリセットされるため、ここでは不要
-    // showResult = false;
+    showAnswerArea = false;
+    currentHintIndex = 0;
+    showAllHints = false;
     if (currentProblemIndex >= problems.length) {
-      goto('/normal-mode/result', { state: { results: results, totalQuestions: problems.length, unitName: unitName} });
+      await goto('/normal-mode/result', { state: { results: results, totalQuestions: problems.length, unitName: unitName} });
+      return;
     }
-  }
-
-  function proceedToNextProblem() { // 関数名を変更し、より明確に
-    nextProblem();
   }
 </script>
 
 <svelte:head>
-  <title>通常モード ({unit}) - 算数学習アプリ</title>
+  <title>演習モード：{unitName} - 算数学習アプリ</title>
 </svelte:head>
 
 <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">
@@ -148,8 +183,8 @@
               onClick={handleShowNextHintEvent} widthClass="w-[calc(25%-1.5rem)]"
               buttonColorClass="bg-yellow-300"
               borderColorClass="border-yellow-500"
-              shadowColorClass="[box-shadow:0_5px_0_0_#facc15]"
-              hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#facc15]"
+              shadowColorClass="[box-shadow:0_5px_0_0_#eab308]"
+              hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#eab308]"
               textColorClass="text-stone-800"
             />
           {/if}
@@ -166,14 +201,14 @@
               textColorClass="text-stone-800"
             />
           {/if}
-
       </div>
+
       {#if showAnswerArea}
         <AnswerInputAndEvaluation
           currentProblemAnswer={problems[currentProblemIndex].answer}
           currentProblemAcceptableAnswers={problems[currentProblemIndex].acceptableAnswers || []}
-          handleProceedToNextProblem={proceedToNextProblem}
-          on:recordAnswer={recordAnswer}
+          on:recordAnswer={handleRecordAnswer}
+          on:nextProblem={nextProblem}
         />
       {/if}
 

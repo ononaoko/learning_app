@@ -6,16 +6,44 @@
   import IconClose from '$lib/components/IconClose.svelte';
   import IconCircle from '$lib/components/IconCircle.svelte';
   import TealButton from '$lib/components/TealButton.svelte';
+  $: console.log('AnswerInputAndEvaluation: currentProblemAnswer updated:', currentProblemAnswer);
+  $: console.log('AnswerInputAndEvaluation: displayMathAnswer:', displayMathAnswer);
+
 
   const dispatch = createEventDispatcher();
 
-  export let currentProblemAnswer = [];
-  export let handleProceedToNextProblem; // 親から受け取る「次の問題へ進む」関数
-  export let currentProblemAcceptableAnswers = [];
+  export let currentProblemAnswer = []; // answer プロパティはオブジェクトの配列
+  export let currentProblemAcceptableAnswers = []; // acceptableAnswers は文字列の配列
 
   let userAnswer = '';
   let showResult = false;
-  let isCorrectAnswer = false;
+  let isCorrect = false;
+  let feedbackMessage = '';
+  let correctSound;
+  let incorrectSound;
+  let displayMathAnswer = ''; // KaTeXDisplayに渡す数式文字列
+
+  // currentProblemAnswer が変更されたときに数式部分を抽出する
+  // このブロックはコンポーネトの状態をリセットするためにも使用します
+  $: if (currentProblemAnswer && currentProblemAnswer.length > 0) {
+    const mathPart = currentProblemAnswer.find(part => part.type === 'math');
+    displayMathAnswer = mathPart ? mathPart.value : '';
+    resetState(); // 新しい問題がロードされたときに状態をリセット
+  }
+
+  function playSound(isCorrect) {
+    if (isCorrect) {
+      if (correctSound) {
+        correctSound.currentTime = 0;
+        correctSound.play().catch(e => console.error("正解音の再生エラー:", e));
+      }
+    } else { // 不正解の場合のみ再生
+      if (incorrectSound) {
+        incorrectSound.currentTime = 0;
+        incorrectSound.play().catch(e => console.error("不正解音の再生エラー:", e));
+      }
+    }
+  }
 
   function handleSpeechRecognized(event) {
     userAnswer = event.detail.transcript;
@@ -25,33 +53,48 @@
     console.error('MicrophoneButtonからのエラー:', event.detail.error);
   }
 
-  function checkAnswer() {
-    const normalizedUserAnswer = userAnswer.trim().toLowerCase().replace(/\s/g, '');
+  function evaluateAnswer() {
+    // ユーザー入力を正規化
+    const normalizedUserAnswer = userAnswer
+      .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角数字を半角に
+      .replace(/[\s　\t\n]/g, '') // 全角/半角スペース、タブ、改行を除去
+      .toLowerCase(); // 大文字小文字を区別しない
 
-    isCorrectAnswer = currentProblemAcceptableAnswers.some(acceptableAnswer => {
-      const normalizedAcceptableAnswer = acceptableAnswer.trim().toLowerCase().replace(/\s/g, '');
+    // acceptableAnswers のみを参照して正誤判定を行う
+    isCorrect = currentProblemAcceptableAnswers.some(acceptableAnswer => {
+      const normalizedAcceptableAnswer = String(acceptableAnswer)
+        .replace(/[\s　\t\n]/g, '') // 全角/半角スペース、タブ、改行を除去
+        .toLowerCase(); // 大文字小文字を区別しない
       return normalizedUserAnswer === normalizedAcceptableAnswer;
     });
 
-    showResult = true; // ★正解・不正解にかかわらず結果を表示する★
-    // ここではまだ dispatch('recordAnswer') しない。
-    // ボタンがクリックされたときに dispatch して親に伝える。
+    showResult = true;
+    playSound(isCorrect);
+
+    if (isCorrect) {
+      feedbackMessage = '正解です！';
+    } else {
+      feedbackMessage = '残念！もう一度考えてみましょう。';
+    }
+
+    dispatch('recordAnswer', { isCorrect: isCorrect });
   }
 
-  function resetState(){ // 新しい関数
+  function resetState() {
     userAnswer = '';
     showResult = false;
-    isCorrectAnswer = false;
+    isCorrect = false;
+    feedbackMessage = '';
   }
 
-  function handleNextButtonClick() {
-    dispatch('recordAnswer', { isCorrect: isCorrectAnswer });
-    handleProceedToNextProblem(); // 親から渡された次の問題へ進む関数を実行
-    resetState(); // このコンポーネントの状態をリセット
+  // イベントオブジェクトを受け取り、preventDefault() を呼び出す
+  function handleNextButtonClick() { // event 引数を削除
+    dispatch('nextProblem');
   }
-
-  $: currentProblemAnswer, resetState();
 </script>
+
+<audio bind:this={correctSound} src="/sounds/correct.mp3" preload="auto"></audio>
+<audio bind:this={incorrectSound} src="/sounds/incorrect.mp3" preload="auto"></audio>
 
 <div in:scale={{ start: 0.5 }} class="rounded-md shadow-lg p-4 bg-white flex flex-col space-y-4 max-w-xl mx-auto">
   {#if !showResult}
@@ -62,6 +105,7 @@
         class="flex-grow p-3 border border-gray-300 rounded-md text-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
         placeholder="ここに音声入力されます"
         bind:value={userAnswer}
+        on:keydown={(e) => { if (e.key === 'Enter') evaluateAnswer(); }}
       />
       <MicrophoneButton
         on:recognized={handleSpeechRecognized}
@@ -70,33 +114,34 @@
     </div>
 
     <TealButton
-  text="回答を送信"
-  onClick={checkAnswer}
-  disabled={!userAnswer.trim() || showResult}
-/>
+      text="回答を送信"
+      type="button"
+      onClick={evaluateAnswer}
+      disabled={!userAnswer.trim() || showResult}
+    />
 
   {/if}
 
   {#if showResult}
-    <div class="mt-4 rounded-md flex flex-col">
+    <div class="mt-4 rounded-md flex flex-col" in:scale={{ start: 0.5 }}>
       <div class="flex justify-center">
-        {#if isCorrectAnswer}
-        <IconCircle width="64" height="64" color="#ef4444" />
-      {:else}
-        <IconClose width="64" height="64" color="#3b82f6" />
-      {/if}
+        {#if isCorrect}
+          <IconCircle width="64" height="64" color="#ef4444" />
+        {:else}
+          <IconClose width="64" height="64" color="#3b82f6" />
+        {/if}
       </div>
       <hr class="border-t border-dashed my-2 border-gray-400"/>
         <div class="text-center py-8">
-          <p class="leading-loose text-center font-light">
-            <KaTeXDisplay textContent={currentProblemAnswer} displayMode={false} fontSizeClass="text-2xl" textColor="text-stone-700" />
-          </p>
+          <p class="text-3xl font-bold {isCorrect ? 'text-teal-600' : 'text-red-600'} mt-4">{feedbackMessage}</p>
+          {#if !isCorrect}
+            <div class="mt-4 text-lg text-stone-700">
+              <p>正解は:</p>
+              <KaTeXDisplay mathExpression={displayMathAnswer} />
+            </div>
+          {/if}
         </div>
-        {#if isCorrectAnswer}
-        <TealButton text="次の問題へ" onClick={handleNextButtonClick} />
-      {:else}
-      <TealButton text="次の問題へ" onClick={handleNextButtonClick} />
-      {/if}
+        <TealButton text="次の問題へ" type="button" onClick={handleNextButtonClick} />
     </div>
   {/if}
 </div>

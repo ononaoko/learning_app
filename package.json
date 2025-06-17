@@ -33,6 +33,8 @@
 		"vite": "^6.2.6"
 	},
 	"dependencies": {
-		"katex": "^0.16.22"
+		"better-sqlite3": "^11.10.0",
+		"katex": "^0.16.22",
+		"uuid": "^11.1.0"
 	}
 }
