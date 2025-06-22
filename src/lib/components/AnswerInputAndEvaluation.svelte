@@ -6,8 +6,6 @@
   import IconClose from '$lib/components/IconClose.svelte';
   import IconCircle from '$lib/components/IconCircle.svelte';
   import TealButton from '$lib/components/TealButton.svelte';
-  $: console.log('AnswerInputAndEvaluation: currentProblemAnswer updated:', currentProblemAnswer);
-  $: console.log('AnswerInputAndEvaluation: displayMathAnswer:', displayMathAnswer);
 
 
   const dispatch = createEventDispatcher();
@@ -21,13 +19,10 @@
   let feedbackMessage = '';
   let correctSound;
   let incorrectSound;
-  let displayMathAnswer = ''; // KaTeXDisplayに渡す数式文字列
 
   // currentProblemAnswer が変更されたときに数式部分を抽出する
   // このブロックはコンポーネトの状態をリセットするためにも使用します
   $: if (currentProblemAnswer && currentProblemAnswer.length > 0) {
-    const mathPart = currentProblemAnswer.find(part => part.type === 'math');
-    displayMathAnswer = mathPart ? mathPart.value : '';
     resetState(); // 新しい問題がロードされたときに状態をリセット
   }
 
@@ -70,12 +65,6 @@
 
     showResult = true;
     playSound(isCorrect);
-
-    if (isCorrect) {
-      feedbackMessage = '正解です！';
-    } else {
-      feedbackMessage = '残念！もう一度考えてみましょう。';
-    }
 
     dispatch('recordAnswer', { isCorrect: isCorrect });
   }
@@ -124,23 +113,19 @@
 
   {#if showResult}
     <div class="mt-4 rounded-md flex flex-col" in:scale={{ start: 0.5 }}>
-      <div class="flex justify-center">
+      <div class="flex justify-center mb-4">
         {#if isCorrect}
           <IconCircle width="64" height="64" color="#ef4444" />
         {:else}
           <IconClose width="64" height="64" color="#3b82f6" />
         {/if}
       </div>
-      <hr class="border-t border-dashed my-2 border-gray-400"/>
-        <div class="text-center py-8">
-          <p class="text-3xl font-bold {isCorrect ? 'text-teal-600' : 'text-red-600'} mt-4">{feedbackMessage}</p>
           {#if !isCorrect}
-            <div class="mt-4 text-lg text-stone-700">
-              <p>正解は:</p>
-              <KaTeXDisplay mathExpression={displayMathAnswer} />
+            <div class="text-lg text-stone-700 text-center mb-4">
+              <KaTeXDisplay textContent={currentProblemAnswer} displayMode={false} fontSizeClass="text-2xl" textColor="text-stone-700" />
             </div>
           {/if}
-        </div>
+
         <TealButton text="次の問題へ" type="button" onClick={handleNextButtonClick} />
     </div>
   {/if}

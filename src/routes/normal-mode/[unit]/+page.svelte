@@ -20,15 +20,10 @@
   export let data;
   let currentUserId = data.userId;
 
-  let unit = $page.params.unit;
-  let unitName = '';
-  $: if (unit === 'algebra') {
-    unitName = '代数';
-  } else if (unit === 'geometry') {
-    unitName = '図形';
-  } else {
-    unitName = '';
-  }
+  let unitName = data.subcategoryDisplayName; // ヘッダーに表示したいサブカテゴリー名
+  let unitId = $page.params.unit; // 内部的な unit ID (algebraなど) は必要に応じて保持
+  let unitDisplayName = data.unitDisplayName; // 内部的な unit の名前 (代数など)
+
 
   let problems = [];
   let currentProblemIndex = 0;
@@ -60,7 +55,7 @@
   }
 
   onMount(async () => {
-    await loadProblems(unit);
+    await loadProblems(unitId);
   });
 
   let isOpen = false;
@@ -147,7 +142,7 @@
 </script>
 
 <svelte:head>
-  <title>演習モード：{unitName} - 算数学習アプリ</title>
+  <title>演習モード：{unitDisplayName} - 算数学習アプリ</title>
 </svelte:head>
 
 <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">
@@ -166,6 +161,7 @@
       <ProblemDisplay
         problemNumber={currentProblemIndex + 1}
         questionContent={problems[currentProblemIndex].question}
+        source={problems[currentProblemIndex].source}
       />
       <div class="flex-grow min-w-0">
         <HintSection

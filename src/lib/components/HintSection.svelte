@@ -1,35 +1,32 @@
 <script>
-  import { createEventDispatcher } from 'svelte'; // dispatchはもう使わないが、念のため残す
   import { slide, fly } from 'svelte/transition';
   import KaTeXDisplay from '$lib/components/KaTeXDisplay.svelte';
-  // TealButtonはもう使わないのでインポートも削除
-  // import TealButton from '$lib/components/TealButton.svelte';
-
-  // const dispatch = createEventDispatcher(); // dispatchはもう使わないのでコメントアウトか削除
 
   export let hints = [];
   export let currentHintIndex = 0;
   export let showAnswerArea = false;
   export let showAllHints = false;
 
-  // dispatchShowNextHint関数も削除
-  // function dispatchShowNextHint() {
+  // 「次のヒントを見る」ボタンがないため、ディスパッチャー関連のコードは不要
+  // import { createEventDispatcher } from 'svelte';
+  // const dispatch = createEventDispatcher();
+  // function showNextHint() {
   //   dispatch('showNextHint');
   // }
 </script>
 
 <div transition:slide={{ duration: 300 }}>
   {#each hints as hint, index}
-  {#if showAllHints || index < currentHintIndex}
+    {#if showAllHints || index < currentHintIndex}
       <div
         class="flex items-center py-4"
         in:slide={{ duration: 300 }}
         out:slide={{ duration: 300 }}
       >
         <div class="w-1/2 ml-14">
-          <p class="text-2xl text-teal-500 leading-loose">
-            <KaTeXDisplay textContent={hint.expression} displayMode={false} fontSizeClass="text-2xl" textColor="text-teal-500" />
-          </p>
+          <div class="flex flex-col items-start text-2xl text-teal-500 leading-loose">
+            <KaTeXDisplay textContent={hint.expression} displayMode={true} fontSizeClass="text-2xl" textColor="text-teal-500" />
+          </div>
         </div>
         <div
           class="w-1/2 text-left bg-white rounded-md p-3 ml-4 shadow-md"
@@ -45,4 +42,9 @@
       {/if}
     {/if}
   {/each}
-</div>
+
+  </div>
+
+<style>
+  /* 既存のKaTeXスタイルや、HintSection固有のスタイル */
+</style>
