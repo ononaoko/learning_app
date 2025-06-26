@@ -1,51 +1,37 @@
 // src/routes/api/learning-record/+server.js
 import { json } from '@sveltejs/kit'
-import { loadUserData, saveUserData } from '$lib/server/user-data/userStore'
+import redisClient, { generateId } from '$lib/server/database' // RedisクライアントとgenerateIdをインポート
 
-// POSTリクエストを受け付ける
-export async function POST({ request, locals }) {
+export async function POST({ request }) {
 	try {
-		// リクエストボディから学習記録データを取得
 		const record = await request.json()
-		// ★追加: 受け取ったrecordオブジェクト全体をログ出力★
-		console.log('Received record from client:', record)
-
-		const { problemId, isCorrect, hintsUsedCount, duration, problemCorrectnessAtAttempt } = record // ★修正: userId を削除★
-		const userId = locals.user.id // ★修正: locals から userId を取得★
-		if (!userId) {
-			// 認証されていない場合
-			return json({ message: 'Authentication required' }, { status: 401 })
-		}
+		const { userId, problemId, isCorrect, hintsUsedCount, duration } = record
 
 		if (!userId || !problemId || typeof isCorrect === 'undefined') {
-			console.warn('Bad Request: Missing required fields in learning record:', {
-				userId,
-				problemId,
-				isCorrect
-			})
 			return json({ message: 'Missing required fields' }, { status: 400 })
 		}
 
-		// ユーザーデータをロード
-		const userData = await loadUserData(userId)
+		const recordId = generateId() // 学習記録にもユニークIDを付与
 
-		// 新しい学習記録を履歴に追加
-		userData.problemRecords.push({
+		const newRecord = {
+			id: recordId,
+			userId,
 			problemId,
 			isCorrect,
 			hintsUsedCount: hintsUsedCount || 0,
-			duration: duration || 0, // 秒単位など
-			timestamp: new Date().toISOString(),
-			problemCorrectnessAtAttempt: problemCorrectnessAtAttempt // ★追加: 新しいフィールドを保存★
-		})
+			durationSeconds: duration || 0,
+			timestamp: new Date().toISOString()
+		}
 
-		// 累計学習回数を更新 (仮のロジック: 毎回増加)
-		userData.totalLearningSessions = (userData.totalLearningSessions || 0) + 1
+		// Redisでは、"learning_records:<userId>:<recordId>" のようなキーで保存
+		await redisClient.set(`learning_records:${userId}:${recordId}`, newRecord)
 
-		// TODO: 連続学習日数のロジックはより複雑なので後で実装
-
-		// 更新されたデータを保存
-		await saveUserData(userId, userData)
+		// 累計学習回数を更新 (ユーザーデータの一部として管理)
+		const userData = await redisClient.get(`users:${userId}`)
+		if (userData) {
+			userData.totalLearningSessions = (userData.totalLearningSessions || 0) + 1
+			await redisClient.set(`users:${userId}`, userData)
+		}
 
 		return json({ message: 'Learning record saved successfully' }, { status: 200 })
 	} catch (error) {

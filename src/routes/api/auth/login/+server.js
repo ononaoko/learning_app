@@ -1,9 +1,8 @@
 // src/routes/api/auth/login/+server.js
 import { json } from '@sveltejs/kit'
-import db from '$lib/server/database' // データベースインスタンスをインポート
+import redisClient from '$lib/server/database' // Redisクライアントをインポート
 
 export async function POST({ request, cookies }) {
-	// cookiesオブジェクトを受け取る
 	try {
 		const { nickname, pincode } = await request.json()
 
@@ -11,27 +10,32 @@ export async function POST({ request, cookies }) {
 			return json({ message: 'ニックネームと4桁のピンコードを入力してください。' }, { status: 400 })
 		}
 
-		// ユーザーをデータベースから取得
-		const user = db
-			.prepare('SELECT id, nickname, pincode FROM users WHERE nickname = ?')
-			.get(nickname)
+		// ニックネームからユーザーIDを取得
+		const userId = await redisClient.get(`nickname:${nickname}`)
+		if (!userId) {
+			return json({ message: 'ニックネームまたはピンコードが間違っています。' }, { status: 401 }) // Unauthorized
+		}
+
+		// ユーザーデータを取得
+		const user = await redisClient.get(`users:${userId}`)
 
 		if (!user || user.pincode !== pincode) {
 			return json({ message: 'ニックネームまたはピンコードが間違っています。' }, { status: 401 }) // Unauthorized
 		}
 
-		// ログイン成功
-		// ここでユーザーIDをCookieに設定します
+		// ログイン時にも全ニックネームリストのSetにニックネームを追加（冪等性を持つので安全）
+		await redisClient.sadd('all_nicknames', nickname)
+
+		// ログイン成功時のCookie設定はそのまま
 		cookies.set('user_id', user.id, {
 			path: '/',
-			httpOnly: true, // JavaScriptからアクセス不可にする
-			secure: process.env.NODE_ENV === 'production', // HTTPSのみ (本番環境)
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
 			maxAge: 60 * 60 * 24 * 7 // 1週間
 		})
 		cookies.set('nickname', user.nickname, {
-			// ニックネームもCookieに保存 (UI表示用、安全ではない)
 			path: '/',
-			httpOnly: false, // JavaScriptからアクセス可能にする (UI表示用)
+			httpOnly: false, // UI表示用
 			secure: process.env.NODE_ENV === 'production',
 			maxAge: 60 * 60 * 24 * 7
 		})

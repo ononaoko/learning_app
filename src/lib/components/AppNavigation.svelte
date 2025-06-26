@@ -24,7 +24,7 @@
       isLoggedIn.set(false);
       nickname.set('');
       localStorage.removeItem('users'); // ローカルストレージのユーザー情報をクリア
-      goto('/login'); // ログアウトしたらログインページへ遷移
+      goto('/'); // ログアウトしたらログインページへ遷移
       isOpen = false; // メニューを閉じる
     }
   </script>

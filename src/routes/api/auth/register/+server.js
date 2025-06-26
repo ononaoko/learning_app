@@ -1,10 +1,8 @@
 // src/routes/api/auth/register/+server.js
 
 import { json } from '@sveltejs/kit'
-import db from '$lib/server/database'
-import { v4 as uuidv4 } from 'uuid'
+import redisClient, { generateId } from '$lib/server/database' // RedisクライアントとgenerateIdをインポート
 
-// request オブジェクトに cookies オブジェクトが追加されるように変更
 export async function POST({ request, cookies }) {
 	try {
 		const { nickname, pincode } = await request.json()
@@ -13,20 +11,24 @@ export async function POST({ request, cookies }) {
 			return json({ message: 'ニックネームと4桁のピンコードを入力してください。' }, { status: 400 })
 		}
 
-		const existingUser = db.prepare('SELECT id FROM users WHERE nickname = ?').get(nickname)
-		if (existingUser) {
-			return json({ message: 'このニックネームは既に使われています。' }, { status: 409 })
+		// ニックネームの重複チェック (Redisのキーでチェック)
+		const existingUserKey = `nickname:${nickname}`
+		const existingUserId = await redisClient.get(existingUserKey)
+		if (existingUserId) {
+			return json({ message: 'このニックネームは既に使われています。' }, { status: 409 }) // Conflict
 		}
 
-		const userId = uuidv4()
+		const userId = generateId() // generateIdを使用
 
-		db.prepare('INSERT INTO users (id, nickname, pincode) VALUES (?, ?, ?)').run(
-			userId,
-			nickname,
-			pincode
-		)
+		// ユーザーデータを保存
+		const user = { id: userId, nickname, pincode }
+		await redisClient.set(`users:${userId}`, user) // redisClientを使用
+		await redisClient.set(existingUserKey, userId) // redisClientを使用
 
-		// ★追加: 新規登録成功時にCookieを設定する★
+		// 全ニックネームリストのSetにニックネームを追加
+		await redisClient.sadd('all_nicknames', nickname)
+
+		// 登録成功時にCookieを設定する部分はそのまま
 		cookies.set('user_id', userId, {
 			path: '/',
 			httpOnly: true,

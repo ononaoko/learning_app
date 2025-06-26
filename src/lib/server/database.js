@@ -1,44 +1,36 @@
 // src/lib/server/database.js
-import Database from 'better-sqlite3'
-import path from 'path'
-import fs from 'fs'
 
-// データベースファイルが保存されるディレクトリ
-const dbDir = path.resolve(process.cwd(), 'src/lib/server')
-// データベースファイルのパス
-const dbPath = path.join(dbDir, 'app.db')
+import { Redis } from '@upstash/redis';
+import { createId } from '@paralleldrive/cuid2'; // ユニークID生成ライブラリ
+import { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } from '$env/static/private'; // SvelteKitの環境変数読み込み
 
-// ディレクトリが存在しない場合は作成
-if (!fs.existsSync(dbDir)) {
-	fs.mkdirSync(dbDir, { recursive: true })
-}
+// Redis クライアントの初期化
+const redis = new Redis({
+  url: UPSTASH_REDIS_REST_URL,
+  token: UPSTASH_REDIS_REST_TOKEN,
+});
 
-// データベースインスタンスの作成
-// verbose: true を設定すると、実行されたSQLクエリがコンソールに出力されデバッグに便利です。
-const db = new Database(dbPath, { verbose: console.log })
+// Redis クライアントインスタンスを直接エクスポート
+export default redis;
 
-// データベースの初期化
-// テーブルが存在しない場合に作成します
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY NOT NULL UNIQUE,
-    nickname TEXT NOT NULL UNIQUE,
-    pincode TEXT NOT NULL
-  );
+// --- スキーマの定義 (参考用) ---
+// これらのオブジェクトは、データベース操作関数の型チェックや、
+// データ構造の理解を助けるために存在しますが、Drizzle ORMの機能は使いません。
+export const usersSchema = {
+  id: 'string', // ユーザーの一意なID (cuid2)
+  nickname: 'string', // ニックネーム
+  pincode: 'string', // ピンコード
+};
 
-  CREATE TABLE IF NOT EXISTS learning_records (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id TEXT NOT NULL,
-    problem_id TEXT NOT NULL,
-    is_correct INTEGER NOT NULL, -- 0 for false, 1 for true
-    hints_used_count INTEGER DEFAULT 0,
-    duration_seconds INTEGER DEFAULT 0,
-    timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  );
-`)
+export const learningRecordsSchema = {
+  id: 'string', // 学習記録の一意なID (cuid2)
+  userId: 'string', // どのユーザーの記録かを示すID
+  problemId: 'string', // どの問題の記録か
+  isCorrect: 'number', // 0 for false, 1 for true
+  hintsUsedCount: 'number',
+  durationSeconds: 'number',
+  timestamp: 'string', // ISO形式のタイムスタンプ文字列
+};
 
-console.log('Database initialized successfully at:', dbPath)
-
-// エクスポートして他のファイルで利用できるようにする
-export default db
+// ヘルパー関数
+export const generateId = createId;
