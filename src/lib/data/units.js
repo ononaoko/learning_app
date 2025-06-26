@@ -6,11 +6,6 @@ export const units = [
 		type: 'category',
 		sub_units: [
 			{
-				name: 'デバック用',
-				type: 'subcategory',
-				sub_units: [{ name: '代数', type: 'unit', id: 'algebra' }]
-			},
-			{
 				name: '割合と比',
 				type: 'subcategory',
 				sub_units: [

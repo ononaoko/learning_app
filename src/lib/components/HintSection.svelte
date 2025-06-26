@@ -24,15 +24,15 @@
         out:slide={{ duration: 300 }}
       >
         <div class="w-1/2 ml-14">
-          <div class="flex flex-col items-start text-2xl text-teal-500 leading-loose">
-            <KaTeXDisplay textContent={hint.expression} displayMode={true} fontSizeClass="text-2xl" textColor="text-teal-500" />
+          <div class="flex flex-col items-start text-teal-500 leading-loose">
+            <KaTeXDisplay textContent={hint.expression} displayMode={true} fontSizeClass="text-xl" textColor="text-teal-500" />
           </div>
         </div>
         <div
           class="w-1/2 text-left bg-white rounded-md p-3 ml-4 shadow-md"
           in:fly="{{ x: 200, duration: 400 }}"
         >
-          <p class="text-lg text-stone-700 leading-loose">
+          <p class="text-stone-700 leading-loose">
             <KaTeXDisplay textContent={hint.explanation} displayMode={false} fontSizeClass="text-lg" textColor="text-stone-700" />
           </p>
         </div>

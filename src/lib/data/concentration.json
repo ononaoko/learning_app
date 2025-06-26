@@ -1,0 +1,441 @@
+[
+    {
+        "id": "濃度-01",
+        "question": [
+          { "type": "text", "value": "15%の食塩水400gに10%の食塩水100gを混ぜあわせると、何%の食塩水が500gできるか、答えなさい。" }
+        ],
+        "source": "大谷中",
+        "answer": [
+          { "type": "math", "value": "14" },
+          { "type": "text", "value": "%" }
+        ],
+        "acceptableAnswers": [
+          "14",
+          "14%",
+          "じゅうよんぱーせんと",
+          "十四パーセント"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "それぞれの食塩水に含まれる食塩の重さを計算しよう。食塩水の重さに濃度を掛けることで食塩の重さが割り出せるよ。" }
+            ],
+"expression": [
+    {
+        "type": "math",
+        "value": "\\text{15\\%の食塩水に含まれる塩} = 400 \\times \\dfrac{15}{100} \\\\ \\text{10\\%の食塩水に含まれる塩} = 100 \\times \\dfrac{10}{100}"
+    }
+]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "混ぜ合わせた食塩の合計と、食塩水全体の重さをそれぞれ計算しよう。" }
+            ],
+"expression": [
+              { "type": "math", "value": "\\text{食塩の合計} = (400 \\times \\dfrac{15}{100}) + (100 \\times \\dfrac{10}{100})" },
+              { "type": "math", "value": "\\text{食塩水全体の重さ} = 400 + 100" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "混ぜ合わせた食塩水の濃度を計算しよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{濃度} = \\dfrac{\\text{食塩の合計}}{\\text{食塩水全体の重さ}} \\times 100" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "濃度-02",
+        "question": [
+          { "type": "text", "value": "濃度が5%の食塩水200gと濃度が2%の食塩水400gを混ぜあわせて、食塩水Aをつくりました。食塩水Aの濃度は何%か、答えなさい。" }
+        ],
+        "source": "函館ラ・サール中",
+        "answer": [
+          { "type": "math", "value": "3" },
+          { "type": "text", "value": "%" }
+        ],
+        "acceptableAnswers": [
+          "3",
+          "3%",
+          "さんぱーせんと",
+          "三パーセント"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "それぞれの食塩水に含まれる食塩の重さを計算しよう。" }
+            ],
+"expression": [
+              {
+                "type": "math",
+                "value": "\\begin{align*} \\text{5\\%の食塩水に含まれる食塩} &= 200 \\times \\dfrac{5}{100} \\\\ \\text{2\\%の食塩水に含まれる食塩} &= 400 \\times \\dfrac{2}{100} \\end{align*}"
+              }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "食塩水Aに含まれる食塩の合計と、食塩水Aの全体の重さを計算しよう。" }
+            ],
+"expression": [
+              { "type": "math", "value": "\\text{食塩の合計} = (200 \\times \\dfrac{5}{100}) + (400 \\times \\dfrac{2}{100})" },
+              { "type": "math", "value": "\\text{食塩水Aの重さ} = 200 + 400" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "食塩水Aの濃度を計算しよう。パーセントを求める時は倍率に100をかければいいから、濃度は「食塩の重さ ÷ 食塩水の重さ × 100」で求められるよ。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{濃度} = \\dfrac{\\text{食塩の合計}}{\\text{食塩水Aの重さ}} \\times 100" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "濃度-03",
+        "tag": "応用",
+        "question": [
+          { "type": "text", "value": "2つの食塩水A、Bの濃度はそれぞれ4%、7%です。AとBの重さを3:2の割合で混ぜあわせてできる食塩水の濃度は何%か、答えなさい。" }
+        ],
+        "source": "山手学院中",
+        "answer": [
+          { "type": "math", "value": "5.2" },
+          { "type": "text", "value": "%" }
+        ],
+        "acceptableAnswers": [
+          "5.2",
+          "5.2%",
+          "ごーてんにぱーせんと"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "食塩水AとBの重さを、比の3:2を使って具体的な重さに仮定してみよう。例えば、食塩水Aを300g、食塩水Bを200gとして考えてみよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{食塩水Aの重さ} = 300\\text{g}" },
+              { "type": "math", "value": "\\text{食塩水Bの重さ} = 200\\text{g}" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "それぞれの食塩水に含まれる食塩の重さを計算しよう。" }
+            ],
+"expression": [
+              { "type": "math", "value": "\\text{食塩水Aの食塩} = 300 \\times \\dfrac{4}{100}" },
+              { "type": "math", "value": "\\text{食塩水Bの食塩} = 200 \\times \\dfrac{7}{100}" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "混ぜ合わせた食塩水の食塩の合計と、食塩水全体の重さを計算しよう。" }
+            ],
+"expression": [
+              { "type": "math", "value": "\\text{食塩の合計} = (300 \\times \\dfrac{4}{100}) + (200 \\times \\dfrac{7}{100})" },
+              { "type": "math", "value": "\\text{食塩水全体の重さ} = 300 + 200" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "混ぜ合わせた食塩水の濃度を計算しよう。パーセントを求める時は倍率に100をかければいいから、濃度は「食塩の重さ ÷ 食塩水の重さ × 100」で求められるよ。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{濃度} = \\dfrac{\\text{食塩の合計}}{\\text{食塩水全体の重さ}} \\times 100" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "濃度-04",
+        "question": [
+          { "type": "text", "value": "濃度が6%の食塩水100gに20gの水を加えると、何%の食塩水になるか、答えなさい。" }
+        ],
+        "source": "芝浦工業大学中",
+        "answer": [
+          { "type": "math", "value": "5" },
+          { "type": "text", "value": "%" }
+        ],
+        "acceptableAnswers": [
+          "5",
+          "5%",
+          "ごぱーせんと",
+          "五パーセント"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "まず、食塩水に含まれる食塩の重さを計算しよう。水を加えても食塩の重さは変わらないよ。" }
+            ],
+"expression": [
+              { "type": "math", "value": "\\text{食塩の重さ} = 100 \\times \\dfrac{6}{100}" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "水を加えた後の食塩水全体の重さを計算しよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{水を加えた後の食塩水全体の重さ} = 100 + 20" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "最後に、濃度を計算しよう。" }
+            ],
+            "expression": [
+                { "type": "math", "value": "\\dfrac{\\text{濃度}}{100} = \\dfrac{\\text{食塩の重さ}}{\\text{水を加えた後の食塩水全体の重さ}}" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "濃度-05",
+        "question": [
+          { "type": "text", "value": "4%の食塩水300gに水を加えて3%の食塩水をつくるには、何gの水を加えればよいか、答えなさい。" }
+        ],
+        "source": "共立女子中",
+        "answer": [
+          { "type": "math", "value": "100" },
+          { "type": "text", "value": "g" }
+        ],
+        "acceptableAnswers": [
+          "100",
+          "100g",
+          "100ぐらむ",
+          "ひゃくぐらむ",
+          "百グラム"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "食塩水に含まれる食塩の重さを計算しよう。水を加えても食塩の重さは変わらないよ。" }
+            ],
+"expression": [
+              { "type": "math", "value": "\\text{食塩の重さ} = 300 \\times \\dfrac{4}{100}" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "水を加えた後の食塩水全体の重さを" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "gとして濃度を求める式を作る。今回は濃度は3%となっているから濃度には3を代入しよう" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\dfrac{\\text{食塩の重さ}}{x} \\times 100 = 3" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "この式を解いて、加えた後の食塩水全体の重さ" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "を求めよう。そして、最初にあった食塩水の重さとの差が、加えた水の重さになるよ。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{加えた水の重さ} = x - 300" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "濃度-6",
+        "tag": "差がつく",
+        "question": [
+          { "type": "text", "value": "4%の食塩水300gに6%の食塩水100gを混ぜ、さらに水を蒸発させると8%の食塩水になりました。蒸発させた水の重さは何gか、答えなさい。" }
+        ],
+        "source": "甲南女子中",
+        "answer": [
+          { "type": "math", "value": "150" },
+          { "type": "text", "value": "g" }
+        ],
+        "acceptableAnswers": [
+          "150",
+          "150g",
+          "150ぐらむ",
+          "ひゃくごじゅうぐらむ",
+          "百五十グラム"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "まず、2つの食塩水を混ぜたときに含まれる食塩の合計の重さを計算しよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{食塩の合計} = (300 \\times 0.04) + (100 \\times 0.06)" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "次に、水を蒸発させた後の食塩水の重さを" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "gとすると、濃度が8%になるので、次の式が作れるよ。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\dfrac{\\text{食塩の合計}}{x} \\times 100 = 8" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "蒸発させる前の食塩水全体の重さを計算し、蒸発させた後の食塩水の重さとの差が、蒸発させた水の重さになるよ。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{蒸発させる前の食塩水全体の重さ} = 300 + 100" },
+              { "type": "math", "value": "\\text{蒸発させた水の重さ} = \\text{蒸発させる前の食塩水全体の重さ} - x" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "濃度-07",
+        "question": [
+          { "type": "text", "value": "8%の食塩水200gから、いくらかの食塩水を取り出し、代わりに水を加えて200gにしたところ、濃度が5%になりました。取り出した食塩水は何gか、答えなさい。" }
+        ],
+        "source": "桜美林中",
+        "answer": [
+          { "type": "math", "value": "75" },
+          { "type": "text", "value": "g" }
+        ],
+        "acceptableAnswers": [
+          "75",
+          "75g",
+          "75ぐらむ",
+          "ななじゅうごぐらむ",
+          "七十五グラム"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "最終的にできた5%の食塩水200gに含まれる食塩の重さを計算しよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{最終的な食塩の重さ} = 200 \\times 0.05" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "この食塩は、最初にあった8%の食塩水から、取り出した食塩水に含まれていた食塩を引いたものになるよ。取り出した食塩水を" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "gとすると、次の式が作れるよ。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "(200 \\times 0.08) - (x \\times 0.08) = 200 \\times 0.05" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "この方程式を解いて、" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "の値を求めてみよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "16 - 0.08x = 10" },
+              { "type": "math", "value": "0.08x = 16 - 10" },
+              { "type": "math", "value": "0.08x = 6" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "濃度-08",
+        "question": [
+          { "type": "text", "value": "7%の食塩水に2%の食塩水300gを加えて5%の食塩水をつくりました。7%の食塩水は何gあったか、答えなさい。" }
+        ],
+        "source": "跡見学園中",
+        "answer": [
+          { "type": "math", "value": "200" },
+          { "type": "text", "value": "g" }
+        ],
+        "acceptableAnswers": [
+          "200",
+          "200g",
+          "200ぐらむ",
+          "にひゃくぐらむ",
+          "二百グラム"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "7%の食塩水を" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "gとすると、それぞれの食塩水に含まれる食塩の重さを式で表してみよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{7\\%食塩水の食塩} = x \\times 0.07" },
+              { "type": "math", "value": "\\text{2\\%食塩水の食塩} = 300 \\times 0.02" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "混ぜ合わせた食塩水の合計の食塩と、全体の食塩水の重さを考えて、次の式が作れるよ。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "(x \\times 0.07) + (300 \\times 0.02) = (x + 300) \\times 0.05" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "この方程式を解いて、" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "の値を求めてみよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "0.07x + 6 = 0.05x + 15" },
+              { "type": "math", "value": "0.07x - 0.05x = 15 - 6" },
+              { "type": "math", "value": "0.02x = 9" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "濃度-09",
+        "question": [
+          { "type": "text", "value": "5%の食塩水が450gあります。この食塩水に何gの食塩を加えると10%の食塩水になるか、答えなさい。" }
+        ],
+        "source": "桜美林中",
+        "answer": [
+          { "type": "math", "value": "25" },
+          { "type": "text", "value": "g" }
+        ],
+        "acceptableAnswers": [
+          "25",
+          "25g",
+          "25ぐらむ",
+          "にじゅうごぐらむ",
+          "二十五グラム"
+        ],
+        "hints": [
+          {
+            "explanation": [
+              { "type": "text", "value": "まず、5%の食塩水450gに含まれる食塩の重さを計算しよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\text{食塩の重さ} = 450 \\times 0.05" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "加える食塩の重さを" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "gとすると、食塩を加えた後の食塩の合計の重さと、食塩水全体の重さを式で表してみよう。濃度が10%になるので、次の式が作れるよ。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "\\dfrac{(450 \\times 0.05) + x}{450 + x} \\times 100 = 10" }
+            ]
+          },
+          {
+            "explanation": [
+              { "type": "text", "value": "この方程式を解いて、" },
+              { "type": "math", "value": "x" },
+              { "type": "text", "value": "の値を求めてみよう。" }
+            ],
+            "expression": [
+              { "type": "math", "value": "22.5 + x = 0.1(450 + x)" },
+              { "type": "math", "value": "22.5 + x = 45 + 0.1x" },
+              { "type": "math", "value": "x - 0.1x = 45 - 22.5" },
+              { "type": "math", "value": "0.9x = 22.5" }
+            ]
+          }
+        ]
+      }
+]

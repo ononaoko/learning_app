@@ -162,6 +162,7 @@
         problemNumber={currentProblemIndex + 1}
         questionContent={problems[currentProblemIndex].question}
         source={problems[currentProblemIndex].source}
+        tag={problems[currentProblemIndex].tag}
       />
       <div class="flex-grow min-w-0">
         <HintSection

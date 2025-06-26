@@ -81,7 +81,7 @@
             { "type": "math", "value": "3:4" },
             { "type": "text", "value": "なので、Bさんのおはじきの個数を" },
             { "type": "math", "value": "x" },
-            { "type": "text", "value": "個として比の式を作ろう" }
+            { "type": "text", "value": "個として比の式を作ろう。" }
           ],
           "expression": [
             { "type": "math", "value": "15:x = 3:4" }
@@ -110,7 +110,7 @@
     },
     {
       "id": "basic_ratio_proportion-003",
-      "tag": "重要",
+      "tag": "応用",
       "question": [
         { "type": "text", "value": "ある仕事を15日かかって、全体の" },
         { "type": "math", "value": "\\dfrac{5}{8}" },
@@ -143,9 +143,7 @@
             { "type": "math", "value": "\\dfrac{5}{8}" },
             { "type": "text", "value": "の仕事を15日で終えたのだから、残りの仕事に何日かかるかを" },
             { "type": "math", "value": "x" },
-            { "type": "text", "value": "日とすると、" },
-            { "type": "math", "value": "\\dfrac{5}{8} : 15 = \\left(1 - \\dfrac{5}{8}\\right) : x" },
-            { "type": "text", "value": "という式が立てられるね。" }
+            { "type": "text", "value": "日として、比の式を作ろう。" }
           ],
           "expression": [
             { "type": "math", "value": "\\dfrac{5}{8} : 15 = \\dfrac{3}{8} : x" }
@@ -153,9 +151,7 @@
         },
         {
           "explanation": [
-            { "type": "text", "value": "比の計算「外側の積と内側の積が等しい」を使って、" },
-            { "type": "math", "value": "\\dfrac{5}{8} \\times x = 15 \\times \\dfrac{3}{8}" },
-            { "type": "text", "value": "を計算してみよう。" }
+            { "type": "text", "value": "比の計算では、式の両辺の「外側×外側」と「内側×内側」は等しいという性質を使うといいよ。" }
           ],
           "expression": [
             { "type": "math", "value": "\\begin{aligned} \\dfrac{5}{8}x &= \\dfrac{45}{8} \\\\ 5x &= 45 \\end{aligned}" }
@@ -189,9 +185,7 @@
             { "type": "math", "value": "200" },
             { "type": "text", "value": "ページならば、残りのページ数を" },
             { "type": "math", "value": "x" },
-            { "type": "text", "value": "ページとすると、" },
-            { "type": "math", "value": "200:x = 5:9" },
-            { "type": "text", "value": "という式が作れるよ。" }
+            { "type": "text", "value": "ページとして、比の式を作ろう。" }
           ],
           "expression": [
             { "type": "math", "value": "200:x = 5:9" }
@@ -199,9 +193,7 @@
         },
         {
           "explanation": [
-            { "type": "text", "value": "比の計算「外側の積と内側の積が等しい」を使って、" },
-            { "type": "math", "value": "5 \\times x = 200 \\times 9" },
-            { "type": "text", "value": "を計算してみよう。" }
+            { "type": "text", "value": "比の計算では、式の両辺の「外側×外側」と「内側×内側」は等しいという性質を使うといいよ。" }
           ],
           "expression": [
             { "type": "math", "value": "5x = 1800" },
@@ -243,15 +235,17 @@
           "explanation": [
             { "type": "text", "value": "弟のおこづかいを" },
             { "type": "math", "value": "x" },
-            { "type": "text", "value": "円とすると、兄のおこづかいはいくらになるかな？" }
+            { "type": "text", "value": "円として、兄のおこづかいを数式で表してみよう。" }
           ],
           "expression": [
-            { "type": "math", "value": "\\text{兄のおこづかい} = 2x" }
+            { "type": "math", "value": "\\begin{aligned} \\text{弟のおこづかい} &= x \\\\ \\text{兄のおこづかい} &= 2x \\end{aligned}" }
           ]
         },
         {
           "explanation": [
-            { "type": "text", "value": "弟が出した金額と兄が出した金額を合計すると1950円になるね。それぞれが出した金額を式で表してみよう。" }
+            { "type": "text", "value": "弟と兄のお小遣いのそれぞれ" },
+            { "type": "math", "value": "\\dfrac{1}{2}" },
+            { "type": "text", "value": "を合わせたら1950円になったという式を作ろう。" }
           ],
           "expression": [
             { "type": "math", "value": "x \\times \\dfrac{1}{2} + 2x \\times \\dfrac{1}{2} = 1950" }
@@ -292,20 +286,20 @@
           "explanation": [
             { "type": "text", "value": "兄がはじめに持っていたお金を" },
             { "type": "math", "value": "x" },
-            { "type": "text", "value": "円とすると、弟がはじめに持っていたお金はいくらになるかな？" }
+            { "type": "text", "value": "円とすると、弟がはじめに持っていたお金はどう表せる？" }
           ],
           "expression": [
-            { "type": "math", "value": "\\text{弟のお金} = 9000 - x" }
+            { "type": "math", "value": "\\begin{aligned} \\text{兄のお金} &= x \\\\ \\text{弟のお金} &= 9000 - x \\end{aligned}" }
           ]
         },
         {
           "explanation": [
             { "type": "text", "value": "2人がお金を使った後の残りの金額を式で表してみよう。兄の残金は弟の残金の1.5倍なので、" },
-            { "type": "math", "value": "\\left(x - 700\\right) = 1.5 \\times \\left(9000 - x - 800\\right)" },
+            { "type": "math", "value": "\\text{弟の残金} = 1.5 \\times text{兄の残金}" },
             { "type": "text", "value": "という式が作れるよ。" }
           ],
           "expression": [
-            { "type": "math", "value": "\\left(x - 700\\right) = 1.5 \\times \\left(8200 - x\\right)" }
+            { "type": "math", "value": "\\left(x - 700\\right) = 1.5 \\times \\left(9000 - x - 800\\right)" }
           ]
         },
         {
@@ -341,10 +335,15 @@
       "hints": [
         {
           "explanation": [
-            { "type": "text", "value": "Aさん、Bさん、Cさんの所持金の比を連比で表してみよう。" },
-            { "type": "text", "value": "A:B = 5:3" },
-            { "type": "text", "value": "B:C = 2:3" },
-            { "type": "text", "value": "Bの比をそろえるために、3と2の最小公倍数である6にそろえよう。" }
+            { "type": "text", "value": "2つの比を比較するために、Bさんの比を3と2の最小公倍数である6にそろえよう。" }
+          ],
+          "expression": [
+            { "type": "math", "value": "\\begin{aligned} A:B &= 5:3 &= 10:6 \\\\ B:C &= 2:3 &= 6:9 \\end{aligned}" }
+          ]
+        },
+        {
+          "explanation": [
+            { "type": "text", "value": "Aさん、Bさん、Cさんの所持金の比を連比で表してみよう。" }
           ],
           "expression": [
             { "type": "math", "value": "\\begin{aligned} A:B &= 10:6 \\\\ B:C &= 6:9 \\\\ A:B:C &= 10:6:9 \\end{aligned}" }
@@ -360,7 +359,7 @@
         },
         {
           "explanation": [
-            { "type": "text", "value": "Bさんの所持金は、全体の何分のいくつか考えて、計算してみよう。" }
+            { "type": "text", "value": "Bさんの所持金は、全体(25)のいくつか考えて、計算してみよう。" }
           ],
           "expression": [
             { "type": "math", "value": "10000 \\times \\dfrac{6}{25}" }
@@ -370,7 +369,7 @@
     },
     {
       "id": "basic_ratio_proportion-008",
-      "tag": "重要",
+      "tag": "応用",
       "question": [
         { "type": "text", "value": "同じ本を兄は全体の" },
         { "type": "math", "value": "\\dfrac{8}{15}" },
@@ -409,14 +408,21 @@
         },
         {
           "explanation": [
-            { "type": "text", "value": "この差が22ページに当たるので、本全体のページ数を" },
+            { "type": "math", "value": "\\dfrac{11}{105}" },
+            { "type": "text", "value": "が22ページに当たるので、本全体のページ数を" },
             { "type": "math", "value": "x" },
-            { "type": "text", "value": "ページとすると、" },
-            { "type": "math", "value": "x \\times \\dfrac{11}{105} = 22" },
-            { "type": "text", "value": "という式が作れるよ。" }
+            { "type": "text", "value": "ページとして、比の式を作ろう。" }
           ],
           "expression": [
-            { "type": "math", "value": "x = 22 \\times \\dfrac{105}{11}" }
+            { "type": "math", "value": "x : 22 = 1 : \\dfrac{11}{105}" }
+          ]
+        },
+        {
+          "explanation": [
+            { "type": "text", "value": "比の計算では、式の両辺の「外側×外側」と「内側×内側」は等しいという性質を使うといいよ。" }
+          ],
+          "expression": [
+            { "type": "math", "value": "\\begin{aligned} x \\times \\dfrac{11}{105} &= 22 \\times 1 \\\\ \\dfrac{11}{105}x &= 22 \\\\ x &= 22 \\times \\dfrac{105}{11} \\end{aligned}" }
           ]
         }
       ]
@@ -447,7 +453,7 @@
           "explanation": [
             { "type": "text", "value": "学級全体の人数を" },
             { "type": "math", "value": "x" },
-            { "type": "text", "value": "人とすると、男子の人数と女子の人数を式で表してみよう。" }
+            { "type": "text", "value": "人として、男子の人数と女子の人数を式で表してみよう。" }
           ],
           "expression": [
             { "type": "math", "value": "\\begin{aligned} \\text{男子の人数} &= \\dfrac{1}{2}x - 2 \\\\ \\text{女子の人数} &= \\dfrac{1}{3}x + 7 \\end{aligned}" }
