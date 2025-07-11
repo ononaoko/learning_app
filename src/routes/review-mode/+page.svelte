@@ -162,16 +162,14 @@
   {#if errorMessage}
     <p class="text-red-500 text-center text-xl mt-8">{errorMessage}</p>
     <TealButton text="ダッシュボードへ戻る" onClick={() => goto('/dashboard')}
-      buttonColorClass="bg-blue-500"
-      borderColorClass="border-blue-700"
-      shadowColorClass="[box-shadow:0_5px_0_0_#2563eb]"
-      hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#2563eb]"
     />
   {:else if problems.length > 0 && currentProblemIndex < problems.length}
     <div class="w-full h-full">
       <ProblemDisplay
         problemNumber={currentProblemIndex + 1}
         questionContent={problems[currentProblemIndex].question}
+        source={problems[currentProblemIndex].source}
+        tag={problems[currentProblemIndex].tag}
       />
       <div class="flex-grow min-w-0">
         <HintSection

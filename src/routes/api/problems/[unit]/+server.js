@@ -1,38 +1,48 @@
-import { json } from '@sveltejs/kit'
-import { loadProblems as loadAllProblems } from '$lib/server/problems-data/problemsStore' // ★修正: problemsStore をインポート★
+// src/routes/api/problems/[unit]/+server.js
+import { json } from '@sveltejs/kit';
+// 古いインポートは削除またはコメントアウト
+// import { loadProblems as loadAllProblems } from '$lib/server/problems-data/problemsStore';
+
+// 新しい problemsByUnit オブジェクトをインポートします
+// problemsStore.js が src/lib/problems-data/ にあると仮定します
+import { problemsByUnit } from '$lib/problems-data/problemsStore';
 
 // サーバー起動時に一度だけ全ての問題をロードしてキャッシュする（パフォーマンスのため）
-// または、必要に応じてリクエストごとにロードすることも可能だが、キャッシュ推奨
-let allProblemsByUnit = {}
-let isProblemsLoaded = false
+// ★修正: problemsByUnit はすでに同期的にロードされているため、initializeProblemsCache は不要です★
+// let allProblemsByUnit = {}; // 不要
+// let isProblemsLoaded = false; // 不要
 
-async function initializeProblemsCache() {
-	if (isProblemsLoaded) return
-	try {
-		allProblemsByUnit = await loadAllProblems()
-		isProblemsLoaded = true
-		console.log('[API Problems] All problems loaded and cached.')
-	} catch (error) {
-		console.error('[API Problems] Failed to load all problems:', error)
-		allProblemsByUnit = {} // 失敗しても空にしておく
-	}
-}
-initializeProblemsCache() // サーバー起動時に初期化
+// async function initializeProblemsCache() { // この関数全体が不要
+//     if (isProblemsLoaded) return;
+//     try {
+//         allProblemsByUnit = await loadAllProblems();
+//         isProblemsLoaded = true;
+//         console.log('[API Problems] All problems loaded and cached.');
+//     } catch (error) {
+//         console.error('[API Problems] Failed to load all problems:', error);
+//         allProblemsByUnit = {};
+//     }
+// }
+// initializeProblemsCache(); // 不要
 
 export async function GET({ params }) {
-	const { unit } = params
-	console.log('API called with unit:', unit) // デバッグ用ログ
-	// ★修正: 問題キャッシュが初期化されているか確認し、必要なら待機する★
-	if (!isProblemsLoaded) {
-		console.log('[API Problems] Cache not initialized yet. Initializing now...')
-		await initializeProblemsCache()
-	}
+    const { unit } = params;
+    console.log('API called with unit:', unit); // デバッグ用ログ
 
-	const data = allProblemsByUnit[unit] // ★修正: キャッシュからデータを取得★
-	if (data) {
-		console.log('Returning data:', data) // デバッグ用ログ
-		return json(data)
-	}
-	console.log(`Unit "${unit}" not found`) // デバッグ用ログ
-	return new Response(`Unit "${unit}" not found`, { status: 404 })
+    // ★修正: problemsByUnit はすでにロード済みなので、await や initializeCache は不要です★
+    // if (!isProblemsLoaded) { // 不要
+    //     console.log('[API Problems] Cache not initialized yet. Initializing now...'); // 不要
+    //     await initializeProblemsCache(); // 不要
+    // }
+
+    // problemsByUnit オブジェクトから直接データを取得します
+    const data = problemsByUnit[unit]; // ★修正: problemsByUnit からデータを直接取得★
+
+    if (data) {
+        console.log('Returning data:', data); // デバッグ用ログ
+        return json(data);
+    }
+
+    console.log(`Unit "${unit}" not found`); // デバッグ用ログ
+    return new Response(`Unit "${unit}" not found`, { status: 404 });
 }

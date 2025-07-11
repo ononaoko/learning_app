@@ -3,8 +3,13 @@
 import { json } from '@sveltejs/kit'
 import redisClient from '$lib/server/database'
 import { units } from '$lib/data/units' // units.js から単元構造をインポート
-import fs from 'fs/promises'
-import path from 'path'
+
+// ★修正: fs と path のインポートは不要になるので削除★
+// import fs from 'fs/promises';
+// import path from 'path';
+
+// ★追加: problemsStore から problemsByUnit をインポート★
+import { problemsByUnit } from '$lib/problems-data/problemsStore'
 
 // 英語単元IDと日本語名のマップ (変更なし)
 function createUnitNameMap(unitsData) {
@@ -26,26 +31,29 @@ function createUnitNameMap(unitsData) {
 }
 const unitNameMap = createUnitNameMap(units)
 
-// 各単元のJSONデータを動的に読み込む関数 (変更なし)
-async function loadUnitJsonData(unitId) {
-	const jsonPath = path.resolve(process.cwd(), `src/lib/data/${unitId}.json`)
-	try {
-		const data = await fs.readFile(jsonPath, 'utf-8')
-		return JSON.parse(data)
-	} catch (error) {
-		// ログは残しつつ、エラー時は空の配列を返す
-		console.error(`Failed to load JSON data for unit ${unitId} at ${jsonPath}:`, error)
-		return []
-	}
-}
+// ★削除: loadUnitJsonData 関数は不要になるので削除★
+// async function loadUnitJsonData(unitId) {
+//     const jsonPath = path.resolve(process.cwd(), `src/lib/data/${unitId}.json`);
+//     try {
+//         const data = await fs.readFile(jsonPath, 'utf-8');
+//         return JSON.parse(data);
+//     } catch (error) {
+//         console.error(`Failed to load JSON data for unit ${unitId} at ${jsonPath}:`, error);
+//         return [];
+//     }
+// }
 
-// ★追加: 全ての単元の総問題数を事前に読み込み、マップとして保持する★
+// ★修正: 全ての単元の総問題数を事前に読み込み、マップとして保持する★
+// problemsByUnit が同期的に利用可能なので、非同期の初期化はよりシンプルになります。
 let allUnitsTotalProblems = {}
-async function initializeTotalProblems() {
-	// units.js から全ての単元IDを取得
-	const allUnitIds = Object.values(unitNameMap) // unitNameMapのキー（ID）を取得
+let isTotalProblemsInitialized = false // 初期化状態を追跡するフラグ
 
-	// units.js の構造から直接IDを抽出する方が正確
+async function initializeTotalProblems() {
+	if (isTotalProblemsInitialized) {
+		return // すでに初期化済みなら何もしない
+	}
+
+	// units.js の構造から全ての単元IDを抽出する (変更なし)
 	const allKnownUnitIds = []
 	units.forEach((category) => {
 		if (category.sub_units) {
@@ -61,56 +69,74 @@ async function initializeTotalProblems() {
 		}
 	})
 
-	const totalProblemsPromises = allKnownUnitIds.map(async (unitId) => {
-		const data = await loadUnitJsonData(unitId)
-		return { unitId, total: data.length }
-	})
-
-	const results = await Promise.all(totalProblemsPromises)
-	results.forEach((item) => {
-		allUnitsTotalProblems[item.unitId] = item.total
-	})
-	console.log('Total problems initialized for all units:', allUnitsTotalProblems)
-}
-
-// サーバー起動時に一度だけ総問題数を初期化する
-// これをGETハンドラ内で毎回やると遅いので、モジュールのトップレベルで実行
-initializeTotalProblems()
-
-// 統計計算ロジック
-async function calculateStats(userId) {
-	const recordKeys = await redisClient.keys(`learning_records:${userId}:*`)
-	const problemRecords = []
-	for (const key of recordKeys) {
-		const record = await redisClient.get(key)
-		if (record) {
-			problemRecords.push(record)
+	// ★修正: loadUnitJsonData の呼び出しを problemsByUnit からの直接取得に置き換え★
+	for (const unitId of allKnownUnitIds) {
+		const problemsInUnit = problemsByUnit[unitId]
+		if (problemsInUnit) {
+			allUnitsTotalProblems[unitId] = problemsInUnit.length
+		} else {
+			console.warn(
+				`[Learning Stats API] No problem data found in problemsByUnit for unit: ${unitId}. Setting total to 0.`
+			)
+			allUnitsTotalProblems[unitId] = 0
 		}
 	}
 
-	const stats = {
-		totalLearningSessions: 0,
-		consecutiveLearningDays: 0,
-		unitStats: [],
-		problemCorrectness: [],
-		learningTime: {
-			'2025/06/26': '0分',
-			average: '0分'
-		},
-		achievements: [],
-		progressRates: [],
-		weakestProblems: []
-	}
+	isTotalProblemsInitialized = true
+	console.log('Total problems initialized for all units:', allUnitsTotalProblems)
+}
 
-	const userData = await redisClient.get(`users:${userId}`)
-	if (userData) {
-		stats.totalLearningSessions = userData.totalLearningSessions || 0
-	}
+// サーバー起動時に一度だけ総問題数を初期化する (そのまま残す)
+// ★注意: initializeTotalProblems() は非同期関数なので、この場所で呼び出すと
+// モジュールロード時に非同期処理が走り、その結果を待たずに次のコードが実行される可能性があります。
+// しかし、GETハンドラ内で isTotalProblemsInitialized をチェックして await するロジックがあるため、
+// 今回は問題ありません。
+initializeTotalProblems()
+
+// 統計計算ロジック (変更なし: problemsByUnit への直接的な依存はここにはない)
+async function calculateStats(userId) {
+    const recordKeys = await redisClient.keys(`learning_records:${userId}:*`)
+    const problemRecords = []
+    for (const key of recordKeys) {
+        // record は既にオブジェクトとして取得される
+        const record = await redisClient.get(key)
+        if (record) {
+            // ★修正: JSON.parse(record) の呼び出しを削除！★
+            problemRecords.push(record)
+        }
+    }
+
+    const stats = {
+        totalLearningSessions: 0,
+        consecutiveLearningDays: 0,
+        unitStats: [],
+        problemCorrectness: [],
+        learningTime: {
+            '2025/06/26': '0分',
+            average: '0分'
+        },
+        achievements: [],
+        progressRates: [],
+        weakestProblems: []
+    }
+
+    // userData は既にオブジェクトとして取得される
+    const userData = await redisClient.get(`user_data:${userId}`)
+    if (userData) {
+        // ★修正: JSON.parse(userData) の呼び出しを削除！★
+        stats.totalLearningSessions = userData.totalLearningSessions || 0
+    }
+
 
 	const unitMap = {}
 	const coveredProblemIdsByUnit = {}
 
 	problemRecords.forEach((record) => {
+		// problemId が存在しない場合や形式が不適切な場合に対応
+		if (!record.problemId || typeof record.problemId !== 'string') {
+			console.warn(`[Learning Stats API] Skipping record due to invalid problemId:`, record)
+			return
+		}
 		const unitId = record.problemId.split('-')[0]
 
 		if (!unitMap[unitId]) {
@@ -144,22 +170,19 @@ async function calculateStats(userId) {
 		})
 	}
 
-	// ★修正: progressRates の計算 (問題総数をallUnitsTotalProblemsから取得)★
-	// ユーザーがまだ解いていない単元も含むように、unitMapのキーではなくunitNameMapのキーをループする
+	// progressRates の計算 (変更なし)
 	for (const unitId in unitNameMap) {
-		// 全ての既知の単元をループ
 		const total = allUnitsTotalProblems[unitId] || 0 // 事前に読み込んだ総問題数
-		const covered = coveredProblemIdsByUnit[unitId] ? coveredProblemIdsByUnit[unitId].size : 0 // カバーした問題数
+		const covered = coveredProblemIdsByUnit[unitId] ? coveredProblemIdsByUnit[unitId].size : 0
 
 		if (total > 0) {
 			stats.progressRates.push({
-				unit: unitNameMap[unitId], // 日本語名
+				unit: unitNameMap[unitId],
 				covered: covered,
 				total: total
 			})
 		}
 	}
-	// ソートすると表示順が綺麗になる
 	stats.progressRates.sort((a, b) => a.unit.localeCompare(b.unit, 'ja'))
 
 	// problemCorrectness の計算 (変更なし)
@@ -188,7 +211,7 @@ async function calculateStats(userId) {
 		.sort((a, b) => a.correctness - b.correctness)
 		.slice(0, 3)
 
-	stats.achievements = ['初回ログイン', '学習開始']
+	stats.achievements = ['初回ログイン', '学習開始'] // これはダミーデータかもしれません
 
 	return stats
 }
@@ -201,6 +224,12 @@ export async function GET({ locals }) {
 	}
 
 	try {
+		// ★修正: initializeTotalProblems が完了していることを確認★
+		if (!isTotalProblemsInitialized) {
+			console.log('[Learning Stats API] Total problems not initialized yet. Initializing now...')
+			await initializeTotalProblems()
+		}
+
 		const stats = await calculateStats(userId)
 		return json(stats)
 	} catch (error) {
