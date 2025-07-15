@@ -95,38 +95,37 @@ initializeTotalProblems()
 
 // 統計計算ロジック (変更なし: problemsByUnit への直接的な依存はここにはない)
 async function calculateStats(userId) {
-    const recordKeys = await redisClient.keys(`learning_records:${userId}:*`)
-    const problemRecords = []
-    for (const key of recordKeys) {
-        // record は既にオブジェクトとして取得される
-        const record = await redisClient.get(key)
-        if (record) {
-            // ★修正: JSON.parse(record) の呼び出しを削除！★
-            problemRecords.push(record)
-        }
-    }
+	const recordKeys = await redisClient.keys(`learning_records:${userId}:*`)
+	const problemRecords = []
+	for (const key of recordKeys) {
+		// record は既にオブジェクトとして取得される
+		const record = await redisClient.get(key)
+		if (record) {
+			// ★修正: JSON.parse(record) の呼び出しを削除！★
+			problemRecords.push(record)
+		}
+	}
 
-    const stats = {
-        totalLearningSessions: 0,
-        consecutiveLearningDays: 0,
-        unitStats: [],
-        problemCorrectness: [],
-        learningTime: {
-            '2025/06/26': '0分',
-            average: '0分'
-        },
-        achievements: [],
-        progressRates: [],
-        weakestProblems: []
-    }
+	const stats = {
+		totalLearningSessions: 0,
+		consecutiveLearningDays: 0,
+		unitStats: [],
+		problemCorrectness: [],
+		learningTime: {
+			'2025/06/26': '0分',
+			average: '0分'
+		},
+		achievements: [],
+		progressRates: [],
+		weakestProblems: []
+	}
 
-    // userData は既にオブジェクトとして取得される
-    const userData = await redisClient.get(`user_data:${userId}`)
-    if (userData) {
-        // ★修正: JSON.parse(userData) の呼び出しを削除！★
-        stats.totalLearningSessions = userData.totalLearningSessions || 0
-    }
-
+	// userData は既にオブジェクトとして取得される
+	const userData = await redisClient.get(`user_data:${userId}`)
+	if (userData) {
+		// ★修正: JSON.parse(userData) の呼び出しを削除！★
+		stats.totalLearningSessions = userData.totalLearningSessions || 0
+	}
 
 	const unitMap = {}
 	const coveredProblemIdsByUnit = {}

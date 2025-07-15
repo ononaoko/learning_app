@@ -75,8 +75,13 @@ function toggleMenu() {
     <title>算数学習アプリ - ダッシュボード</title>
   </svelte:head>
 
-  <main class="flex flex-col gap-8 items-center min-h-screen bg-gray-100 p-8">
-    <header class="bg-teal-300 shadow-lg w-full p-6 rounded-md relative">
+  <main class="flex flex-col items-center min-h-screen bg-gray-100 p-8">
+    <header class="
+    w-full p-6 rounded-md relative
+    bg-stone-100 /* stone-200を直接指定 */
+    [box-shadow:var(--shadow-neumorphic-convex)] /* CSS変数を直接参照 */
+    mb-8
+  ">
         <div class="flex items-center justify-between">
           <div class="flex items-center">
             <IconGhost />

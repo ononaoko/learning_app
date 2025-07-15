@@ -19,17 +19,17 @@
   {#each hints as hint, index}
     {#if showAllHints || index < currentHintIndex}
       <div
-        class="flex items-center py-4"
+        class="flex flex-col lg:flex-row items-center py-4 gap-8"
         in:slide={{ duration: 300 }}
         out:slide={{ duration: 300 }}
       >
-        <div class="w-1/2 ml-14">
+        <div class="w-full lg:w-1/2 gap-8">
           <div class="flex flex-col items-start text-teal-500 leading-loose">
             <KaTeXDisplay textContent={hint.expression} displayMode={true} fontSizeClass="text-xl" textColor="text-teal-500" />
           </div>
         </div>
         <div
-          class="w-1/2 text-left bg-white rounded-md p-3 ml-4 shadow-md"
+          class="w-full lg:w-1/2 text-left bg-white rounded-md p-3 gap-8 shadow-md"
           in:fly="{{ x: 200, duration: 400 }}"
         >
           <p class="text-stone-700 leading-loose">

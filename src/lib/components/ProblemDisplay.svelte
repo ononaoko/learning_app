@@ -27,7 +27,7 @@
        <KaTeXDisplay textContent={questionContent} displayMode={false} fontSizeClass="text-2xl" textColor="text-stone-700" />
      </p>
    </div>
-  <div class="w-full flex justify-end mt-4">
+  <div class="w-full flex justify-end">
     {#if tag}
     <span class="text-white text-xs font-semibold {tagColorClass(tag)} py-2 px-4 rounded-full mr-2">{tag}</span>
     {/if}

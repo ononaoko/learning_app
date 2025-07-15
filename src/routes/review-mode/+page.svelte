@@ -2,47 +2,59 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { slide, fly, scale } from 'svelte/transition';
-  import IconClose from '$lib/components/IconClose.svelte';
-  import IconCircle from '$lib/components/IconCircle.svelte';
   import IconHamburger from '$lib/components/IconHamburger.svelte';
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import KaTeXDisplay from '$lib/components/KaTeXDisplay.svelte';
-  import ProgressBar from '$lib/components/ProgressBar.svelte';
-  import SpeechInputButton from '$lib/components/SpeechInputButton.svelte';
+  import ProgressBar from '$lib/components/ProgressBar.svelte'; // .svelte 拡張子を確認
   import ProblemDisplay from '$lib/components/ProblemDisplay.svelte';
   import HintSection from '$lib/components/HintSection.svelte';
   import AnswerInputAndEvaluation from '$lib/components/AnswerInputAndEvaluation.svelte';
   import TealButton from '$lib/components/TealButton.svelte';
-  import { nickname } from '$lib/authStore';
+  // ★削除: authStoreとgetのインポートは不要★
+  // import { userId as currentUserIdStore } from '$lib/authStore';
+  // import { get } from 'svelte/store';
+
+  // ★変更: +page.server.js からデータを受け取る★
+  export let data;
+  let currentUserId = data.userId; // サーバーから渡されたuserIdを使用
 
   let modeName = '弱点克服モード';
-  let unitName = 'あなたの苦手問題';
   let averageWeaknessCorrectness = 0;
   let currentProblemCorrectness = 0;
 
-  let problems = []; // ロードされた問題の配列
-  let currentProblemIndex = 0; // 現在表示中の問題のインデックス
+  // ★削除: ストアからのcurrentUserId定義とリアクティブ更新は不要★
+  // let currentUserId;
+  // $: currentUserId = get(currentUserIdStore);
+
+  let problems = [];
+  let currentProblemIndex = 0;
   let showAnswerArea = false;
   let currentHintIndex = 0;
-  let errorMessage = '';
+  let errorMessage = '問題の読み込み中にエラーが発生しました。インターネット接続を確認するか、時間をおいて再度お試しください。';
   let showAllHints = false;
   let results = [];
+
+  let problemStartTime = 0;
+  let sessionStartTime = 0;
 
   async function loadWeakProblems() {
     try {
       console.log('Fetching weak problems...');
-      const response = await fetch('/api/weak-problems?limit=5');
+      // ★修正: userIdのチェックは不要だが、APIへの渡すのは必要★
+      const response = await fetch(`/api/weak-problems?limit=5&userId=${currentUserId}`);
       if (response.ok) {
         const data = await response.json();
-        problems = data.problems; // 問題配列をロード
+        problems = data.problems;
         averageWeaknessCorrectness = data.averageCorrectness;
 
-        // ★修正: 問題がロードされたら、インデックスをリセットし、初回の正答率を設定★
-        currentProblemIndex = 0; // 問題が再ロードされたら、必ず最初の問題から始める
+        currentProblemIndex = 0;
         if (problems.length > 0) {
           currentProblemCorrectness = problems[currentProblemIndex].correctness;
-          errorMessage = ''; // 成功したらエラーメッセージをクリア
+          errorMessage = '';
+          problemStartTime = Date.now();
+          if (sessionStartTime === 0) {
+            sessionStartTime = Date.now();
+            console.log('Weakness mode session started at:', new Date(sessionStartTime).toLocaleString());
+          }
         } else {
           errorMessage = 'まだ学習記録が少ないか、該当する弱点問題を特定できませんでした。演習モードで問題を解いてみましょう！';
         }
@@ -50,16 +62,17 @@
 
       } else {
         errorMessage = `弱点問題の読み込みに失敗しました: ${response.statusText}`;
-        problems = []; // 失敗したら problems を空にする
+        problems = [];
       }
     } catch (error) {
       errorMessage = '弱点問題の読み込み中にエラーが発生しました。';
       console.error('Error loading weak problems:', error);
-      problems = []; // エラーが発生したら problems を空にする
+      problems = [];
     }
   }
 
   onMount(async () => {
+    // ★修正: data.userId は onMount 時点ですでに利用可能なので、直接ロードを呼び出す★
     await loadWeakProblems();
   });
 
@@ -73,7 +86,7 @@
   }
 
   function handleShowNextHintEvent() {
-    if (problems[currentProblemIndex].hints && currentHintIndex < problems[currentProblemIndex].hints.length) {
+    if (currentProblem && currentProblem.hints && currentHintIndex < currentProblem.hints.length) {
       currentHintIndex++;
     }
   }
@@ -88,20 +101,22 @@
 
     results = [...results, isCorrect];
 
+    const durationSeconds = Math.round((Date.now() - problemStartTime) / 1000);
+
     if (problems[currentProblemIndex]) {
       const currentProblem = problems[currentProblemIndex];
-      // ★追加: 現在の問題の正答率を取得★
-     const problemCorrectnessAtAttempt = currentProblem.correctness || 0;
+      const problemCorrectnessAtAttempt = currentProblem.correctness || 0;
 
       const recordData = {
-        problemId: currentProblem.id, // problemIdを送信
+        userId: currentUserId, // これで定義済み
+        problemId: currentProblem.id,
         isCorrect: isCorrect,
         hintsUsedCount: currentHintIndex,
-        duration: 0,
-        problemCorrectnessAtAttempt: problemCorrectnessAtAttempt // ★追加: 正答率を記録データに含める★
+        duration: durationSeconds,
+        problemCorrectnessAtAttempt: problemCorrectnessAtAttempt
       };
 
-      console.log('Sending recordData to API:', recordData);
+      console.log('Sending recordData to API:', recordData, 'Duration:', durationSeconds, 'seconds');
 
       try {
         const response = await fetch('/api/learning-record', {
@@ -113,12 +128,12 @@
         });
 
         if (response.ok) {
-          console.log('学習記録を保存しました。');
+          console.log('個別問題の学習記録を保存しました。');
         } else {
-          console.error('学習記録の保存に失敗しました:', response.statusText);
+          console.error('個別問題の学習記録の保存に失敗しました:', response.statusText);
         }
       } catch (error) {
-        console.error('学習記録の送信中にエラーが発生しました:', error);
+        console.error('個別問題の学習記録の送信中にエラーが発生しました:', error);
       }
     }
 
@@ -132,10 +147,40 @@
     showAnswerArea = false;
     currentHintIndex = 0;
     showAllHints = false;
+
     if (currentProblemIndex < problems.length) {
       currentProblemCorrectness = problems[currentProblemIndex].correctness;
+      problemStartTime = Date.now();
     } else {
-      goto('/dashboard', { state: { results: results, totalQuestions: problems.length, mode: 'weakness' } });
+      const sessionEndTime = Date.now();
+      const totalSessionDurationSeconds = Math.round((sessionEndTime - sessionStartTime) / 1000);
+
+      console.log('Weakness mode session completed. Total duration:', totalSessionDurationSeconds, 'seconds');
+
+      try {
+        const sessionRecordResponse = await fetch('/api/session-record', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+                userId: currentUserId,
+                mode: 'weakness-mode',
+                unitId: 'N/A',
+                duration: totalSessionDurationSeconds,
+                timestamp: new Date().toISOString()
+            })
+        });
+
+        if (sessionRecordResponse.ok) {
+          console.log('弱点克服モードセッション全体の学習記録を保存しました。');
+        } else {
+          console.error('弱点克服モードセッション全体の学習記録の保存に失敗しました:', sessionRecordResponse.statusText);
+        }
+      } catch (error) {
+        console.error('弱点克服モードセッション全体の学習記録の送信中にエラーが発生しました:', error);
+      }
+      goto('/review-mode/result', { state: { results: results, totalQuestions: problems.length, mode: 'weakness' } });
       return;
     }
   }
@@ -146,7 +191,12 @@
 </svelte:head>
 
 <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">
-  <header class="bg-teal-300 shadow-lg w-full p-6 rounded-md relative">
+  <header class="
+  w-full p-6 rounded-md relative
+  bg-stone-100 /* stone-200を直接指定 */
+  [box-shadow:var(--shadow-neumorphic-convex)] /* CSS変数を直接参照 */
+  mb-8
+">
     <div class="flex items-center justify-between">
       <h1 class="text-4xl font-bold text-stone-700">{modeName}：
       {#if problems.length > 0 && currentProblemIndex < problems.length}
@@ -217,23 +267,10 @@
       {/if}
 
     </div>
-  {:else if problems.length > 0}
-    <p class="text-xl font-semibold">全問クリア！お疲れ様でした。</p>
-    <TealButton text="ダッシュボードへ戻る" onClick={() => goto('/dashboard')}
-      buttonColorClass="bg-blue-500"
-      borderColorClass="border-blue-700"
-      shadowColorClass="[box-shadow:0_5px_0_0_#2563eb]"
-      hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#2563eb]"
-    />
-  {:else}
+    {:else if problems.length === 0 && !errorMessage}
     <p class="p-16">問題がありません。</p>
-    <TealButton text="ダッシュボードへ戻る" onClick={() => goto('/dashboard')}
-      buttonColorClass="bg-blue-500"
-      borderColorClass="border-blue-700"
-      shadowColorClass="[box-shadow:0_5px_0_0_#2563eb]"
-      hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#2563eb]"
-    />
-  {/if}
+  {:else}
+    {/if}
 
   <ProgressBar current={currentProblemIndex + 1} total={problems.length} />
 </main>

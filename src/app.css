@@ -3,3 +3,15 @@
 body {
     overflow-x: hidden;
   }
+
+/* --- ここから追加 --- */
+:root {
+  /* ライトモード用のニューモーフィズム凹みシャドウ */
+  --shadow-neumorphic-concave: inset 5px 5px 10px #d6d3d1, inset -5px -5px 10px #e7e5e4;
+
+  /* （参考）凸状のニューモーフィズムシャドウも必要なら追加 */
+  --shadow-neumorphic-convex: 5px 5px 10px #d6d3d1, -7.5px -7.5px 10px #ffffff;
+  --shadow-neumorphic-convex2: 2.5px 2.5px 5px #d6d3d1, -2.5px -2.5px 5px #ffffff;
+}
+
+/* --- ここまで追加 --- */

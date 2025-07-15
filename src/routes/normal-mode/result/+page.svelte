@@ -3,16 +3,21 @@
   import { page } from '$app/stores';
   import { slide } from 'svelte/transition';
   import IconHamburger from '$lib/components/IconHamburger.svelte';
-  import DiagonalFraction from '$lib/components/DiagonalFraction.svelte'; // DiagonalFractionをインポート
+  import AppNavigation from '$lib/components/AppNavigation.svelte'; // AppNavigationをインポート
+  import DiagonalFraction from '$lib/components/DiagonalFraction.svelte';
   import AvatarMessage from '$lib/components/AvatarMessage.svelte';
-  import IconCircle2 from '$lib/components/IconCircle2.svelte'
-  import IconClose2 from '$lib/components/IconClose2.svelte'
+  import IconCircle2 from '$lib/components/IconCircle2.svelte';
+  import IconClose2 from '$lib/components/IconClose2.svelte';
 
   // page.state からデータを取得
-  $: unitName = $page.state.unitName || ''; // デフォルト値を空文字列に修正
-  $: results = $page.state.results || []; // 例: [true, true, false, true, false]
-  $: totalQuestions = $page.state.totalQuestions || 0;
-  $: correctAnswers = results.filter(Boolean).length; // 正解数（true の数）
+  $: unitName = $page.state.unitName || '';
+  $: results = $page.state.results || []; // 例: [{ isCorrect: true, tag: '重要' }, { isCorrect: false, tag: '応用' }, ...]
+  $: totalAnsweredQuestions = results.length; // 回答した問題の総数
+  $: correctAnswers = results.filter(r => r.isCorrect).length; // 全体の正解数
+
+  // 基礎問題と応用問題の正答数を計算
+  $: basicCorrectAnswers = results.filter(r => r.isCorrect && r.tag === '重要').length;
+  $: applicationCorrectAnswers = results.filter(r => r.isCorrect && r.tag === '応用').length;
 
   let isOpen = false;
 
@@ -26,52 +31,62 @@
   }
 
   function goToNormalMode() {
-    goto('/normal-mode');
-    isOpen = false; // メニューを閉じる
+    // ユニット選択ページに戻る場合は、適切なパスを設定してください
+    // 例: goto('/normal-mode');
+    // 今回はダッシュボードに戻るボタンのみなので削除しました
+    goto('/normal-mode'); // ユニット選択ページへの遷移
+    isOpen = false;
+  }
+
+  function goToTop() {
+    goto('/');
+    isOpen = false;
   }
 
   // メッセージのロジック
   let resultMessage = '';
   $: resultMessage = (() => {
-    if (correctAnswers === totalQuestions) {
+    if (totalAnsweredQuestions === 0) return 'まだ問題がありません。';
+
+    if (correctAnswers === totalAnsweredQuestions) {
       return '全問正解！素晴らしい！🎉';
-    } else if (correctAnswers >= totalQuestions / 2) {
+    } else if (correctAnswers >= totalAnsweredQuestions / 2) {
       return 'よくできました！もう少しで完璧！';
-    } else {
+    } else if (correctAnswers < totalAnsweredQuestions / 2) {
       return '練習すればもっと上達するよ！';
     }
   })();
-
 </script>
 
 <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">
-  <header class="bg-teal-300 shadow-lg w-full p-6 rounded-md relative">
+  <header class="
+  w-full p-6 rounded-md relative
+  bg-stone-100 /* stone-200を直接指定 */
+  [box-shadow:var(--shadow-neumorphic-convex)] /* CSS変数を直接参照 */
+  mb-8
+">
     <div class="flex items-center justify-between">
       <h1 class="text-4xl font-bold text-stone-700">演習 : {unitName}</h1>
       <button class="focus:outline-none" on:click={toggleMenu} aria-label="メニューを開閉">
         <IconHamburger width="48" height="48" isOpen={isOpen} color="#374151" />
       </button>
     </div>
-    {#if isOpen}
-      <nav transition:slide={{ duration: 200 }} class="absolute top-[calc(100%-1rem)] right-[1rem] w-1/3 bg-white shadow-lg rounded-md z-10">
-        <button class="block text-stone-700 py-4 px-6 hover:bg-stone-200 rounded-md w-full text-left" on:click={goToTop}>ホーム</button>
-      </nav>
-    {/if}
+    <AppNavigation isOpen={isOpen} />
   </header>
   <div class="w-full h-full my-6">
     {#if results.length > 0}
       <div class="mb-6 w-full bg-white rounded-md shadow-lg">
-        <div class="flex justify-center bg-teal-100 rounded-t-lg">
+        <div class="flex justify-center bg-teal-100 rounded-t-lg overflow-x-auto whitespace-nowrap">
           {#each results as _, i}
             <span class="w-1/5 text-center font-bold text-stone-700 text-xl py-2 last:border-r-0">
               {i + 1}
             </span>
           {/each}
         </div>
-        <div class="flex justify-center">
+        <div class="flex justify-center overflow-x-auto whitespace-nowrap">
           {#each results as result}
           <span class="w-1/5 py-2 border-r-2 border-gray-100 last:border-r-0 flex justify-center">
-            {#if result}
+            {#if result.isCorrect}
               <IconCircle2 width="48" height="48"/>
             {:else}
               <IconClose2 width="48" height="48"/>
@@ -86,7 +101,7 @@
           <p class="text-lg font-bold text-stone-700 mb-2">正答数</p>
           <DiagonalFraction
             numerator={correctAnswers}
-            denominator={totalQuestions}
+            denominator={totalAnsweredQuestions}
             textColor="text-teal-500"
             fontSize="text-3xl"
             separatorColor="border-gray-700"
@@ -96,8 +111,8 @@
         <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-md w-1/3">
           <p class="text-lg font-bold text-stone-700 mb-2">基礎問題正答数</p>
           <DiagonalFraction
-            numerator={results.filter(Boolean).length}
-            denominator={totalQuestions}
+            numerator={basicCorrectAnswers}
+            denominator={results.filter(r => r.tag === '重要').length}
             textColor="text-teal-500"
             fontSize="text-3xl"
             separatorColor="border-gray-700"
@@ -106,8 +121,8 @@
         <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-md w-1/3">
           <p class="text-lg font-bold text-stone-700 mb-4">応用問題正答数</p>
           <DiagonalFraction
-            numerator={results.filter(Boolean).length}
-            denominator={totalQuestions}
+            numerator={applicationCorrectAnswers}
+            denominator={results.filter(r => r.tag === '応用').length}
             textColor="text-teal-500"
             fontSize="text-3xl"
             separatorColor="border-gray-700"

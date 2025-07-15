@@ -1,0 +1,9 @@
+POST http://localhost:5173/api/user-progress
+Content-Type: application/json
+
+{
+  "userId": "utilocdl9zhhw1ezjcb2t9jw",
+  "unitId": "basic_addition_subtraction",
+  "lastProblemIndex": 5,
+  "isCompleted": false
+}
