@@ -39,7 +39,7 @@
   let errorMessage = ''; // エラーメッセージ
   let showAllHints = false; // 全てのヒントを表示するかどうか (誤答時に使用)
 
-  let sessionStartTime; // セッション開始時刻
+  let sessionStartTime = 0 // セッション開始時刻
   let problemStartTime; // 各問題の開始時刻
   let totalSessionTime = 0; // 全セッションの合計学習時間 (秒)
   let results = []; // 各問題の解答結果を格納 (isCorrect, tag)
@@ -273,57 +273,76 @@
     }
   }
 
-  // 次の問題へ進む
   async function nextProblem() {
-    currentProblemIndex++;
-    showAnswerArea = false;
-    currentHintIndex = 0;
-    showAllHints = false;
+  currentProblemIndex++;
+  showAnswerArea = false;
+  currentHintIndex = 0;
+  showAllHints = false;
 
-    if (currentProblemIndex < problems.length) { // まだ問題が残っている場合
-      currentProblem = problems[currentProblemIndex]; // 次の問題を設定
-      problemStartTime = Date.now(); // 次の問題の開始時間を記録
-      // 次の問題に進んだら、その進捗を保存（自動保存の役割も兼ねる）
-      await saveUserProgress(currentUserId, unitId, currentProblemIndex); // isCompleted を省略
-    } else {
-      // 全てのノーマルモード問題が終了した時の処理
-      const sessionEndTime = Date.now();
-      const totalSessionDurationSeconds = Math.round((sessionEndTime - sessionStartTime) / 1000);
+  if (currentProblemIndex < problems.length) { // まだ問題が残っている場合
+    currentProblem = problems[currentProblemIndex]; // 次の問題を設定
+    problemStartTime = Date.now(); // 次の問題の開始時間を記録
+    // 次の問題に進んだら、その進捗を保存（自動保存の役割も兼ねる）
+    await saveUserProgress(currentUserId, unitId, currentProblemIndex); // isCompleted を省略
+  } else {
+    // 全てのノーマルモード問題が終了した時の処理
+    const sessionEndTime = Date.now();
+    const totalSessionDurationSeconds = Math.round((sessionEndTime - sessionStartTime) / 1000);
 
-      console.log('Normal mode session completed. Total duration:', totalSessionDurationSeconds, 'seconds');
+    console.log('Normal mode session completed. Total duration:', totalSessionDurationSeconds, 'seconds');
 
-      // セッション全体の学習記録を保存
-      try {
-        const sessionRecordResponse = await fetch('/api/session-record', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            userId: currentUserId,
-            mode: 'normal-mode',
-            unitId: unitId,
-            duration: totalSessionDurationSeconds,
-            timestamp: new Date().toISOString()
-          })
-        });
+    // ★追加：全問正解かどうかをチェック★
+    const allCorrect = results.every(result => result.isCorrect === true);
+    console.log('All problems correct:', allCorrect);
+    console.log('Results:', results);
 
-        if (sessionRecordResponse.ok) {
-          console.log('ノーマルモードセッション全体の学習記録を保存しました。');
-        } else {
-          console.error('ノーマルモードセッション全体の学習記録の保存に失敗しました:', sessionRecordResponse.statusText);
-        }
-      } catch (error) {
-        console.error('ノーマルモードセッション全体の学習記録の送信中にエラーが発生しました:', error);
+    // セッション全体の学習記録を保存
+    try {
+      const sessionRecordResponse = await fetch('/api/session-record', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: currentUserId,
+          mode: 'normal-mode',
+          unitId: unitId,
+          duration: totalSessionDurationSeconds,
+          timestamp: new Date().toISOString()
+        })
+      });
+
+      if (sessionRecordResponse.ok) {
+        console.log('ノーマルモードセッション全体の学習記録を保存しました。');
+      } else {
+        console.error('ノーマルモードセッション全体の学習記録の保存に失敗しました:', sessionRecordResponse.statusText);
       }
-
-      // 全問完了したら、その単元の進捗記録を「完了済み」として保存 (lastProblemIndexは0に戻す)
-      await saveUserProgress(currentUserId, unitId, 0, true);
-      // リザルト画面へ遷移 (state を渡す)
-      await goto('/normal-mode/result', { state: { results: results, unitName: unitDisplayName} });
-      return;
+    } catch (error) {
+      console.error('ノーマルモードセッション全体の学習記録の送信中にエラーが発生しました:', error);
     }
+
+    // ★修正：全問正解の場合のみisCompleted: trueで保存★
+    if (allCorrect) {
+      // 全問正解したら、その単元の進捗記録を「完了済み」として保存 (lastProblemIndexは0に戻す)
+      await saveUserProgress(currentUserId, unitId, 0, true);
+      console.log(`Unit ${unitId} completed successfully - all problems correct!`);
+    } else {
+      // 全問正解でない場合は、最後の問題インデックスを保存（isCompletedはfalseのまま）
+      await saveUserProgress(currentUserId, unitId, problems.length - 1, false);
+      console.log(`Unit ${unitId} finished but not all problems were correct`);
+    }
+
+    // リザルト画面へ遷移 (state を渡す)
+    await goto('/normal-mode/result', {
+      state: {
+        results: results,
+        unitName: unitDisplayName,
+        allCorrect: allCorrect // リザルト画面で使用可能
+      }
+    });
+    return;
   }
+}
 
   // コンポーネントマウント時
   onMount(async () => {

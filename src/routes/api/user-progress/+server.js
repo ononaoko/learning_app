@@ -73,11 +73,11 @@ export async function GET({ url }) {
 					if (fieldType === 'lastProblemIndex') {
 						groupedProgress[currentUnitId].lastProblemIndex = parseInt(allProgressFields[field], 10)
 					} else if (fieldType === 'isCompleted') {
-						groupedProgress[currentUnitId].isCompleted = (allProgressFields[field] === 'true') // ★修正点★
+						groupedProgress[currentUnitId].isCompleted = (allProgressFields[field] === 'true');
 					} else if (fieldType === 'completionDate') {
-						groupedProgress[currentUnitId].completionDate = allProgressFields[field]
+						groupedProgress[currentUnitId].completionDate = allProgressFields[field] === 'null' ? null : allProgressFields[field];
 					} else if (fieldType === 'lastEbbinghausReview') {
-						groupedProgress[currentUnitId].lastEbbinghausReview = allProgressFields[field]
+						groupedProgress[currentUnitId].lastEbbinghausReview = allProgressFields[field] === 'null' ? null : allProgressFields[field];
 					} else if (fieldType === 'ebbinghausReviewCount') {
 						groupedProgress[currentUnitId].ebbinghausReviewCount = parseInt(
 							allProgressFields[field],

@@ -24,7 +24,7 @@ export async function POST({ request }) {
 		const { userId, mode, unitId, duration, timestamp } = await request.json()
 
 		// 必須データのバリデーション
-		if (!userId || !mode || duration === undefined || duration === null || !timestamp) {
+		if (!userId || !mode || typeof duration !== 'number' || isNaN(duration) || !timestamp) {
 			return json({ error: 'Missing required session record data' }, { status: 400 })
 		}
 

@@ -23,7 +23,7 @@
     }
     try {
       // ユーザーの全単元の進捗を取得
-      const response = await fetch(`/api/user-progress?userId=${userId}`);
+    await fetch(`/api/user-progress?userId=${userId}`);
       if (response.ok) {
         const progressArray = await response.json();
         const progressMap = {};
