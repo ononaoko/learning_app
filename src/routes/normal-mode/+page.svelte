@@ -1,39 +1,33 @@
 <script>
   import { goto } from '$app/navigation';
-  import { onMount } from 'svelte'; // onMount をインポート
+  import { onMount } from 'svelte';
   import IconHamburger from '$lib/components/IconHamburger.svelte';
-  import { units } from '$lib/data/units.js'; // 単元データをインポート
-  import AppNavigation from '$lib/components/AppNavigation.svelte'; // ナビゲーションコンポーネントをインポート
-  import UnitStatusClearIcon from '$lib/components/UnitStatusClearIcon.svelte';
+  import { units } from '$lib/data/units.js';
+  import AppNavigation from '$lib/components/AppNavigation.svelte';
+  import UnitStatusPerfectIcon from '$lib/components/UnitStatusPerfectIcon.svelte';
   import UnitStatusInProgressIcon from '$lib/components/UnitStatusInProgressIcon.svelte';
 
-
-  export let data; // layout.server.ts から data を受け取る
-  let currentUserId = data.userId; // ユーザーIDを取得
+  export let data;
+  let currentUserId = data.userId;
 
   let isOpen = false;
-  let userProgress = {}; // ユーザーの学習進捗を保持するオブジェクト { unitId: { lastProblemIndex: ..., isCompleted: ... }, ... }
-  let processedUnits = []; // ユーザー進捗情報をマージした単元データ
+  let userProgress = {};
+  let processedUnits = [];
 
-  // ユーザーの進捗データをロードする関数
   async function loadUserProgress(userId) {
     if (!userId) {
       console.warn('User ID is not available for loading progress.');
       return;
     }
     try {
-      // ユーザーの全単元の進捗を取得
-    await fetch(`/api/user-progress?userId=${userId}`);
+      const response = await fetch(`/api/user-progress?userId=${userId}`);
       if (response.ok) {
         const progressArray = await response.json();
         const progressMap = {};
-        // 配列をオブジェクトに変換し、unitIdでアクセスできるようにする
         progressArray.forEach(p => {
           progressMap[p.unitId] = p;
         });
         userProgress = progressMap;
-        console.log('Loaded user progress:', userProgress);
-        // 進捗をロードした後で単元データを処理
         processUnitsData();
       } else {
         console.error('Failed to load user progress:', response.statusText);
@@ -43,25 +37,24 @@
     }
   }
 
-  // 単元データとユーザー進捗情報をマージする関数
   function processUnitsData() {
     processedUnits = units.map(category => ({
       ...category,
       sub_units: category.sub_units.map(subcategory => ({
         ...subcategory,
         sub_units: subcategory.sub_units ? subcategory.sub_units.map(unit => {
-          const progress = userProgress[unit.id] || {};
-          return {
+          const progress = userProgress[unit.id];
+
+          const processedUnit = {
             ...unit,
-            // isCompleted はAPIから取得した値、またはデフォルトで false
-            isCompleted: progress.isCompleted || false,
-            // lastProblemIndex はAPIから取得した値、またはデフォルトで 0
-            lastProblemIndex: progress.lastProblemIndex !== undefined ? progress.lastProblemIndex : 0
+            isCompleted: progress && progress.isCompleted === true ? true : false,
+            lastProblemIndex: progress && typeof progress.lastProblemIndex === 'number' ? progress.lastProblemIndex : 0
           };
+
+          return processedUnit;
         }) : []
       }))
     }));
-    console.log('Processed units with progress:', processedUnits);
   }
 
   onMount(async () => {
@@ -74,27 +67,21 @@
 
   function goToTop() {
     goto('/');
-    isOpen = false; // メニューを閉じる
+    isOpen = false;
   }
 
-  // 単元が選択されたときの処理
   function selectUnit(unitId) {
-    console.log('選択された単元ID:', unitId);
-    goto(`/normal-mode/${unitId}`); // 動的ルートへ遷移
+    goto(`/normal-mode/${unitId}`);
   }
 
-  // ★この getUnitButtonStyle 関数が欠落している可能性が高いです。ここに追加してください。★
-  // 単元ボタンのスタイルを決定する関数
   function getUnitButtonStyle(unit) {
     let baseStyle = "w-full text-left bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex2)] hover:bg-teal-300 text-stone-700 font-bold py-2 px-4 rounded-md shadow-md text-lg transition duration-200 ease-in-out flex items-center justify-between";
     let statusStyle = "";
 
     if (unit.isCompleted) {
-      // 単元がクリアされている場合（`lastProblemIndex` は `0` になっているはず）
-      statusStyle = "bg-green-200 hover:bg-green-300"; // 明るい緑色
+      statusStyle = "bg-green-200 hover:bg-green-300";
     } else if (unit.lastProblemIndex > 0) {
-      // 完了していないが、途中まで進捗がある場合
-      statusStyle = "bg-blue-100 hover:bg-blue-200"; // 明るい青色 (中断中)
+      statusStyle = "bg-blue-100 hover:bg-blue-200";
     }
 
     return `${baseStyle} ${statusStyle}`;
@@ -108,8 +95,8 @@
 <main class="flex flex-col items-center min-h-screen bg-gray-100 p-8">
   <header class="
   w-full p-6 rounded-md relative
-  bg-stone-100 /* stone-200を直接指定 */
-  [box-shadow:var(--shadow-neumorphic-convex)] /* CSS変数を直接参照 */
+  bg-stone-100
+  [box-shadow:var(--shadow-neumorphic-convex)]
 ">
     <div class="flex items-center justify-between">
       <h1 class="text-4xl font-bold text-stone-700">通常モード</h1>
@@ -125,7 +112,7 @@
 
     {#each processedUnits as category (category.name)}
       <div class="mb-8">
-        <h3 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-500 pb-2 mb-4">
+        <h3 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-400 pb-2 mb-4">
           {category.name}
         </h3>
         {#if category.sub_units}
@@ -143,7 +130,7 @@
                         >
                           <span>{unit.name}</span>
                           {#if unit.isCompleted}
-                            <UnitStatusClearIcon />
+                            <UnitStatusPerfectIcon text="Perfect"/>
                           {:else if unit.lastProblemIndex > 0}
                             <UnitStatusInProgressIcon />
                           {/if}

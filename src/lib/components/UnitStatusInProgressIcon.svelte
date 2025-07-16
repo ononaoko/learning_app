@@ -1,11 +1,11 @@
 <script>
-    export let text = '途中'; // 表示するテキスト
-    export let iconSize = '18'; // アイコンのサイズ
-    export let bgColor = 'bg-blue-100'; // 背景色
-    export let textColor = 'text-blue-700'; // テキスト色
+    export let text = 'In Progress'; // 表示するテキスト
+    export let iconSize = '14'; // アイコンのサイズ
+    export let bgColor = 'bg-blue-400'; // 背景色
+    export let textColor = 'text-white'; // テキスト色
   </script>
 
-  <div class="flex items-center space-x-1 px-2 py-1 rounded-full {bgColor} {textColor} text-sm font-semibold">
+  <div class="flex items-center space-x-1 px-2 py-1 rounded-full {bgColor} {textColor} text-xs font-semibold">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={iconSize}

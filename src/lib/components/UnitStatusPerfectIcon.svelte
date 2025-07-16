@@ -1,11 +1,11 @@
 <script>
     export let text = 'CLEAR'; // 表示するテキスト
-    export let iconSize = '18'; // アイコンのサイズ
+    export let iconSize = '14'; // アイコンのサイズ
     export let bgColor = 'bg-teal-400'; // 背景色
     export let textColor = 'text-white'; // テキスト色
   </script>
 
-  <div class="flex items-center space-x-1 px-2 py-1 rounded-full {bgColor} {textColor} text-sm font-semibold">
+  <div class="flex items-center space-x-1 px-2 py-1 rounded-full {bgColor} {textColor} text-xs font-semibold">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={iconSize}

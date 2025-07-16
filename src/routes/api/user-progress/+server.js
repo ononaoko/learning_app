@@ -1,15 +1,23 @@
 // src/routes/api/user-progress/+server.js
 
 import { json } from '@sveltejs/kit'
-import redis from '$lib/server/database' // Redisクライアントをインポート
+import redis from '$lib/server/database'
+
+/**
+ * 安全なboolean変換関数
+ */
+function parseBoolean(value) {
+	if (value === true || value === 'true') return true;
+	if (value === false || value === 'false') return false;
+	return false; // デフォルト値
+}
 
 /**
  * 特定のユーザーの単元学習進行状況を取得するAPI
- * @type {import('./$types').RequestHandler}
  */
 export async function GET({ url }) {
 	const userId = url.searchParams.get('userId')
-	const unitId = url.searchParams.get('unitId') // 特定の単元IDが指定された場合
+	const unitId = url.searchParams.get('unitId')
 
 	if (!userId) {
 		return new Response('User ID is required', { status: 400 })
@@ -19,6 +27,7 @@ export async function GET({ url }) {
 		const progressKey = `user:progress:${userId}`
 
 		if (unitId) {
+			// 単一の単元の進捗を取得
 			const allUnitProgressFields = await redis.hgetall(progressKey)
 
 			if (allUnitProgressFields) {
@@ -28,7 +37,7 @@ export async function GET({ url }) {
 						allUnitProgressFields[`${unitId}:lastProblemIndex`] || '0',
 						10
 					),
-					isCompleted: allUnitProgressFields[`${unitId}:isCompleted`] === 'true',
+					isCompleted: parseBoolean(allUnitProgressFields[`${unitId}:isCompleted`]),
 					completionDate: allUnitProgressFields[`${unitId}:completionDate`] || null,
 					lastEbbinghausReview: allUnitProgressFields[`${unitId}:lastEbbinghausReview`] || null,
 					ebbinghausReviewCount: parseInt(
@@ -36,7 +45,6 @@ export async function GET({ url }) {
 						10
 					)
 				}
-				console.log(`[API] Returning progress for unit ${unitId} for user ${userId}:`, unitProgress)
 				return json(unitProgress)
 			} else {
 				const defaultProgress = {
@@ -47,49 +55,61 @@ export async function GET({ url }) {
 					lastEbbinghausReview: null,
 					ebbinghausReviewCount: 0
 				}
-				console.log(
-					`[API] No progress found for unit ${unitId} for user ${userId}. Returning default.`,
-					defaultProgress
-				)
 				return json(defaultProgress)
 			}
 		} else {
+			// 全ての単元の進捗を取得
 			const allProgressFields = await redis.hgetall(progressKey)
 
 			if (allProgressFields) {
 				const groupedProgress = {}
+
+				// 最初に全てのunitIdを特定
+				const unitIds = new Set()
 				for (const field in allProgressFields) {
 					const [currentUnitId, fieldType] = field.split(':')
-					if (!groupedProgress[currentUnitId]) {
-						groupedProgress[currentUnitId] = {
-							unitId: currentUnitId,
-							lastProblemIndex: 0,
-							isCompleted: false,
-							completionDate: null,
-							lastEbbinghausReview: null,
-							ebbinghausReviewCount: 0
-						}
-					}
-					if (fieldType === 'lastProblemIndex') {
-						groupedProgress[currentUnitId].lastProblemIndex = parseInt(allProgressFields[field], 10)
-					} else if (fieldType === 'isCompleted') {
-						groupedProgress[currentUnitId].isCompleted = (allProgressFields[field] === 'true');
-					} else if (fieldType === 'completionDate') {
-						groupedProgress[currentUnitId].completionDate = allProgressFields[field] === 'null' ? null : allProgressFields[field];
-					} else if (fieldType === 'lastEbbinghausReview') {
-						groupedProgress[currentUnitId].lastEbbinghausReview = allProgressFields[field] === 'null' ? null : allProgressFields[field];
-					} else if (fieldType === 'ebbinghausReviewCount') {
-						groupedProgress[currentUnitId].ebbinghausReviewCount = parseInt(
-							allProgressFields[field],
-							10
-						)
+					if (currentUnitId && fieldType) {
+						unitIds.add(currentUnitId)
 					}
 				}
+
+				// 各unitIdについて、実際のデータがある場合のみ処理
+				for (const currentUnitId of unitIds) {
+					const lastProblemIndexField = `${currentUnitId}:lastProblemIndex`
+					const isCompletedField = `${currentUnitId}:isCompleted`
+					const completionDateField = `${currentUnitId}:completionDate`
+					const lastEbbinghausReviewField = `${currentUnitId}:lastEbbinghausReview`
+					const ebbinghausReviewCountField = `${currentUnitId}:ebbinghausReviewCount`
+
+					// 少なくとも1つのフィールドが存在する場合のみ処理
+					if (allProgressFields[lastProblemIndexField] !== undefined ||
+						allProgressFields[isCompletedField] !== undefined ||
+						allProgressFields[completionDateField] !== undefined ||
+						allProgressFields[lastEbbinghausReviewField] !== undefined ||
+						allProgressFields[ebbinghausReviewCountField] !== undefined) {
+
+						const unitProgress = {
+							unitId: currentUnitId,
+							lastProblemIndex: parseInt(
+								allProgressFields[lastProblemIndexField] || '0',
+								10
+							),
+							isCompleted: parseBoolean(allProgressFields[isCompletedField]),
+							completionDate: allProgressFields[completionDateField] === 'null' ? null : (allProgressFields[completionDateField] || null),
+							lastEbbinghausReview: allProgressFields[lastEbbinghausReviewField] === 'null' ? null : (allProgressFields[lastEbbinghausReviewField] || null),
+							ebbinghausReviewCount: parseInt(
+								allProgressFields[ebbinghausReviewCountField] || '0',
+								10
+							)
+						}
+
+						groupedProgress[currentUnitId] = unitProgress
+					}
+				}
+
 				const progressArray = Object.values(groupedProgress)
-				console.log(`[API] Returning all progress for user ${userId}:`, progressArray)
 				return json(progressArray)
 			} else {
-				console.log(`[API] No overall progress found for user ${userId}. Returning empty array.`)
 				return json([])
 			}
 		}
@@ -101,11 +121,9 @@ export async function GET({ url }) {
 
 /**
  * ユーザーの単元学習進行状況を更新するAPI
- * @type {import('./$types').RequestHandler}
  */
 export async function POST({ request }) {
 	try {
-		// isCompleted と ebbinghausReviewCount をオプションにするため、初期値 undefined を設定
 		const {
 			userId,
 			unitId,
@@ -115,7 +133,6 @@ export async function POST({ request }) {
 		} = await request.json()
 
 		if (!userId || !unitId || lastProblemIndex === undefined) {
-			// isCompleted は必須ではなくなった
 			return new Response('Missing required fields: userId, unitId, lastProblemIndex', {
 				status: 400
 			})
@@ -127,44 +144,47 @@ export async function POST({ request }) {
 		// lastProblemIndexの更新は常に実行
 		updates[`${unitId}:lastProblemIndex`] = lastProblemIndex.toString()
 
-		// isCompletedが明確に指定された場合のみ更新、undefinedの場合は既存の値を維持
 		if (isCompleted !== undefined) {
-			updates[`${unitId}:isCompleted`] = isCompleted.toString()
+			// 既存の値を取得
+			const existingIsCompleted = await redis.hget(progressKey, `${unitId}:isCompleted`);
+			const existingBool = parseBoolean(existingIsCompleted);
+
+			// 一度trueになった後にfalseに戻さないようにする保護ロジック
+			if (isCompleted === false && existingBool === true) {
+				// falseに戻そうとする場合は更新しない
+			} else {
+				updates[`${unitId}:isCompleted`] = isCompleted.toString();
+			}
 		}
 
-		// 単元が完了した場合、completionDateを現在時刻に設定
+		// completionDateの処理
 		if (isCompleted === true) {
-			// isCompletedがtrueの場合のみ
 			const existingIsCompleted = await redis.hget(progressKey, `${unitId}:isCompleted`)
-			// 既存のisCompletedが'true'でない、または存在しない場合のみcompletionDateを設定
-			if (existingIsCompleted !== 'true') {
+			const existingCompletionDate = await redis.hget(progressKey, `${unitId}:completionDate`)
+			const existingBool = parseBoolean(existingIsCompleted);
+
+			if (!existingBool || !existingCompletionDate || existingCompletionDate === 'null') {
 				updates[`${unitId}:completionDate`] = new Date().toISOString()
-				console.log(`[API] Setting completionDate for ${unitId} for user ${userId}`)
 			}
 		} else if (isCompleted === false) {
-			// isCompletedがfalseになった場合
 			const existingIsCompleted = await redis.hget(progressKey, `${unitId}:isCompleted`)
-			// 既存が'true'の場合のみcompletionDateをnullにリセット（再学習開始時など）
-			if (existingIsCompleted === 'true') {
+			const existingBool = parseBoolean(existingIsCompleted);
+			if (existingBool === true) {
 				updates[`${unitId}:completionDate`] = 'null'
-				console.log(`[API] Resetting completionDate for ${unitId} for user ${userId}`)
 			}
 		}
 
 		// ebbinghausReviewCountが存在する場合のみ更新
 		if (ebbinghausReviewCount !== undefined && ebbinghausReviewCount !== null) {
 			updates[`${unitId}:ebbinghausReviewCount`] = ebbinghausReviewCount.toString()
-			// エビングハウス復習回数が更新されたら、最終復習日時も更新
 			updates[`${unitId}:lastEbbinghausReview`] = new Date().toISOString()
-		} else {
-			// ebbinghausReviewCountが明示的にnullまたはundefinedの場合、lastEbbinghausReviewもリセットしない
-			// ここでは明示的に指定がない場合は既存の値を維持する
 		}
 
-		// Redisハッシュにまとめて更新を適用
-		await redis.hmset(progressKey, updates)
+		// 更新するフィールドがある場合のみRedisを更新
+		if (Object.keys(updates).length > 0) {
+			await redis.hmset(progressKey, updates)
+		}
 
-		console.log(`[API] User progress updated for ${userId}, unit ${unitId}.`, updates)
 		return json({ message: 'Progress updated successfully' })
 	} catch (error) {
 		console.error('[API] Failed to update user progress:', error)
