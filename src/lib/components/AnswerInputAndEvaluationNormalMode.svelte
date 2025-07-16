@@ -128,11 +128,9 @@
           <IconClose width="64" height="64" color="#3b82f6" />
         {/if}
       </div>
-          {#if !isCorrect}
             <div class="text-lg text-stone-700 text-center">
               <KaTeXDisplay textContent={currentProblemAnswer} displayMode={false} fontSizeClass="text-2xl" textColor="text-stone-700" />
             </div>
-          {/if}
           <div class="flex flex-col lg:flex-row-reverse gap-8">
         <TealButton
         text="次の問題へ"

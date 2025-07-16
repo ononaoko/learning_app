@@ -13,6 +13,7 @@
   let isOpen = false;
   let userProgress = {};
   let processedUnits = [];
+  let clickSound; // 単元選択時の効果音
 
   async function loadUserProgress(userId) {
     if (!userId) {
@@ -90,21 +91,62 @@
     }
   }
 
-  onMount(async () => {
-    await loadUserProgress(currentUserId);
+// 効果音を再生する関数 - デバッグ強化版
+function playClickSound() {
+  console.log('playClickSound関数が呼ばれました');
 
-    // ページの可視性変更を監視
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+  if (clickSound) {
+    console.log('clickSound要素が存在します');
 
-    // オプション：定期的な進捗更新を開始
-    startProgressPolling();
+    // 音声ファイルがロードされているか確認
+    if (clickSound.readyState >= 2) {
+      console.log('音声ファイルは正常にロードされています');
+    } else {
+      console.warn('音声ファイルが完全にロードされていません', clickSound.readyState);
+    }
 
-    // クリーンアップ関数
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      stopProgressPolling();
-    };
-  });
+    // 音量の確認
+    console.log('音量設定:', clickSound.volume);
+
+    // 再生を試みる
+    clickSound.currentTime = 0;
+    clickSound.volume = 1.0; // 最大音量に設定
+
+    // Promise APIを使用
+    clickSound.play()
+      .then(() => {
+        console.log('効果音の再生に成功しました');
+      })
+      .catch(e => {
+        console.error('効果音の再生に失敗しました:', e);
+      });
+  } else {
+    console.error('clickSound要素が見つかりません');
+  }
+}
+
+ // onMountでのデバッグ追加
+onMount(async () => {
+  await loadUserProgress(currentUserId);
+
+  // オーディオ要素の初期化確認
+  console.log('onMount: オーディオ要素の状態確認');
+  if (clickSound) {
+    console.log('オーディオ要素が正常に初期化されました');
+  } else {
+    console.warn('オーディオ要素が初期化されていません');
+  }
+
+  // 以下は既存のコード
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  startProgressPolling();
+
+  // クリーンアップ関数
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    stopProgressPolling();
+  };
+});
 
   function toggleMenu() {
     isOpen = !isOpen;
@@ -115,12 +157,40 @@
     isOpen = false;
   }
 
-  function selectUnit(unitId) {
+// 効果音を再生してから遅延してページ遷移する関数
+function selectUnit(unitId) {
+  console.log(`単元選択: ${unitId}`);
+
+  // 効果音を再生
+  if (clickSound) {
+    clickSound.currentTime = 0;
+    clickSound.volume = 1.0;
+
+    // 音声再生をPromiseとして扱い、再生開始後に遅延してから遷移
+    clickSound.play()
+      .then(() => {
+        console.log('効果音の再生を開始しました');
+
+        // 音声が少なくとも100〜300ms程度再生されてから遷移
+        setTimeout(() => {
+          console.log(`ページ遷移を実行: /normal-mode/${unitId}`);
+          goto(`/normal-mode/${unitId}`);
+        }, 200); // 200msの遅延
+      })
+      .catch(e => {
+        console.error('効果音の再生に失敗しました:', e);
+        // 再生に失敗した場合はすぐに遷移
+        goto(`/normal-mode/${unitId}`);
+      });
+  } else {
+    // clickSoundが利用できない場合はすぐに遷移
+    console.warn('音声要素が利用できないため、すぐに遷移します');
     goto(`/normal-mode/${unitId}`);
   }
+}
 
   function getUnitButtonStyle(unit) {
-    let baseStyle = "w-full text-left bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex2)] hover:bg-stone-200 text-stone-700 font-bold py-2 px-4 rounded-md shadow-md text-lg transition duration-500 ease-out flex items-center justify-between";
+    let baseStyle = "w-full text-left bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex2)] cursor-pointer hover:bg-stone-200 active:bg-stone-200 text-stone-700 font-bold py-2 px-4 rounded-md shadow-md text-lg transition duration-500 ease-out flex items-center justify-between";
     let statusStyle = "";
 
     if (unit.isCompleted && unit.isPerfect) {
@@ -142,6 +212,9 @@
 </svelte:head>
 
 <svelte:window on:progress-updated={handleProgressUpdate} />
+
+<!-- 効果音用のaudio要素を追加 -->
+<audio bind:this={clickSound} src="/sounds/tap.mp3" preload="auto"></audio>
 
 <main class="flex flex-col items-center gap-8 min-h-screen bg-gradient-to-br from-stone-100 via-stone-100 to-stone-200 p-8">
   <header class="
@@ -181,7 +254,7 @@
                     {#each subcategory.sub_units as unit (unit.id)}
                       <li>
                         <button
-                          class="{getUnitButtonStyle(unit)} cursor-pointer"
+                          class="{getUnitButtonStyle(unit)}"
                           on:click={() => selectUnit(unit.id)}
                         >
                           <span class="text-base font-normal">{unit.name}</span>

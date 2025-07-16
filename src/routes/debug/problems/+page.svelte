@@ -10,7 +10,8 @@
     let selectedUnit = 'concentration'; // 初期表示する単元
     let availableUnits = [ // 利用可能な単元リスト (必要に応じて追加)
       { id: 'basic_ratio_proportion', name: '比と割合' }, // 新しく追加した単元があれば追加
-      { id: 'concentration', name: '濃度' } // 新しく追加した単元があれば追加
+      { id: 'concentration', name: '濃度' }, // 新しく追加した単元があれば追加
+      { id: 'equivalent_calc', name: '相当算' }
     ];
 
     // 全問題データをロードする関数

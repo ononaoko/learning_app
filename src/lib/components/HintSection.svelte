@@ -1,19 +1,47 @@
 <script>
   import { slide, fly } from 'svelte/transition';
   import KaTeXDisplay from '$lib/components/KaTeXDisplay.svelte';
+  import { onMount } from 'svelte';
 
   export let hints = [];
   export let currentHintIndex = 0;
   export let showAnswerArea = false;
   export let showAllHints = false;
 
-  // 「次のヒントを見る」ボタンがないため、ディスパッチャー関連のコードは不要
-  // import { createEventDispatcher } from 'svelte';
-  // const dispatch = createEventDispatcher();
-  // function showNextHint() {
-  //   dispatch('showNextHint');
-  // }
+  let slideSound;
+  let previousHintIndex = 0;
+  let wasShowAllHints = false;
+
+  // ヒント音を再生する関数
+  function playSlideSound() {
+    if (slideSound) {
+      slideSound.currentTime = 0;
+      slideSound.play().catch(e => console.error("スライド音の再生エラー:", e));
+    }
+  }
+
+  // currentHintIndexが変化したときに効果音を鳴らす
+  $: if (currentHintIndex > previousHintIndex) {
+    playSlideSound();
+    previousHintIndex = currentHintIndex;
+  }
+
+  // showAllHintsがtrueに変化したときにも効果音を鳴らす
+  $: if (showAllHints && !wasShowAllHints) {
+    playSlideSound();
+    wasShowAllHints = showAllHints;
+  }
+
+  // コンポーネントがマウントされたときの処理
+  onMount(() => {
+    // 初期状態をセット
+    previousHintIndex = currentHintIndex;
+    wasShowAllHints = showAllHints;
+  });
 </script>
+
+<!-- 効果音のaudio要素 -->
+<audio bind:this={slideSound} src="/sounds/slide.mp3" preload="auto"></audio>
 
 <div transition:slide={{ duration: 300 }}>
   {#each hints as hint, index}
@@ -42,8 +70,7 @@
       {/if}
     {/if}
   {/each}
-
-  </div>
+</div>
 
 <style>
   /* 既存のKaTeXスタイルや、HintSection固有のスタイル */

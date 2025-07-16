@@ -1,0 +1,509 @@
+[
+    {
+        "id": "equivalent_calc-01",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "Aさんは、ある本を1日目には全体の" },
+            { "type": "math", "value": "\\tfrac{1}{6}" },
+            { "type": "text", "value": "を読み、2日目には残りの" },
+            { "type": "math", "value": "\\tfrac{4}{5}" },
+            { "type": "text", "value": "を読んだところ、まだ10ページ残っていました。この本は全部で何ページか、答えなさい。" }
+        ],
+        "source": "立正中",
+        "answer": [
+            { "type": "math", "value": "60" },
+            { "type": "text", "value": "ページ" }
+        ],
+        "acceptableAnswers": [
+            "60",
+            "60ページ",
+            "ろくじゅう",
+            "ろくじゅうページ"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "まず、最後に残った10ページから考え始めよう。Aさんは2日目に「残りの" },
+                    { "type": "math", "value": "\\tfrac{4}{5}" },
+                    { "type": "text", "value": "」を読んだんだね。ということは、残った10ページは、2日目に読む前の残りの「1から" },
+                    { "type": "math", "value": "\\tfrac{4}{5}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{2日目に読む前の残りページ数} \\times \\left(1 - \\dfrac{4}{5}\\right) &= 10 \\\\ \\text{2日目に読む前の残りページ数} \\times \\dfrac{1}{5} &= 10 \\\\ \\text{2日目に読む前の残りページ数} &= 10 \\div \\dfrac{1}{5} \\\\ &= 10 \\times 5 \\\\ &= 50 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "次に、この「2日目に読む前の残りページ数50ページ」が、1日目に本を読んだ後の残りのページ数になるね。1日目には本全体の" },
+                    { "type": "math", "value": "\\tfrac{1}{6}" },
+                    { "type": "text", "value": "を読んだんだから、残りの50ページは本全体の「1から" },
+                    { "type": "math", "value": "\\tfrac{1}{6}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{本全体のページ数} \\times \\left(1 - \\dfrac{1}{6}\\right) &= 50 \\\\ \\text{本全体のページ数} \\times \\dfrac{5}{6} &= 50 \\\\ \\text{本全体のページ数} &= 50 \\div \\dfrac{5}{6} \\\\ &= 50 \\times \\dfrac{6}{5} \\\\ &= 10 \\times 6 \\\\ &= 60 \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "equivalent_calc-02",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "折り紙を用意して鶴を折りました。1日目は用意した折り紙の" },
+            { "type": "math", "value": "\\tfrac{1}{5}" },
+            { "type": "text", "value": "を、2日目は残った折り紙の" },
+            { "type": "math", "value": "\\tfrac{2}{3}" },
+            { "type": "text", "value": "を折りました。3日目はさらに残った折り紙の" },
+            { "type": "math", "value": "\\tfrac{2}{3}" },
+            { "type": "text", "value": "を折ったので、あと160枚折ればすべて折り終わります。折り紙は何枚用意したか、答えなさい。" }
+        ],
+        "source": "浦和明の星女子中",
+        "answer": [
+            { "type": "math", "value": "1200" },
+            { "type": "text", "value": "枚" }
+        ],
+        "acceptableAnswers": [
+            "1200",
+            "1200枚",
+            "せんにはく",
+            "せんにはくまい"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "まず、最後に残った160枚から考え始めよう。3日目には「残りの" },
+                    { "type": "math", "value": "\\tfrac{2}{3}" },
+                    { "type": "text", "value": "」を折ったんだね。ということは、あと160枚折ればすべて折り終わるのだから、この160枚は3日目に折る前の残りの「1から" },
+                    { "type": "math", "value": "\\tfrac{2}{3}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{3日目に折る前の残り枚数} \\times \\left(1 - \\dfrac{2}{3}\\right) &= 160 \\\\ \\text{3日目に折る前の残り枚数} \\times \\dfrac{1}{3} &= 160 \\\\ \\text{3日目に折る前の残り枚数} &= 160 \\div \\dfrac{1}{3} \\\\ &= 160 \\times 3 \\\\ &= 480 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "次に、この「3日目に折る前の残り枚数480枚」が、2日目に折った後の残りの枚数になるね。2日目には「残った折り紙の" },
+                    { "type": "math", "value": "\\tfrac{2}{3}" },
+                    { "type": "text", "value": "」を折ったんだから、残りの480枚は2日目に折る前の残りの「1から" },
+                    { "type": "math", "value": "\\tfrac{2}{3}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{2日目に折る前の残り枚数} \\times \\left(1 - \\dfrac{2}{3}\\right) &= 480 \\\\ \\text{2日目に折る前の残り枚数} \\times \\dfrac{1}{3} &= 480 \\\\ \\text{2日目に折る前の残り枚数} &= 480 \\div \\dfrac{1}{3} \\\\ &= 480 \\times 3 \\\\ &= 1440 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "最後に、この「2日目に折る前の残り枚数1440枚」が、1日目に折った後の残りの枚数になるね。1日目には「用意した折り紙の" },
+                    { "type": "math", "value": "\\tfrac{1}{5}" },
+                    { "type": "text", "value": "」を折ったんだから、残りの1440枚は最初に用意した折り紙全体の「1から" },
+                    { "type": "math", "value": "\\tfrac{1}{5}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{最初に用意した折り紙の枚数} \\times \\left(1 - \\dfrac{1}{5}\\right) &= 1440 \\\\ \\text{最初に用意した折り紙の枚数} \\times \\dfrac{4}{5} &= 1440 \\\\ \\text{最初に用意した折り紙の枚数} &= 1440 \\div \\dfrac{4}{5} \\\\ &= 1440 \\times \\dfrac{5}{4} \\\\ &= 360 \\times 5 \\\\ &= 1800 \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "equivalent_calc-03",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "壁にペンキをぬります。1日目に壁の" },
+            { "type": "math", "value": "\\tfrac{2}{5}" },
+            { "type": "text", "value": "をぬり、2日目に残りの" },
+            { "type": "math", "value": "\\tfrac{3}{7}" },
+            { "type": "text", "value": "だけぬると、ペンキをぬっていない部分が13m²残ります。壁の広さは何m²か、答えなさい。" }
+        ],
+        "source": "広島学院中",
+        "answer": [
+            { "type": "math", "value": "35" },
+            { "type": "text", "value": "m²" }
+        ],
+        "acceptableAnswers": [
+            "35",
+            "35m2",
+            "35平方メートル",
+            "さんじゅうご",
+            "さんじゅうごへいほうめーとる"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "まず、最後に残った13m²から考え始めよう。2日目に「残りの" },
+                    { "type": "math", "value": "\\tfrac{3}{7}" },
+                    { "type": "text", "value": "」をぬったんだね。ということは、ぬっていない部分の13m²は、2日目にぬる前の残りの「1から" },
+                    { "type": "math", "value": "\\tfrac{3}{7}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{2日目にぬる前の残り面積} \\times \\left(1 - \\dfrac{3}{7}\\right) &= 13 \\\\ \\text{2日目にぬる前の残り面積} \\times \\dfrac{4}{7} &= 13 \\\\ \\text{2日目にぬる前の残り面積} &= 13 \\div \\dfrac{4}{7} \\\\ &= 13 \\times \\dfrac{7}{4} \\\\ &= \\dfrac{91}{4} \\\\ &= 22.75 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "次に、この「2日目にぬる前の残り面積22.75m²」が、1日目に壁をぬった後の残りの面積になるね。1日目には壁全体の" },
+                    { "type": "math", "value": "\\tfrac{2}{5}" },
+                    { "type": "text", "value": "をぬったんだから、残りの22.75m²は壁全体の「1から" },
+                    { "type": "math", "value": "\\tfrac{2}{5}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{壁全体の広さ} \\times \\left(1 - \\dfrac{2}{5}\\right) &= 22.75 \\\\ \\text{壁全体の広さ} \\times \\dfrac{3}{5} &= 22.75 \\\\ \\text{壁全体の広さ} &= 22.75 \\div \\dfrac{3}{5} \\\\ &= 22.75 \\times \\dfrac{5}{3} \\\\ &= \\dfrac{113.75}{3} \\\\ &= 37.916... \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "equivalent_calc-04",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "A君は、ある本を、1日目に全体の" },
+            { "type": "math", "value": "\\tfrac{2}{7}" },
+            { "type": "text", "value": "にあたるページ数を読み、2日目に180ページを読み、3日目に残り" },
+            { "type": "math", "value": "\\tfrac{1}{3}" },
+            { "type": "text", "value": "にあたるページ数を読んだところ、100ページ残りました。この本は全部で何ページか、答えなさい。" }
+        ],
+        "source": "東京都市大学付属中",
+        "answer": [
+            { "type": "math", "value": "420" },
+            { "type": "text", "value": "ページ" }
+        ],
+        "acceptableAnswers": [
+            "420",
+            "420ページ",
+            "よんひゃくにじゅう",
+            "よんひゃくにじゅうページ"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "まず、最後に残った100ページから考え始めよう。3日目には「残り" },
+                    { "type": "math", "value": "\\tfrac{1}{3}" },
+                    { "type": "text", "value": "」を読んだんだね。ということは、残った100ページは、3日目に読む前の残りの「1から" },
+                    { "type": "math", "value": "\\tfrac{1}{3}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{3日目に読む前の残りページ数} \\times \\left(1 - \\dfrac{1}{3}\\right) &= 100 \\\\ \\text{3日目に読む前の残りページ数} \\times \\dfrac{2}{3} &= 100 \\\\ \\text{3日目に読む前の残りページ数} &= 100 \\div \\dfrac{2}{3} \\\\ &= 100 \\times \\dfrac{3}{2} \\\\ &= 150 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "次に、この「3日目に読む前の残りページ数150ページ」は、1日目に読んだ後の残りページ数から2日目に読んだ180ページを引いたものになるね。だから、この150ページに2日目に読んだ180ページを足すと、1日目に読んだ後の残りページ数がわかるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{1日目に読んだ後の残りページ数} &= 150 + 180 \\\\ &= 330 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "最後に、この「1日目に読んだ後の残りページ数330ページ」が、本全体のどれくらいの割合にあたるか考えよう。1日目には本全体の" },
+                    { "type": "math", "value": "\\tfrac{2}{7}" },
+                    { "type": "text", "value": "を読んだんだから、残りの330ページは本全体の「1から" },
+                    { "type": "math", "value": "\\tfrac{2}{7}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{本全体のページ数} \\times \\left(1 - \\dfrac{2}{7}\\right) &= 330 \\\\ \\text{本全体のページ数} \\times \\dfrac{5}{7} &= 330 \\\\ \\text{本全体のページ数} &= 330 \\div \\dfrac{5}{7} \\\\ &= 330 \\times \\dfrac{7}{5} \\\\ &= 66 \\times 7 \\\\ &= 462 \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "equivalent_calc-05",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "ある本を読むのに、1日目は全体の" },
+            { "type": "math", "value": "\\tfrac{1}{4}" },
+            { "type": "text", "value": "より15ページ多く読み、次の日には残りの" },
+            { "type": "math", "value": "\\tfrac{1}{3}" },
+            { "type": "text", "value": "より20ページ多く読むと、80ページ残ります。この本は全部で何ページか、答えなさい。" }
+        ],
+        "source": "桜美林中",
+        "answer": [
+            { "type": "math", "value": "240" },
+            { "type": "text", "value": "ページ" }
+        ],
+        "acceptableAnswers": [
+            "240",
+            "240ページ",
+            "にひゃくよんじゅう",
+            "にひゃくよんじゅうページ"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "まず、最後に残った80ページから考え始めよう。2日目には「残りの" },
+                    { "type": "math", "value": "\\tfrac{1}{3}" },
+                    { "type": "text", "value": "より20ページ多く」読んだんだね。もし20ページ多く読んでいなかったら、残りは「80ページ＋20ページ＝100ページ」になっていたはずだね。この100ページが、2日目に読む前の残りの「1から" },
+                    { "type": "math", "value": "\\tfrac{1}{3}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{2日目に読んだ後の、割合通りの残り(ページ)} &= 80 + 20 \\\\ &= 100 \\end{aligned}"
+                    },
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{2日目に読む前の残りページ数} \\times \\left(1 - \\dfrac{1}{3}\\right) &= 100 \\\\ \\text{2日目に読む前の残りページ数} \\times \\dfrac{2}{3} &= 100 \\\\ \\text{2日目に読む前の残りページ数} &= 100 \\div \\dfrac{2}{3} \\\\ &= 100 \\times \\dfrac{3}{2} \\\\ &= 150 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "次に、この「2日目に読む前の残りページ数150ページ」が、1日目に本を読んだ後の残りのページ数になるね。1日目には「全体の" },
+                    { "type": "math", "value": "\\tfrac{1}{4}" },
+                    { "type": "text", "value": "より15ページ多く」読んだんだね。もし15ページ多く読んでいなかったら、残りは「150ページ＋15ページ＝165ページ」になっていたはずだね。この165ページが、本全体の「1から" },
+                    { "type": "math", "value": "\\tfrac{1}{4}" },
+                    { "type": "text", "value": "を引いた割合」にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{1日目に読んだ後の、割合通りの残り(ページ)} &= 150 + 15 \\\\ &= 165 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "最後に、この「1日目に読んだ後の、割合通りの残り165ページ」が、本全体のどれくらいの割合にあたるか分かったね。この情報を使って、本全体のページ数を計算しよう。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{本全体のページ数} \\times \\left(1 - \\dfrac{1}{4}\\right) &= 165 \\\\ \\text{本全体のページ数} \\times \\dfrac{3}{4} &= 165 \\\\ \\text{本全体のページ数} &= 165 \\div \\dfrac{3}{4} \\\\ &= 165 \\times \\dfrac{4}{3} \\\\ &= 55 \\times 4 \\\\ &= 220 \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "equivalent_calc-06",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "ある学校のテニスコートと運動場をあわせた面積は、学校のしき地全体の面積の3割5分にあたります。また、テニスコートの面積は700m²で、運動場の面積の4割の広さです。学校のしき地全体の面積は何m²か、答えなさい。" }
+        ],
+        "source": "甲南女子中",
+        "answer": [
+            { "type": "math", "value": "3500" },
+            { "type": "text", "value": "m²" }
+        ],
+        "acceptableAnswers": [
+            "3500",
+            "3500m2",
+            "3500平方メートル",
+            "さんぜんごひゃく",
+            "さんぜんごひゃくへいほうめーとる"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "まず、テニスコートの面積700m²と、運動場の面積の関係から考え始めよう。テニスコートの面積は、運動場の面積の4割（" },
+                    { "type": "math", "value": "\\tfrac{4}{10}" },
+                    { "type": "text", "value": "または" },
+                    { "type": "math", "value": "\\tfrac{2}{5}" },
+                    { "type": "text", "value": "）にあたるんだね。この情報を使って運動場の面積を計算してみよう。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{運動場の面積} \\times \\dfrac{4}{10} &= 700 \\\\ \\text{運動場の面積} &= 700 \\div \\dfrac{4}{10} \\\\ &= 700 \\times \\dfrac{10}{4} \\\\ &= 700 \\times \\dfrac{5}{2} \\\\ &= 350 \\times 5 \\\\ &= 1750 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "次に、テニスコートと運動場をあわせた面積を計算しよう。テニスコートは700m²、運動場は上で計算した1750m²だね。この合計面積が、学校全体のしき地面積の3割5分にあたるよ。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{テニスコートと運動場の合計面積(m²)} &= 700 + 1750 \\\\ &= 2450 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "最後に、この「テニスコートと運動場の合計面積2450m²」が、学校のしき地全体の面積の3割5分（" },
+                    { "type": "math", "value": "\\tfrac{35}{100}" },
+                    { "type": "text", "value": "または" },
+                    { "type": "math", "value": "\\tfrac{7}{20}" },
+                    { "type": "text", "value": "）にあたることを使って、学校のしき地全体の面積を計算しよう。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{学校のしき地全体の面積} \\times \\dfrac{35}{100} &= 2450 \\\\ \\text{学校のしき地全体の面積} &= 2450 \\div \\dfrac{35}{100} \\\\ &= 2450 \\times \\dfrac{100}{35} \\\\ &= 70 \\times 100 \\\\ &= 7000 \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "equivalent_calc-07",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "ある商品の2月の売り上げ個数は、1月の売り上げ個数よりも10%減りましたが、3月の売り上げ個数は、2月の売り上げ個数よりも20%増えました。2月の売り上げ個数が900個のとき、3月の売り上げ個数は1月の売り上げ個数より何個多いか、答えなさい。" }
+        ],
+        "source": "吉祥女子中",
+        "answer": [
+            { "type": "math", "value": "80" },
+            { "type": "text", "value": "個" }
+        ],
+        "acceptableAnswers": [
+            "80",
+            "80個",
+            "はちじゅう",
+            "はちじゅうこ"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "まず、2月の売り上げ個数900個から、1月の売り上げ個数を逆算しよう。2月の売り上げは1月の売り上げよりも10%減ったのだから、2月の売り上げ900個は1月の売り上げの「1から" },
+                    { "type": "math", "value": "\\tfrac{10}{100}" },
+                    { "type": "text", "value": "を引いた割合」にあたるね。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{1月の売り上げ個数} \\times \\left(1 - \\dfrac{10}{100}\\right) &= 900 \\\\ \\text{1月の売り上げ個数} \\times \\dfrac{90}{100} &= 900 \\\\ \\text{1月の売り上げ個数} &= 900 \\div \\dfrac{90}{100} \\\\ &= 900 \\times \\dfrac{100}{90} \\\\ &= 10 \\times 100 \\\\ &= 1000 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "次に、2月の売り上げ個数900個から、3月の売り上げ個数を計算しよう。3月の売り上げは2月の売り上げよりも20%増えたのだから、900個の「1に" },
+                    { "type": "math", "value": "\\tfrac{20}{100}" },
+                    { "type": "text", "value": "を足した割合」にあたるね。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{3月の売り上げ個数} &= 900 \\times \\left(1 + \\dfrac{20}{100}\\right) \\\\ &= 900 \\times \\dfrac{120}{100} \\\\ &= 900 \\times \\dfrac{6}{5} \\\\ &= 180 \\times 6 \\\\ &= 1080 \\end{aligned}"
+                    }
+                ]
+            },
+            {
+                "explanation": [
+                    { "type": "text", "value": "最後に、3月の売り上げ個数と1月の売り上げ個数を比べて、どれだけ多いか計算しよう。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{多い個数} &= 1080 - 1000 \\\\ &= 80 \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "equivalent_calc-08-1",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "落とした高さの" },
+            { "type": "math", "value": "\\tfrac{3}{4}" },
+            { "type": "text", "value": "はね上がるボールがあります。(1) 図1のようにボールを落とすと図のようにはねました。(あ)の高さは何cmか、答えなさい。" }
+        ],
+        "source": "広島学院中",
+        "answer": [
+            { "type": "math", "value": "96" },
+            { "type": "text", "value": "cm" }
+        ],
+        "acceptableAnswers": [
+            "96",
+            "96cm",
+            "きゅうじゅうろく",
+            "きゅうじゅうろくせんちめーとる"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "図1を見ると、ボールは最初128cmの高さから落とされているね。このボールは落とした高さの" },
+                    { "type": "math", "value": "\\tfrac{3}{4}" },
+                    { "type": "text", "value": "だけはね上がる性質があるよ。" },
+                    { "type": "text", "value": "「(あ)」の高さは、128cmから落ちて1回はね上がったときの高さだね。この情報を計算してみよう。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{(あ)の高さ(cm)} &= 128 \\times \\dfrac{3}{4} \\\\ &= 32 \\times 3 \\\\ &= 96 \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "equivalent_calc-08-2",
+        "tag": "",
+        "question": [
+            { "type": "text", "value": "落とした高さの" },
+            { "type": "math", "value": "\\tfrac{3}{4}" },
+            { "type": "text", "value": "はね上がるボールがあります。(2) 図2のようにボールを落とすと図のようにはねました。(い)の高さは何cmか、答えなさい。" }
+        ],
+        "source": "広島学院中",
+        "answer": [
+            { "type": "math", "value": "170.67" },
+            { "type": "text", "value": "cm" }
+        ],
+        "acceptableAnswers": [
+            "170.67",
+            "170.67cm",
+            "170と3分の2",
+            "170と3分の2cm"
+        ],
+        "hints": [
+            {
+                "explanation": [
+                    { "type": "text", "value": "図2を見ると、ボールは「(い)cm」の高さから落ちて、はね上がって128cmの高さになっているね。" },
+                    { "type": "text", "value": "ボールは落とした高さの" },
+                    { "type": "math", "value": "\\tfrac{3}{4}" },
+                    { "type": "text", "value": "だけはね上がるのだから、128cmという高さは、落とした高さ「(い)」の" },
+                    { "type": "math", "value": "\\tfrac{3}{4}" },
+                    { "type": "text", "value": "にあたるんだ。この情報を使って、「(い)の高さ」を逆算してみよう。" }
+                ],
+                "expression": [
+                    {
+                        "type": "math",
+                        "value": "\\begin{aligned} \\text{(い)の高さ(cm)} \\times \\dfrac{3}{4} &= 128 \\\\ \\text{(い)の高さ(cm)} &= 128 \\div \\dfrac{3}{4} \\\\ &= 128 \\times \\dfrac{4}{3} \\\\ &= \\dfrac{512}{3} \\\\ &= 170.666... \\end{aligned}"
+                    }
+                ]
+            }
+        ]
+    }
+    ]
