@@ -14,6 +14,7 @@
   let userProgress = {};
   let processedUnits = [];
   let clickSound; // 単元選択時の効果音
+  let menuSound;
 
   async function loadUserProgress(userId) {
     if (!userId) {
@@ -148,9 +149,19 @@ onMount(async () => {
   };
 });
 
-  function toggleMenu() {
-    isOpen = !isOpen;
+function toggleMenu() {
+  // 効果音を再生
+  if (menuSound) {
+    menuSound.currentTime = 0;
+    menuSound.volume = 1.0;
+    menuSound.play()
+      .then(() => console.log('メニュー効果音の再生に成功しました'))
+      .catch(e => console.error('メニュー効果音の再生に失敗しました:', e));
   }
+
+  // メニュー状態を切り替え
+  isOpen = !isOpen;
+}
 
   function goToTop() {
     goto('/');
@@ -215,6 +226,7 @@ function selectUnit(unitId) {
 
 <!-- 効果音用のaudio要素を追加 -->
 <audio bind:this={clickSound} src="/sounds/tap.mp3" preload="auto"></audio>
+<audio bind:this={menuSound} src="/sounds/slide.mp3" preload="auto"></audio>
 
 <main class="flex flex-col items-center gap-8 min-h-screen bg-gradient-to-br from-stone-100 via-stone-100 to-stone-200 p-8">
   <header class="
