@@ -48,117 +48,188 @@
   let isSavingProgress = false;
   let isUnitCompleted = false;
 
-  async function saveUserProgress(userId, unitId, lastProblemIndex, isCompleted = undefined, ebbinghausReviewCount = undefined) {
-    if (isSavingProgress) {
-      return false;
-    }
-
-    if (isUnitCompleted && isCompleted !== true) {
-      return true;
-    }
-
-    isSavingProgress = true;
-
-    try {
-      const response = await fetch('/api/user-progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          userId,
-          unitId,
-          lastProblemIndex,
-          isCompleted,
-          ebbinghausReviewCount
-        })
-      });
-
-      if (!response.ok) {
-        console.error(`Failed to save user progress for ${unitId}:`, response.statusText);
-        return false;
-      }
-
-      if (isCompleted === true) {
-        isUnitCompleted = true;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error saving user progress:', error);
-      return false;
-    } finally {
-      isSavingProgress = false;
-    }
+  async function saveUserProgress(userId, unitId, lastProblemIndex, isCompleted = undefined, isPerfect = undefined, ebbinghausReviewCount = undefined) {
+  if (isSavingProgress) {
+    return false;
   }
 
-  async function loadUserProgress(userId, unitId) {
-    try {
-      const response = await fetch(`/api/user-progress?userId=${userId}&unitId=${unitId}`);
-      if (response.ok) {
-        const progress = await response.json();
+  if (isUnitCompleted && isCompleted !== true) {
+    return true;
+  }
 
-        if (progress && progress.isCompleted === true) {
-          isUnitCompleted = true;
-        }
+  isSavingProgress = true;
 
-        return progress;
-      } else {
-        console.error('Failed to load user progress:', response.statusText);
-        return null;
+  try {
+    const progressData = {
+      userId,
+      unitId,
+      lastProblemIndex,
+      isCompleted,
+      ebbinghausReviewCount
+    };
+
+    // isPerfectが指定されている場合のみ追加
+    if (isPerfect !== undefined) {
+      progressData.isPerfect = isPerfect;
+    }
+
+    // デバッグ用ログ
+    console.log('=== 進捗データ送信 ===');
+    console.log('Unit ID:', unitId);
+    console.log('送信データ:', progressData);
+
+    const response = await fetch('/api/user-progress', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(progressData)
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to save user progress for ${unitId}:`, response.statusText);
+      return false;
+    }
+
+    const responseData = await response.json();
+    console.log('サーバーからの返答:', responseData);
+
+    if (isCompleted === true) {
+      isUnitCompleted = true;
+
+      // カスタムイベントをディスパッチして単元選択画面に状態更新を通知
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('progress-updated', {
+          detail: {
+            unitId: unitId,
+            progress: progressData
+          }
+        }));
       }
-    } catch (error) {
-      console.error('Error loading user progress:', error);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error saving user progress:', error);
+    return false;
+  } finally {
+    isSavingProgress = false;
+  }
+}
+
+async function loadUserProgress(userId, unitId) {
+  try {
+    console.log('=== loadUserProgress開始 ===');
+    console.log('userId:', userId);
+    console.log('unitId:', unitId);
+
+    const url = `/api/user-progress?userId=${userId}&unitId=${unitId}`;
+    console.log('リクエストURL:', url);
+
+    const response = await fetch(url);
+    console.log('レスポンスステータス:', response.status);
+
+    if (response.ok) {
+      const progress = await response.json();
+      console.log('取得した生データ:', progress);
+
+      if (progress && progress.isCompleted === true) {
+        isUnitCompleted = true;
+        console.log('単元完了フラグを設定');
+      }
+
+      return progress;
+    } else {
+      console.error('Failed to load user progress:', response.status, response.statusText);
       return null;
     }
+  } catch (error) {
+    console.error('Error loading user progress:', error);
+    return null;
   }
+}
 
-  async function loadProblemsForUnit(unit) {
-    try {
-      const response = await fetch(`/api/problems/${unit}`);
-      if (response.ok) {
-        const data = await response.json();
-        problems = data;
+async function loadProblemsForUnit(unit) {
+  try {
+    console.log('=== loadProblemsForUnit開始 ===');
+    console.log('unit:', unit);
 
-        if (problems && problems.length > 0) {
-          const progressData = await loadUserProgress(currentUserId, unitId);
+    const response = await fetch(`/api/problems/${unit}`);
+    if (response.ok) {
+      const data = await response.json();
+      problems = data;
+      console.log('問題数:', problems.length);
 
-          if (progressData) {
-            let loadedIndex = progressData.lastProblemIndex;
+      if (problems && problems.length > 0) {
+        const progressData = await loadUserProgress(currentUserId, unitId);
 
-            if (progressData.isCompleted) {
-              loadedIndex = 0;
-            }
+        // デバッグ用ログ
+        console.log('=== 進捗データロード ===');
+        console.log('取得した進捗データ:', progressData);
+        console.log('progressData の型:', typeof progressData);
+        console.log('progressData が null/undefined:', progressData == null);
 
-            if (loadedIndex < 0 || loadedIndex >= problems.length) {
+        if (progressData && progressData !== null && typeof progressData === 'object') {
+          let loadedIndex = progressData.lastProblemIndex;
+          console.log('生のlastProblemIndex:', loadedIndex, '(型:', typeof loadedIndex, ')');
+
+          // 数値に変換
+          if (typeof loadedIndex === 'string') {
+            loadedIndex = parseInt(loadedIndex, 10);
+          }
+          if (typeof loadedIndex !== 'number' || isNaN(loadedIndex)) {
+            loadedIndex = 0;
+          }
+
+          console.log('保存されていたlastProblemIndex:', loadedIndex);
+          console.log('isCompleted:', progressData.isCompleted, '(型:', typeof progressData.isCompleted, ')');
+
+          // 完了していない場合のみ、保存されたインデックスから開始
+          if (progressData.isCompleted !== true && progressData.isCompleted !== 'true') {
+            // インデックスが有効範囲内かチェック
+            if (loadedIndex >= 0 && loadedIndex < problems.length) {
+              currentProblemIndex = loadedIndex;
+              console.log('✅ 続きから開始:', currentProblemIndex);
+            } else {
+              // 無効なインデックスの場合は最初から
               currentProblemIndex = 0;
+              console.log('❌ 無効なインデックスのため最初から開始');
               if (!isUnitCompleted) {
                 await saveUserProgress(currentUserId, unitId, 0, false);
               }
-            } else {
-              currentProblemIndex = loadedIndex;
             }
           } else {
+            // 完了済みの場合は最初から（解き直し）
             currentProblemIndex = 0;
-          }
-
-          currentProblem = problems[currentProblemIndex];
-          problemStartTime = Date.now();
-
-          if (sessionStartTime === 0) {
-            sessionStartTime = Date.now();
+            console.log('🔄 完了済み単元の解き直し - 最初から開始');
           }
         } else {
-          errorMessage = 'この単元には問題がありません。';
+          // 進捗データがない場合は最初から
+          currentProblemIndex = 0;
+          console.log('🆕 進捗データなし - 最初から開始');
         }
+
+        currentProblem = problems[currentProblemIndex];
+        problemStartTime = Date.now();
+
+        if (sessionStartTime === 0) {
+          sessionStartTime = Date.now();
+        }
+
+        console.log('=== 最終状態 ===');
+        console.log('最終的なcurrentProblemIndex:', currentProblemIndex);
+        console.log('currentProblem:', currentProblem ? `問題${currentProblemIndex + 1}` : 'null');
       } else {
-        errorMessage = `問題の読み込みに失敗しました: ${response.statusText}`;
+        errorMessage = 'この単元には問題がありません。';
       }
-    } catch (error) {
-      errorMessage = '問題の読み込み中にエラーが発生しました。';
-      console.error('Error loading problems:', error);
+    } else {
+      errorMessage = `問題の読み込みに失敗しました: ${response.statusText}`;
     }
+  } catch (error) {
+    errorMessage = '問題の読み込み中にエラーが発生しました。';
+    console.error('Error loading problems:', error);
   }
+}
 
   function startAutoSave() {
     if (intervalId) {
@@ -220,17 +291,107 @@
   }
 
   async function finishSession() {
-    await saveUserProgress(currentUserId, unitId, currentProblemIndex, false);
+  console.log('=== ここまでボタン押下 ===');
+  console.log('現在のproblemIndex:', currentProblemIndex);
+  console.log('総問題数:', problems.length);
 
-    await goto('/normal-mode/result', {
-      state: {
-        results: results,
-        unitName: unitDisplayName
-      }
+  // 明示的に未完了として保存
+  const progressData = {
+    userId: currentUserId,
+    unitId: unitId,
+    lastProblemIndex: currentProblemIndex,
+    isCompleted: false, // 明示的にfalse
+    isPerfect: false    // 明示的にfalse
+  };
+
+  console.log('送信予定のデータ:', progressData);
+
+  try {
+    const response = await fetch('/api/user-progress', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(progressData)
     });
 
+    if (!response.ok) {
+      console.error('進捗の保存に失敗しました:', response.status, response.statusText);
+    } else {
+      const responseData = await response.json();
+      console.log('保存成功 - サーバーからの応答:', responseData);
+      console.log('確認 - isCompleted:', responseData.isCompleted);
+      console.log('確認 - lastProblemIndex:', responseData.lastProblemIndex);
+    }
+  } catch (error) {
+    console.error('進捗保存中にエラー:', error);
+  }
+
+  // セッション記録を保存
+  const sessionEndTime = Date.now();
+  const totalSessionDurationSeconds = Math.round((sessionEndTime - sessionStartTime) / 1000);
+
+  try {
+    const sessionRecordResponse = await fetch('/api/session-record', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        userId: currentUserId,
+        mode: 'normal-mode',
+        unitId: unitId,
+        duration: totalSessionDurationSeconds,
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    if (!sessionRecordResponse.ok) {
+      console.error('ノーマルモードセッション全体の学習記録の保存に失敗しました。(中断時):', sessionRecordResponse.statusText);
+    }
+  } catch (error) {
+    console.error('ノーマルモードセッション全体の学習記録の送信中にエラーが発生しました。(中断時):', error);
+  }
+
+  // 結果画面に遷移
+  await goto('/normal-mode/result', {
+    state: {
+      results: results,
+      unitName: unitDisplayName,
+      isIncomplete: true // 途中終了フラグ
+    }
+  });
+}
+
+  async function nextProblem() {
+  currentProblemIndex++;
+  showAnswerArea = false;
+  currentHintIndex = 0;
+  showAllHints = false;
+
+  if (currentProblemIndex < problems.length) {
+    currentProblem = problems[currentProblemIndex];
+    problemStartTime = Date.now();
+
+    if (!isUnitCompleted) {
+      try {
+        await saveUserProgress(currentUserId, unitId, currentProblemIndex);
+      } catch (error) {
+        console.error('Failed to save progress:', error);
+      }
+    }
+  } else {
     const sessionEndTime = Date.now();
     const totalSessionDurationSeconds = Math.round((sessionEndTime - sessionStartTime) / 1000);
+
+    const allCorrect = results.every(result => result.isCorrect === true);
+
+    // デバッグ用ログ - 単元完了時の判定
+    console.log('=== 単元完了判定 ===');
+    console.log('結果一覧:', results);
+    console.log('すべて正解:', allCorrect);
+    console.log('総問題数:', problems.length);
+    console.log('結果数:', results.length);
 
     try {
       const sessionRecordResponse = await fetch('/api/session-record', {
@@ -248,86 +409,44 @@
       });
 
       if (!sessionRecordResponse.ok) {
-        console.error('ノーマルモードセッション全体の学習記録の保存に失敗しました。(中断時):', sessionRecordResponse.statusText);
+        console.error('ノーマルモードセッション全体の学習記録の保存に失敗しました:', sessionRecordResponse.statusText);
       }
     } catch (error) {
-      console.error('ノーマルモードセッション全体の学習記録の送信中にエラーが発生しました。(中断時):', error);
+      console.error('ノーマルモードセッション全体の学習記録の送信中にエラーが発生しました:', error);
     }
-  }
 
-  async function nextProblem() {
-    currentProblemIndex++;
-    showAnswerArea = false;
-    currentHintIndex = 0;
-    showAllHints = false;
+    try {
+      // 修正：isPerfectフラグも一緒に送信
+      const saveSuccess = await saveUserProgress(
+        currentUserId,
+        unitId,
+        0,
+        true,  // isCompleted
+        allCorrect  // isPerfect - すべて正解の場合のみtrue
+      );
 
-    if (currentProblemIndex < problems.length) {
-      currentProblem = problems[currentProblemIndex];
-      problemStartTime = Date.now();
-
-      if (!isUnitCompleted) {
-        try {
-          await saveUserProgress(currentUserId, unitId, currentProblemIndex);
-        } catch (error) {
-          console.error('Failed to save progress:', error);
-        }
+      if (!saveSuccess) {
+        console.error('Failed to save completed status');
       }
-    } else {
-      const sessionEndTime = Date.now();
-      const totalSessionDurationSeconds = Math.round((sessionEndTime - sessionStartTime) / 1000);
-
-      const allCorrect = results.every(result => result.isCorrect === true);
-
-      try {
-        const sessionRecordResponse = await fetch('/api/session-record', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            userId: currentUserId,
-            mode: 'normal-mode',
-            unitId: unitId,
-            duration: totalSessionDurationSeconds,
-            timestamp: new Date().toISOString()
-          })
-        });
-
-        if (!sessionRecordResponse.ok) {
-          console.error('ノーマルモードセッション全体の学習記録の保存に失敗しました:', sessionRecordResponse.statusText);
-        }
-      } catch (error) {
-        console.error('ノーマルモードセッション全体の学習記録の送信中にエラーが発生しました:', error);
-      }
-
-      try {
-        if (allCorrect) {
-          const saveSuccess = await saveUserProgress(currentUserId, unitId, 0, true);
-          if (!saveSuccess) {
-            console.error('Failed to save completed status');
-          }
-        } else {
-          await saveUserProgress(currentUserId, unitId, problems.length - 1, false);
-        }
-      } catch (error) {
-        console.error('Failed to save final progress:', error);
-      }
-
-      try {
-        await goto('/normal-mode/result', {
-          state: {
-            results: results,
-            unitName: unitDisplayName,
-            allCorrect: allCorrect
-          }
-        });
-      } catch (error) {
-        console.error('Failed to navigate to result page:', error);
-        await goto('/normal-mode/result');
-      }
-      return;
+    } catch (error) {
+      console.error('Failed to save final progress:', error);
     }
+
+    try {
+      await goto('/normal-mode/result', {
+        state: {
+          results: results,
+          unitName: unitDisplayName,
+          allCorrect: allCorrect
+        }
+      });
+    } catch (error) {
+      console.error('Failed to navigate to result page:', error);
+      await goto('/normal-mode/result');
+    }
+    return;
   }
+}
 
   onMount(async () => {
     try {
@@ -361,35 +480,44 @@
   });
 
   if (browser) {
-    window.addEventListener('beforeunload', (event) => {
-      if (isUnitCompleted) {
-        return;
+  window.addEventListener('beforeunload', (event) => {
+    if (isUnitCompleted) {
+      return;
+    }
+
+    if (currentUserId && unitId && currentProblemIndex !== undefined) {
+      const isAtEnd = currentProblemIndex >= problems.length;
+
+      let completedStatus;
+      let perfectStatus;
+
+      if (isAtEnd && results.length === problems.length) {
+        const allCorrect = results.every(result => result.isCorrect === true);
+        completedStatus = allCorrect;
+        perfectStatus = allCorrect; // 追加：isPerfectも設定
+      } else {
+        completedStatus = undefined;
+        perfectStatus = undefined;
       }
 
-      if (currentUserId && unitId && currentProblemIndex !== undefined) {
-        const isAtEnd = currentProblemIndex >= problems.length;
+      const progressData = {
+        userId: currentUserId,
+        unitId: unitId,
+        lastProblemIndex: isAtEnd ? 0 : currentProblemIndex,
+        isCompleted: completedStatus
+      };
 
-        let completedStatus;
-        if (isAtEnd && results.length === problems.length) {
-          const allCorrect = results.every(result => result.isCorrect === true);
-          completedStatus = allCorrect;
-        } else {
-          completedStatus = undefined;
-        }
-
-        const progressData = {
-          userId: currentUserId,
-          unitId: unitId,
-          lastProblemIndex: isAtEnd ? 0 : currentProblemIndex,
-          isCompleted: completedStatus
-        };
-
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon('/api/user-progress', JSON.stringify(progressData));
-        }
+      // isPerfectが定義されている場合のみ追加
+      if (perfectStatus !== undefined) {
+        progressData.isPerfect = perfectStatus;
       }
-    });
-  }
+
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/user-progress', JSON.stringify(progressData));
+      }
+    }
+  });
+}
 </script>
 
 <svelte:head>
@@ -432,7 +560,7 @@
           on:showNextHint={handleShowNextHintEvent}
         />
       </div>
-      <div class="flex items-start justify-end w-full gap-4 mt-6">
+      <div class="flex items-start justify-end w-full gap-4 my-8">
           {#if !showAnswerArea && currentHintIndex < currentProblem.hints.length && !showAllHints}
             <TealButton
               text="ヒント"

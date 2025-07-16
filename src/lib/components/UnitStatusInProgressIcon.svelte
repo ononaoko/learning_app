@@ -1,5 +1,5 @@
 <script>
-    export let text = 'In Progress'; // 表示するテキスト
+    export let text = 'Continue'; // 表示するテキスト
     export let iconSize = '14'; // アイコンのサイズ
     export let bgColor = 'bg-blue-400'; // 背景色
     export let textColor = 'text-white'; // テキスト色

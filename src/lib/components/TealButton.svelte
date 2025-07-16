@@ -14,10 +14,10 @@
 <button
   type={type}
   class="{widthClass} {minWidthClass} {buttonColorClass} {borderColorClass} border-b-[1px]
-         transition-all duration-150 h-[4rem]
+         transition-all duration-150 h-[4rem] active:border-b-[0px] active:translate-y-2
          {shadowColorClass} {hoverShadowColorClass}
          hover:border-b-[0px] hover:translate-y-2
-         {textColorClass} text-2xl font-bold py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
+         {textColorClass} text-2xl font-bold font-sans py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
   on:click={onClick}
 >
   {text}

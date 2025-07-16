@@ -27,8 +27,8 @@
         progressArray.forEach(p => {
           progressMap[p.unitId] = p;
         });
+        // Svelteのリアクティビティのために新しいオブジェクトを代入
         userProgress = progressMap;
-        processUnitsData();
       } else {
         console.error('Failed to load user progress:', response.statusText);
       }
@@ -37,7 +37,17 @@
     }
   }
 
-  function processUnitsData() {
+  // 進捗状態をリアルタイムで更新する関数
+  function updateUnitProgress(unitId, newProgress) {
+    // Svelteのリアクティビティのために新しいオブジェクトを作成
+    userProgress = {
+      ...userProgress,
+      [unitId]: { ...userProgress[unitId], ...newProgress }
+    };
+  }
+
+  // userProgressが変更されるたびに自動的にprocessedUnitsを更新
+  $: if (userProgress) {
     processedUnits = units.map(category => ({
       ...category,
       sub_units: category.sub_units.map(subcategory => ({
@@ -48,7 +58,8 @@
           const processedUnit = {
             ...unit,
             isCompleted: progress && progress.isCompleted === true ? true : false,
-            lastProblemIndex: progress && typeof progress.lastProblemIndex === 'number' ? progress.lastProblemIndex : 0
+            lastProblemIndex: progress && typeof progress.lastProblemIndex === 'number' ? progress.lastProblemIndex : 0,
+            isPerfect: progress && progress.isPerfect === true ? true : false
           };
 
           return processedUnit;
@@ -57,8 +68,42 @@
     }));
   }
 
+  // ページの可視性が変わったときに進捗を再読み込み
+  function handleVisibilityChange() {
+    if (!document.hidden) {
+      loadUserProgress(currentUserId);
+    }
+  }
+
+  // 定期的に進捗を更新（オプション）
+  let progressUpdateInterval;
+  function startProgressPolling() {
+    // 30秒ごとに進捗を更新
+    progressUpdateInterval = setInterval(() => {
+      loadUserProgress(currentUserId);
+    }, 30000);
+  }
+
+  function stopProgressPolling() {
+    if (progressUpdateInterval) {
+      clearInterval(progressUpdateInterval);
+    }
+  }
+
   onMount(async () => {
     await loadUserProgress(currentUserId);
+
+    // ページの可視性変更を監視
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // オプション：定期的な進捗更新を開始
+    startProgressPolling();
+
+    // クリーンアップ関数
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopProgressPolling();
+    };
   });
 
   function toggleMenu() {
@@ -78,13 +123,17 @@
     let baseStyle = "w-full text-left bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex2)] hover:bg-teal-300 text-stone-700 font-bold py-2 px-4 rounded-md shadow-md text-lg transition duration-200 ease-in-out flex items-center justify-between";
     let statusStyle = "";
 
-    if (unit.isCompleted) {
-      statusStyle = "bg-green-200 hover:bg-green-300";
-    } else if (unit.lastProblemIndex > 0) {
-      statusStyle = "bg-blue-100 hover:bg-blue-200";
+    if (unit.isCompleted && unit.isPerfect) {
+      statusStyle = "bg-stone-200";
     }
 
     return `${baseStyle} ${statusStyle}`;
+  }
+
+  // カスタムイベントリスナー（他のコンポーネントから進捗更新を受信）
+  function handleProgressUpdate(event) {
+    const { unitId, progress } = event.detail;
+    updateUnitProgress(unitId, progress);
   }
 </script>
 
@@ -92,7 +141,9 @@
   <title>通常モード - 単元選択</title>
 </svelte:head>
 
-<main class="flex flex-col items-center min-h-screen bg-gray-100 p-8">
+<svelte:window on:progress-updated={handleProgressUpdate} />
+
+<main class="flex flex-col items-center gap-8 min-h-screen bg-gray-100 p-8">
   <header class="
   w-full p-6 rounded-md relative
   bg-stone-100
@@ -107,19 +158,24 @@
     <AppNavigation isOpen={isOpen} />
   </header>
 
-  <div class="w-full rounded-lg p-8 mt-8">
-    <h2 class="text-3xl font-bold text-gray-700 text-center mb-6">単元選択</h2>
-
+  <div class="w-full flex flex-col gap-8">
+    <h2 class="text-3xl font-bold text-gray-700 text-center">単元選択</h2>
     {#each processedUnits as category (category.name)}
-      <div class="mb-8">
-        <h3 class="text-2xl font-bold text-teal-700 border-b-2 border-teal-400 pb-2 mb-4">
+      <div>
+        <div class="
+        bg-teal-400 text-white rounded-full
+        flex items-center
+        px-6 py-2 mb-4
+      ">
+        <h3 class="text-xl m-0">
           {category.name}
         </h3>
+      </div>
         {#if category.sub_units}
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {#each category.sub_units as subcategory (subcategory.name)}
               <div class="bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] p-4 rounded-lg shadow-sm">
-                <h4 class="text-xl font-semibold text-gray-800 mb-3">{subcategory.name}</h4>
+                <h4 class="text-lg font-medium text-gray-800 mb-3 ml-1">{subcategory.name}</h4>
                 {#if subcategory.sub_units}
                   <ul class="space-y-4">
                     {#each subcategory.sub_units as unit (unit.id)}
@@ -128,9 +184,11 @@
                           class="{getUnitButtonStyle(unit)}"
                           on:click={() => selectUnit(unit.id)}
                         >
-                          <span>{unit.name}</span>
-                          {#if unit.isCompleted}
-                            <UnitStatusPerfectIcon text="Perfect"/>
+                          <span class="text-base font-normal">{unit.name}</span>
+                          {#if unit.isCompleted && unit.isPerfect}
+                            <UnitStatusPerfectIcon text="Perfect!"/>
+                          {:else if unit.isCompleted && !unit.isPerfect}
+                            <UnitStatusPerfectIcon text="Clear" bgColor="bg-red-300"/>
                           {:else if unit.lastProblemIndex > 0}
                             <UnitStatusInProgressIcon />
                           {/if}

@@ -7,9 +7,9 @@ import redis from '$lib/server/database'
  * 安全なboolean変換関数
  */
 function parseBoolean(value) {
-	if (value === true || value === 'true') return true;
-	if (value === false || value === 'false') return false;
-	return false; // デフォルト値
+	if (value === true || value === 'true') return true
+	if (value === false || value === 'false') return false
+	return false // デフォルト値
 }
 
 /**
@@ -19,18 +19,40 @@ export async function GET({ url }) {
 	const userId = url.searchParams.get('userId')
 	const unitId = url.searchParams.get('unitId')
 
+	console.log('=== API GET request ===');
+	console.log('userId:', userId);
+	console.log('unitId:', unitId);
+
 	if (!userId) {
 		return new Response('User ID is required', { status: 400 })
 	}
 
 	try {
 		const progressKey = `user:progress:${userId}`
+		console.log('Redis key:', progressKey);
 
 		if (unitId) {
 			// 単一の単元の進捗を取得
 			const allUnitProgressFields = await redis.hgetall(progressKey)
+			console.log('Redis raw data:', allUnitProgressFields);
 
-			if (allUnitProgressFields) {
+			if (allUnitProgressFields && Object.keys(allUnitProgressFields).length > 0) {
+				const lastProblemIndexKey = `${unitId}:lastProblemIndex`;
+				const isCompletedKey = `${unitId}:isCompleted`;
+				const isPerfectKey = `${unitId}:isPerfect`;
+
+				console.log('Looking for keys:', {
+					lastProblemIndexKey,
+					isCompletedKey,
+					isPerfectKey
+				});
+
+				console.log('Raw values:', {
+					lastProblemIndex: allUnitProgressFields[lastProblemIndexKey],
+					isCompleted: allUnitProgressFields[isCompletedKey],
+					isPerfect: allUnitProgressFields[isPerfectKey]
+				});
+
 				const unitProgress = {
 					unitId: unitId,
 					lastProblemIndex: parseInt(
@@ -43,17 +65,26 @@ export async function GET({ url }) {
 					ebbinghausReviewCount: parseInt(
 						allUnitProgressFields[`${unitId}:ebbinghausReviewCount`] || '0',
 						10
-					)
+					),
+					correctCount: parseInt(allUnitProgressFields[`${unitId}:correctCount`] || '0', 10),
+					totalCount: parseInt(allUnitProgressFields[`${unitId}:totalCount`] || '0', 10),
+					isPerfect: parseBoolean(allUnitProgressFields[`${unitId}:isPerfect`])
 				}
+
+				console.log('Processed unit progress:', unitProgress);
 				return json(unitProgress)
 			} else {
+				console.log('No progress data found, returning default');
 				const defaultProgress = {
 					unitId: unitId,
 					lastProblemIndex: 0,
 					isCompleted: false,
 					completionDate: null,
 					lastEbbinghausReview: null,
-					ebbinghausReviewCount: 0
+					ebbinghausReviewCount: 0,
+					correctCount: 0,
+					totalCount: 0,
+					isPerfect: false
 				}
 				return json(defaultProgress)
 			}
@@ -61,7 +92,7 @@ export async function GET({ url }) {
 			// 全ての単元の進捗を取得
 			const allProgressFields = await redis.hgetall(progressKey)
 
-			if (allProgressFields) {
+			if (allProgressFields && Object.keys(allProgressFields).length > 0) {
 				const groupedProgress = {}
 
 				// 最初に全てのunitIdを特定
@@ -80,27 +111,40 @@ export async function GET({ url }) {
 					const completionDateField = `${currentUnitId}:completionDate`
 					const lastEbbinghausReviewField = `${currentUnitId}:lastEbbinghausReview`
 					const ebbinghausReviewCountField = `${currentUnitId}:ebbinghausReviewCount`
+					const correctCountField = `${currentUnitId}:correctCount`
+					const totalCountField = `${currentUnitId}:totalCount`
+					const isPerfectField = `${currentUnitId}:isPerfect`
 
 					// 少なくとも1つのフィールドが存在する場合のみ処理
-					if (allProgressFields[lastProblemIndexField] !== undefined ||
+					if (
+						allProgressFields[lastProblemIndexField] !== undefined ||
 						allProgressFields[isCompletedField] !== undefined ||
 						allProgressFields[completionDateField] !== undefined ||
 						allProgressFields[lastEbbinghausReviewField] !== undefined ||
-						allProgressFields[ebbinghausReviewCountField] !== undefined) {
-
+						allProgressFields[ebbinghausReviewCountField] !== undefined ||
+						allProgressFields[correctCountField] !== undefined ||
+						allProgressFields[totalCountField] !== undefined ||
+						allProgressFields[isPerfectField] !== undefined
+					) {
 						const unitProgress = {
 							unitId: currentUnitId,
-							lastProblemIndex: parseInt(
-								allProgressFields[lastProblemIndexField] || '0',
-								10
-							),
+							lastProblemIndex: parseInt(allProgressFields[lastProblemIndexField] || '0', 10),
 							isCompleted: parseBoolean(allProgressFields[isCompletedField]),
-							completionDate: allProgressFields[completionDateField] === 'null' ? null : (allProgressFields[completionDateField] || null),
-							lastEbbinghausReview: allProgressFields[lastEbbinghausReviewField] === 'null' ? null : (allProgressFields[lastEbbinghausReviewField] || null),
+							completionDate:
+								allProgressFields[completionDateField] === 'null'
+									? null
+									: allProgressFields[completionDateField] || null,
+							lastEbbinghausReview:
+								allProgressFields[lastEbbinghausReviewField] === 'null'
+									? null
+									: allProgressFields[lastEbbinghausReviewField] || null,
 							ebbinghausReviewCount: parseInt(
 								allProgressFields[ebbinghausReviewCountField] || '0',
 								10
-							)
+							),
+							correctCount: parseInt(allProgressFields[correctCountField] || '0', 10),
+							totalCount: parseInt(allProgressFields[totalCountField] || '0', 10),
+							isPerfect: parseBoolean(allProgressFields[isPerfectField])
 						}
 
 						groupedProgress[currentUnitId] = unitProgress
@@ -124,70 +168,91 @@ export async function GET({ url }) {
  */
 export async function POST({ request }) {
 	try {
+		const progressData = await request.json()
 		const {
 			userId,
 			unitId,
 			lastProblemIndex,
-			isCompleted = undefined,
-			ebbinghausReviewCount = undefined
-		} = await request.json()
+			isCompleted,
+			isPerfect,
+			ebbinghausReviewCount
+		} = progressData
 
-		if (!userId || !unitId || lastProblemIndex === undefined) {
-			return new Response('Missing required fields: userId, unitId, lastProblemIndex', {
-				status: 400
-			})
+		// デバッグ用ログ
+		console.log('=== API側で受信したデータ ===')
+		console.log('受信データ:', progressData)
+		console.log('isPerfect:', isPerfect)
+
+		if (!userId || !unitId) {
+			return new Response('User ID and Unit ID are required', { status: 400 })
 		}
 
 		const progressKey = `user:progress:${userId}`
-		const updates = {}
+		const updateData = {}
 
-		// lastProblemIndexの更新は常に実行
-		updates[`${unitId}:lastProblemIndex`] = lastProblemIndex.toString()
+		// 各フィールドを設定
+		if (lastProblemIndex !== undefined) {
+			updateData[`${unitId}:lastProblemIndex`] = lastProblemIndex.toString()
+		}
 
 		if (isCompleted !== undefined) {
-			// 既存の値を取得
-			const existingIsCompleted = await redis.hget(progressKey, `${unitId}:isCompleted`);
-			const existingBool = parseBoolean(existingIsCompleted);
+			updateData[`${unitId}:isCompleted`] = isCompleted.toString()
 
-			// 一度trueになった後にfalseに戻さないようにする保護ロジック
-			if (isCompleted === false && existingBool === true) {
-				// falseに戻そうとする場合は更新しない
-			} else {
-				updates[`${unitId}:isCompleted`] = isCompleted.toString();
+			// 完了時に完了日時を設定
+			if (isCompleted === true) {
+				updateData[`${unitId}:completionDate`] = new Date().toISOString()
 			}
 		}
 
-		// completionDateの処理
-		if (isCompleted === true) {
-			const existingIsCompleted = await redis.hget(progressKey, `${unitId}:isCompleted`)
-			const existingCompletionDate = await redis.hget(progressKey, `${unitId}:completionDate`)
-			const existingBool = parseBoolean(existingIsCompleted);
-
-			if (!existingBool || !existingCompletionDate || existingCompletionDate === 'null') {
-				updates[`${unitId}:completionDate`] = new Date().toISOString()
-			}
-		} else if (isCompleted === false) {
-			const existingIsCompleted = await redis.hget(progressKey, `${unitId}:isCompleted`)
-			const existingBool = parseBoolean(existingIsCompleted);
-			if (existingBool === true) {
-				updates[`${unitId}:completionDate`] = 'null'
-			}
+		// isPerfectが明示的に指定された場合のみ更新
+		if (isPerfect !== undefined) {
+			updateData[`${unitId}:isPerfect`] = isPerfect.toString()
+			console.log('isPerfectをRedisに保存:', isPerfect)
 		}
 
-		// ebbinghausReviewCountが存在する場合のみ更新
-		if (ebbinghausReviewCount !== undefined && ebbinghausReviewCount !== null) {
-			updates[`${unitId}:ebbinghausReviewCount`] = ebbinghausReviewCount.toString()
-			updates[`${unitId}:lastEbbinghausReview`] = new Date().toISOString()
+		if (ebbinghausReviewCount !== undefined) {
+			updateData[`${unitId}:ebbinghausReviewCount`] = ebbinghausReviewCount.toString()
 		}
 
-		// 更新するフィールドがある場合のみRedisを更新
-		if (Object.keys(updates).length > 0) {
-			await redis.hmset(progressKey, updates)
+		// Redisに一括更新
+		if (Object.keys(updateData).length > 0) {
+			await redis.hmset(progressKey, updateData)
+			console.log('Redisに保存されたデータ:', updateData)
 		}
 
-		return json({ message: 'Progress updated successfully' })
+		// 更新後のデータを取得して返却
+		const updatedFields = await redis.hmget(
+			progressKey,
+			`${unitId}:lastProblemIndex`,
+			`${unitId}:isCompleted`,
+			`${unitId}:isPerfect`,
+			`${unitId}:completionDate`,
+			`${unitId}:ebbinghausReviewCount`
+		)
+
+		const responseData = {
+			userId,
+			unitId,
+			lastProblemIndex: parseInt(updatedFields[0] || '0', 10),
+			isCompleted: parseBoolean(updatedFields[1]),
+			isPerfect: parseBoolean(updatedFields[2]),
+			completionDate: updatedFields[3] || null,
+			ebbinghausReviewCount: parseInt(updatedFields[4] || '0', 10),
+			updatedAt: new Date().toISOString()
+		}
+
+		console.log('API応答データ:', responseData)
+
+		return json(responseData, { status: 200 })
+
 	} catch (error) {
-		console.error('[API] Failed to update user progress:', error)
-		return new Response('Internal Server Error', { status: 500 })
+		console.error('[API] Progress update failed:', error)
+		return new Response(
+			JSON.stringify({ error: 'Failed to update progress', details: error.message }),
+			{
+				status: 500,
+				headers: { 'Content-Type': 'application/json' }
+			}
+		)
 	}
 }

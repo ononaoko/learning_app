@@ -24,7 +24,7 @@
         out:slide={{ duration: 300 }}
       >
         <div class="w-full lg:w-1/2 gap-8">
-          <div class="flex flex-col items-start text-teal-500 leading-loose">
+          <div class="flex flex-col items-start text-teal-500 leading-loose ml-4">
             <KaTeXDisplay textContent={hint.expression} displayMode={true} fontSizeClass="text-xl" textColor="text-teal-500" />
           </div>
         </div>

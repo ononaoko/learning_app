@@ -1,13 +1,16 @@
 @import 'katex/dist/katex.min.css';
 @import 'tailwindcss';
+
+
 body {
     overflow-x: hidden;
+    font-family: serif;
   }
 
 /* --- ここから追加 --- */
 :root {
   /* ライトモード用のニューモーフィズム凹みシャドウ */
-  --shadow-neumorphic-concave: inset 5px 5px 10px #d6d3d1, inset -5px -5px 10px #e7e5e4;
+  --shadow-neumorphic-concave: inset 0px 0px 5px #e7e5e4, inset -0px -0px 5px #e7e5e4;
 
   /* （参考）凸状のニューモーフィズムシャドウも必要なら追加 */
   --shadow-neumorphic-convex: 5px 5px 10px #d6d3d1, -7.5px -7.5px 10px #ffffff;
