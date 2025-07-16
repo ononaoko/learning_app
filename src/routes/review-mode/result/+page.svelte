@@ -46,7 +46,7 @@
 
   </script>
 
-  <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">
+  <main class="bg-gradient-to-br from-stone-100 via-stone-100 to-stone-200 flex flex-col items-center min-h-screen p-4">
     <header class="
     w-full p-6 rounded-md relative
     bg-stone-100 /* stone-200を直接指定 */

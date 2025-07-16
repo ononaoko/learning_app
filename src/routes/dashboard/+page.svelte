@@ -87,7 +87,7 @@ function toggleMenu() {
             <IconGhost />
             <h1 class="text-4xl font-bold text-stone-700">ようこそ、{$nickname} さん！</h1>
           </div>
-          <button class="focus:outline-none" on:click={toggleMenu} aria-label="メニューを開閉">
+          <button class="focus:outline-none cursor-pointer" on:click={toggleMenu} aria-label="メニューを開閉">
             <IconHamburger width="48" height="48" isOpen={isOpen} />
           </button>
         </div>

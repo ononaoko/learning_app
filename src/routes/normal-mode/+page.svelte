@@ -120,7 +120,7 @@
   }
 
   function getUnitButtonStyle(unit) {
-    let baseStyle = "w-full text-left bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex2)] hover:bg-teal-300 text-stone-700 font-bold py-2 px-4 rounded-md shadow-md text-lg transition duration-200 ease-in-out flex items-center justify-between";
+    let baseStyle = "w-full text-left bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex2)] hover:bg-stone-200 text-stone-700 font-bold py-2 px-4 rounded-md shadow-md text-lg transition duration-500 ease-out flex items-center justify-between";
     let statusStyle = "";
 
     if (unit.isCompleted && unit.isPerfect) {
@@ -143,15 +143,15 @@
 
 <svelte:window on:progress-updated={handleProgressUpdate} />
 
-<main class="flex flex-col items-center gap-8 min-h-screen bg-gray-100 p-8">
+<main class="flex flex-col items-center gap-8 min-h-screen bg-gradient-to-br from-stone-100 via-stone-100 to-stone-200 p-8">
   <header class="
   w-full p-6 rounded-md relative
   bg-stone-100
   [box-shadow:var(--shadow-neumorphic-convex)]
 ">
     <div class="flex items-center justify-between">
-      <h1 class="text-4xl font-bold text-stone-700">通常モード</h1>
-      <button class="focus:outline-none" on:click={toggleMenu} aria-label="メニューを開閉">
+      <h1 class="text-4xl font-bold text-stone-700">演習モード</h1>
+      <button class="focus:outline-none cursor-pointer" on:click={toggleMenu} aria-label="メニューを開閉">
         <IconHamburger width="48" height="48" isOpen={isOpen} />
       </button>
     </div>
@@ -181,7 +181,7 @@
                     {#each subcategory.sub_units as unit (unit.id)}
                       <li>
                         <button
-                          class="{getUnitButtonStyle(unit)}"
+                          class="{getUnitButtonStyle(unit)} cursor-pointer"
                           on:click={() => selectUnit(unit.id)}
                         >
                           <span class="text-base font-normal">{unit.name}</span>

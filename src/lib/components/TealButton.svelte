@@ -17,7 +17,7 @@
          transition-all duration-150 h-[4rem] active:border-b-[0px] active:translate-y-2
          {shadowColorClass} {hoverShadowColorClass}
          hover:border-b-[0px] hover:translate-y-2
-         {textColorClass} text-2xl font-bold font-sans py-4 px-4 rounded-md focus:outline-none focus:shadow-outline"
+         {textColorClass} text-2xl font-bold font-sans py-4 px-4 rounded-md focus:outline-none focus:shadow-outline cursor-pointer"
   on:click={onClick}
 >
   {text}

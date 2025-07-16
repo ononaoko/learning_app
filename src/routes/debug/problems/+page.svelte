@@ -7,10 +7,8 @@
 
     let problems = [];
     let errorMessage = '';
-    let selectedUnit = 'algebra'; // 初期表示する単元
+    let selectedUnit = 'concentration'; // 初期表示する単元
     let availableUnits = [ // 利用可能な単元リスト (必要に応じて追加)
-      { id: 'algebra', name: '代数' },
-      { id: 'geometry', name: '図形' },
       { id: 'basic_ratio_proportion', name: '比と割合' }, // 新しく追加した単元があれば追加
       { id: 'concentration', name: '濃度' } // 新しく追加した単元があれば追加
     ];

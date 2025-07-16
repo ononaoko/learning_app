@@ -5,7 +5,7 @@
     export let textColor = 'text-white'; // テキスト色
   </script>
 
-  <div class="flex items-center space-x-1 px-2 py-1 rounded-full {bgColor} {textColor} text-xs font-semibold">
+  <div class="flex items-center space-x-1 px-2 py-1 rounded-full {bgColor} {textColor} text-xs font-bold font-sans">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={iconSize}
@@ -13,7 +13,7 @@
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      stroke-width="2"
+      stroke-width="3"
       stroke-linecap="round"
       stroke-linejoin="round"
       class="lucide lucide-check-circle"

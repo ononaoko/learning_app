@@ -295,7 +295,7 @@
         {
           "explanation": [
             { "type": "text", "value": "2人がお金を使った後の残りの金額を式で表してみよう。兄の残金は弟の残金の1.5倍なので、" },
-            { "type": "math", "value": "\\text{弟の残金} = 1.5 \\times text{兄の残金}" },
+            { "type": "math", "value": "\\text{弟の残金} = 1.5 \\times \\text{兄の残金}" },
             { "type": "text", "value": "という式が作れるよ。" }
           ],
           "expression": [

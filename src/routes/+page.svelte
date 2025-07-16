@@ -167,7 +167,7 @@
   <svelte:head>
     <title>算数学習アプリ - ログイン</title>
   </svelte:head>
-  <main class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-16">
+  <main class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-stone-100 via-stone-100 to-stone-200 p-16">
     <header class="mb-8 w-full max-w-md flex justify-between items-center">
       {#if $isLoggedIn}
         <button class="text-red-500 hover:underline" on:click={logoutUser}>ログアウト</button>
