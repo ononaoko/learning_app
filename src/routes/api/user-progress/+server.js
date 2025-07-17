@@ -190,6 +190,24 @@ export async function POST({ request }) {
 		const progressKey = `user:progress:${userId}`
 		const updateData = {}
 
+		// 現在の進捗データを取得
+		const currentProgress = await redis.hmget(
+			progressKey,
+			`${unitId}:completionDate`,
+			`${unitId}:ebbinghausReviewCount`,
+			`${unitId}:isCompleted`
+		)
+
+		const currentCompletionDate = currentProgress[0]
+		const currentEbbinghausReviewCount = parseInt(currentProgress[1] || '0', 10)
+		const currentIsCompleted = currentProgress[2] === 'true'
+
+		console.log('現在の進捗状況:', {
+			currentCompletionDate,
+			currentEbbinghausReviewCount,
+			currentIsCompleted
+		})
+
 		// 各フィールドを設定
 		if (lastProblemIndex !== undefined) {
 			updateData[`${unitId}:lastProblemIndex`] = lastProblemIndex.toString()
@@ -198,9 +216,18 @@ export async function POST({ request }) {
 		if (isCompleted !== undefined) {
 			updateData[`${unitId}:isCompleted`] = isCompleted.toString()
 
-			// 完了時に完了日時を設定
+			// 完了時の完了日時設定ロジック
 			if (isCompleted === true) {
-				updateData[`${unitId}:completionDate`] = new Date().toISOString()
+				// エビングハウス復習が完了していない場合（3回未満）は完了日時を更新しない
+				if (currentEbbinghausReviewCount < 3 && currentCompletionDate) {
+					console.log('エビングハウス復習未完了のため、完了日時を保持:', currentCompletionDate)
+					updateData[`${unitId}:completionDate`] = currentCompletionDate
+				} else {
+					// 初回完了 または エビングハウス復習完了済みの場合は完了日時を更新
+					const newCompletionDate = new Date().toISOString()
+					console.log('完了日時を更新:', newCompletionDate)
+					updateData[`${unitId}:completionDate`] = newCompletionDate
+				}
 			}
 		}
 

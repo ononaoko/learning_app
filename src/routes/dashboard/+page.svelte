@@ -60,6 +60,13 @@
     }, 150);
     }
 
+    async function goToEbbinghausMode() {
+      await audioStore.playWithDelay('click', () => {
+      goto('/ebbinghaus-mode');
+      isOpen = false;
+    }, 150);
+    }
+
     async function goToReviewMode() {
       await audioStore.playWithDelay('click', () => {
       goto('/review-mode'); // 復習モードページへ遷移
@@ -113,7 +120,7 @@
           </div>
           <div class="flex flex-col md:flex-row items-center gap-6 h-[8rem] md:h-[6rem]">
             <TealButton
-            onClick={goToReviewMode}
+            onClick={goToEbbinghausMode}
             widthClass="w-[300px]"
             buttonColorClass="bg-yellow-400"
             borderColorClass="border-yellow-500"
