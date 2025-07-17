@@ -11,19 +11,25 @@
   import TealButton from '$lib/components/TealButton.svelte';
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import IconHamburger from '$lib/components/IconHamburger.svelte';
+  import { audioStore } from '$lib/stores/audioStore.js';
 
   export let data;
   let currentUserId = data.userId;
 
   let isOpen = false;
 
-  function toggleMenu() {
+  // 効果音付きメニュートグル
+  async function toggleMenu() {
+    await audioStore.play('menu'); // slide.mp3を再生
     isOpen = !isOpen;
   }
 
-  function goToTop() {
-    goto('/');
-    isOpen = false;
+  // 効果音付きページ遷移
+  async function goToTop() {
+    await audioStore.playWithDelay('click', () => {
+      goto('/');
+      isOpen = false;
+    }, 200);
   }
 
   let unitId = $page.params.unit;
@@ -263,8 +269,10 @@
     }, 60000);
   }
 
+  // 効果音付きヒント表示
   async function handleShowNextHintEvent() {
     if (currentProblem && currentProblem.hints && currentHintIndex < currentProblem.hints.length) {
+      await audioStore.play('menu'); // ヒントボタンにクリック音
       currentHintIndex++;
       // DOM更新を待ってからスクロール
       await tick();
@@ -276,7 +284,9 @@
     }
   }
 
+  // 効果音付き回答エリア表示
   async function showAnswerInput() {
+    await audioStore.play('click'); // 回答ボタンにクリック音
     showAnswerArea = true;
     // DOM更新を待ってからスクロール
     await tick();
@@ -331,7 +341,10 @@
     }
   }
 
+  // 効果音付きセッション終了
   async function finishSession() {
+    await audioStore.play('click'); // 終了ボタンにクリック音
+
     console.log('=== ここまでボタン押下 ===');
     console.log('現在のproblemIndex:', currentProblemIndex);
     console.log('総問題数:', problems.length);
@@ -392,13 +405,16 @@
       console.error('ノーマルモードセッション全体の学習記録の送信中にエラーが発生しました。(中断時):', error);
     }
 
-    await goto('/normal-mode/result', {
-      state: {
-        results: results,
-        unitName: unitDisplayName,
-        isIncomplete: true
-      }
-    });
+    // 200ms遅延後にページ遷移
+    setTimeout(() => {
+      goto('/normal-mode/result', {
+        state: {
+          results: results,
+          unitName: unitDisplayName,
+          isIncomplete: true
+        }
+      });
+    }, 200);
   }
 
   async function nextProblem() {
@@ -429,6 +445,13 @@
       console.log('すべて正解:', allCorrect);
       console.log('総問題数:', problems.length);
       console.log('結果数:', results.length);
+
+      // 成功音またはエラー音を再生
+      if (allCorrect) {
+        await audioStore.play('success');
+      } else {
+        await audioStore.play('click');
+      }
 
       try {
         const sessionRecordResponse = await fetch('/api/session-record', {
@@ -468,20 +491,30 @@
         console.error('Failed to save final progress:', error);
       }
 
-      try {
-        await goto('/normal-mode/result', {
-          state: {
-            results: results,
-            unitName: unitDisplayName,
-            allCorrect: allCorrect
-          }
-        });
-      } catch (error) {
-        console.error('Failed to navigate to result page:', error);
-        await goto('/normal-mode/result');
-      }
+      // 200ms遅延後にページ遷移
+      setTimeout(() => {
+        try {
+          goto('/normal-mode/result', {
+            state: {
+              results: results,
+              unitName: unitDisplayName,
+              allCorrect: allCorrect
+            }
+          });
+        } catch (error) {
+          console.error('Failed to navigate to result page:', error);
+          goto('/normal-mode/result');
+        }
+      }, 200);
       return;
     }
+  }
+
+  // 効果音付きダッシュボード遷移
+  async function goToDashboard() {
+    await audioStore.playWithDelay('click', () => {
+      goto('/dashboard');
+    }, 200);
   }
 
   onMount(async () => {
@@ -560,19 +593,18 @@
 </svelte:head>
 
 <main class="bg-gradient-to-br from-stone-100 via-stone-100 to-stone-200 flex flex-col items-center min-h-screen p-4">
-  <header class="
-  w-full p-6 rounded-md relative
-  bg-stone-100
-  [box-shadow:var(--shadow-neumorphic-convex)]
-  mb-8
-">
+  <header class="w-full p-6 rounded-md relative bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] mb-8">
     <div class="flex items-center justify-between">
       <h1 class="text-4xl font-bold text-stone-700">演習 : {unitDisplayName}</h1>
-      <button class="focus:outline-none cursor-pointer" on:click={toggleMenu} aria-label="メニューを開閉">
+      <button
+        class="focus:outline-none cursor-pointer"
+        onclick={toggleMenu}
+        aria-label="メニューを開閉"
+      >
         <IconHamburger width="48" height="48" isOpen={isOpen} color="#374151" />
       </button>
     </div>
-    <AppNavigation isOpen={isOpen} />
+    <AppNavigation isOpen={isOpen} onNavigate={goToTop} />
   </header>
 
   {#if problems.length > 0 && currentProblemIndex < problems.length && currentProblem}
@@ -600,7 +632,8 @@
           {#if !showAnswerArea && currentHintIndex < currentProblem.hints.length && !showAllHints}
             <TealButton
               text="ヒント"
-              onClick={handleShowNextHintEvent} widthClass="w-[12rem]"
+              onClick={handleShowNextHintEvent}
+              widthClass="w-[12rem]"
               buttonColorClass="bg-yellow-400"
               borderColorClass="border-yellow-500"
               shadowColorClass="[box-shadow:0_5px_0_0_#eab308]"
@@ -638,8 +671,7 @@
     <p class="p-16">問題がありません。</p>
   {:else if errorMessage}
     <p class="text-red-500 text-center text-xl mt-8">{errorMessage}</p>
-    <TealButton text="ダッシュボードへ戻る" onClick={() => goto('/dashboard')}
-    />
+    <TealButton text="ダッシュボードへ戻る" onClick={goToDashboard} />
   {/if}
 
   {#if problems.length > 0}

@@ -2,17 +2,19 @@
     import { isLoggedIn, nickname } from '$lib/authStore';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
-    import { slide } from 'svelte/transition'; // slide トランジションをインポート
     import IconHamburger from '$lib/components/IconHamburger.svelte';
     import AppNavigation from '$lib/components/AppNavigation.svelte'; // 新しいナビゲーションコンポーネントをインポート
     import IconGhost from '$lib/components/IconGhost.svelte';
     import TealButton from '$lib/components/TealButton.svelte';
+    import { audioStore } from '$lib/stores/audioStore.js';
 
     let isOpen = false; // メニューの開閉状態
 
-function toggleMenu() {
-  isOpen = !isOpen;
-}
+  // 効果音付きメニュートグル（統一システム使用）
+  async function toggleMenu() {
+    await audioStore.play('menu');
+    isOpen = !isOpen;
+  }
 
     // 学習記録データ (初期値は空かデフォルト値)
     let totalLearningSessions = 0;
@@ -51,23 +53,22 @@ function toggleMenu() {
       loadLearningStats(); // コンポーネントがマウントされたときにデータをロード
     });
 
-    function goToNormalMode() {
+    async function goToNormalMode() {
+      await audioStore.playWithDelay('click', () => {
       goto('/normal-mode');
+      isOpen = false;
+    }, 150);
     }
 
-    function goToReviewMode() {
+    async function goToReviewMode() {
+      await audioStore.playWithDelay('click', () => {
       goto('/review-mode'); // 復習モードページへ遷移
+      isOpen = false;
+    }, 150);
     }
 
-    function goToStats() {
+    async function goToStats() {
       goto('/stats'); // 学習統計詳細ページへ遷移
-    }
-
-    function logoutUser() {
-      isLoggedIn.set(false);
-      nickname.set('');
-      localStorage.removeItem('users');
-      goto('/login'); // ログアウトしたらログインページへ
     }
   </script>
 
@@ -75,7 +76,7 @@ function toggleMenu() {
     <title>算数学習アプリ - ダッシュボード</title>
   </svelte:head>
 
-  <main class="flex flex-col items-center min-h-screen bg-gray-100 p-8">
+  <main class="flex flex-col items-center min-h-screen p-8 bg-gradient-to-br from-stone-100 via-stone-100 to-stone-200">
     <header class="
     w-full p-6 rounded-md relative
     bg-stone-100
@@ -99,37 +100,40 @@ function toggleMenu() {
 
       <section class="flex flex-col items-center pb-8 border-b border-gray-200">
         <div class="max-w-2xl space-y-8 md:space-y-0 w-full">
-          <div class="flex flex-col md:flex-row items-center gap-4 h-24">
+          <h1><img src="/img/logo.svg" alt="ONOTE.APP" class="max-w-80 mx-auto mb-8"></h1>
+          <div class="flex flex-col md:flex-row items-center gap-6 h-[8rem] md:h-[6rem]">
             <TealButton
-            text="演習モード"
             onClick={goToNormalMode}
+            imageOnly={true}
             widthClass="w-[300px]"
+            imageSrc="/img/normal-mode.svg"
+            imageSize="h-8 w-auto"
           />
-          <p class="text-stone-700">過去問を演習して実力を測定</p>
+          <p class="text-stone-700 h-[4rem] rounded-md bg-stone-100 [box-shadow:var(--shadow-neumorphic-concave2)] w-[300px] flex justify-center items-center">過去問を演習して実力を測定</p>
           </div>
-          <div class="flex flex-col md:flex-row items-center gap-4 h-24">
+          <div class="flex flex-col md:flex-row items-center gap-6 h-[8rem] md:h-[6rem]">
             <TealButton
-            text="エビングハウスモード"
             onClick={goToReviewMode}
             widthClass="w-[300px]"
             buttonColorClass="bg-yellow-400"
             borderColorClass="border-yellow-500"
             shadowColorClass="[box-shadow:0_5px_0_0_#eab308,0_10px_0_0_#d1d5db]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#eab308,0_0_0_0_#d1d5db]"
-            textColorClass="text-white"
+            imageSrc="/img/ebbinghaus-mode.svg"
+            imageSize="h-8 w-auto"
           />
-          <p class="text-stone-700">忘却曲線に沿った最適な復習問題を出題（未実装）</p>
+          <p class="text-stone-700 h-[4rem] rounded-md bg-stone-100 [box-shadow:var(--shadow-neumorphic-concave2)] w-[300px] flex justify-center items-center">忘却曲線に沿った最適な復習問題</p>
           </div>
-          <div class="flex flex-col md:flex-row items-center gap-4 h-24">
+          <div class="flex flex-col md:flex-row items-center gap-6 h-[8rem] md:h-[6rem]">
             <TealButton
-            text="弱点克服モード"
             onClick={goToReviewMode}
             widthClass="w-[300px]"
             buttonColorClass="bg-red-400"
             borderColorClass="border-red-400"
             shadowColorClass="[box-shadow:0_5px_0_0_#ef4444,0_10px_0_0_#d1d5db]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#ef4444,0_0px_0_0_#d1d5db]"
-            textColorClass="text-white"
+            imageSrc="/img/review-mode.svg"
+            imageSize="h-8 w-auto"
           />
-          <p class="text-stone-700">正答率が低い問題を重点的に復習</p>
+          <p class="text-stone-700 h-[4rem] rounded-md bg-stone-100 [box-shadow:var(--shadow-neumorphic-concave2)] w-[300px] flex justify-center items-center">正答率が低い問題を重点的に復習</p>
           </div>
         </div>
       </section>

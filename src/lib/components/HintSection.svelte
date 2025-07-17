@@ -8,40 +8,27 @@
   export let showAnswerArea = false;
   export let showAllHints = false;
 
-  let slideSound;
-  let previousHintIndex = 0;
-  let wasShowAllHints = false;
+  // 削除: 個別の音声要素と効果音関連のコード
+  // let slideSound;
+  // let previousHintIndex = 0;
+  // let wasShowAllHints = false;
 
-  // ヒント音を再生する関数
-  function playSlideSound() {
-    if (slideSound) {
-      slideSound.currentTime = 0;
-      slideSound.play().catch(e => console.error("スライド音の再生エラー:", e));
-    }
-  }
+  // 削除: 効果音再生関数
+  // function playSlideSound() { ... }
 
-  // currentHintIndexが変化したときに効果音を鳴らす
-  $: if (currentHintIndex > previousHintIndex) {
-    playSlideSound();
-    previousHintIndex = currentHintIndex;
-  }
+  // 削除: リアクティブ効果音処理
+  // $: if (currentHintIndex > previousHintIndex) { ... }
+  // $: if (showAllHints && !wasShowAllHints) { ... }
 
-  // showAllHintsがtrueに変化したときにも効果音を鳴らす
-  $: if (showAllHints && !wasShowAllHints) {
-    playSlideSound();
-    wasShowAllHints = showAllHints;
-  }
-
-  // コンポーネントがマウントされたときの処理
+  // コンポーネントがマウントされたときの処理（簡略化）
   onMount(() => {
-    // 初期状態をセット
-    previousHintIndex = currentHintIndex;
-    wasShowAllHints = showAllHints;
+    // 効果音関連の初期化は不要になったため、削除
+    console.log('HintSection mounted');
   });
 </script>
 
-<!-- 効果音のaudio要素 -->
-<audio bind:this={slideSound} src="/sounds/slide.mp3" preload="auto"></audio>
+<!-- 削除: 効果音のaudio要素 -->
+<!-- <audio bind:this={slideSound} src="/sounds/slide.mp3" preload="auto"></audio> -->
 
 <div transition:slide={{ duration: 300 }}>
   {#each hints as hint, index}

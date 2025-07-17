@@ -6,6 +6,7 @@
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import UnitStatusPerfectIcon from '$lib/components/UnitStatusPerfectIcon.svelte';
   import UnitStatusInProgressIcon from '$lib/components/UnitStatusInProgressIcon.svelte';
+  import { audioStore } from '$lib/stores/audioStore.js';
 
   export let data;
   let currentUserId = data.userId;
@@ -13,8 +14,6 @@
   let isOpen = false;
   let userProgress = {};
   let processedUnits = [];
-  let clickSound; // 単元選択時の効果音
-  let menuSound;
 
   async function loadUserProgress(userId) {
     if (!userId) {
@@ -92,113 +91,44 @@
     }
   }
 
-// 効果音を再生する関数 - デバッグ強化版
-function playClickSound() {
-  console.log('playClickSound関数が呼ばれました');
+  onMount(async () => {
+    await loadUserProgress(currentUserId);
 
-  if (clickSound) {
-    console.log('clickSound要素が存在します');
+    // イベントリスナーの追加
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    startProgressPolling();
 
-    // 音声ファイルがロードされているか確認
-    if (clickSound.readyState >= 2) {
-      console.log('音声ファイルは正常にロードされています');
-    } else {
-      console.warn('音声ファイルが完全にロードされていません', clickSound.readyState);
-    }
+    // クリーンアップ関数
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopProgressPolling();
+    };
+  });
 
-    // 音量の確認
-    console.log('音量設定:', clickSound.volume);
-
-    // 再生を試みる
-    clickSound.currentTime = 0;
-    clickSound.volume = 1.0; // 最大音量に設定
-
-    // Promise APIを使用
-    clickSound.play()
-      .then(() => {
-        console.log('効果音の再生に成功しました');
-      })
-      .catch(e => {
-        console.error('効果音の再生に失敗しました:', e);
-      });
-  } else {
-    console.error('clickSound要素が見つかりません');
-  }
-}
-
- // onMountでのデバッグ追加
-onMount(async () => {
-  await loadUserProgress(currentUserId);
-
-  // オーディオ要素の初期化確認
-  console.log('onMount: オーディオ要素の状態確認');
-  if (clickSound) {
-    console.log('オーディオ要素が正常に初期化されました');
-  } else {
-    console.warn('オーディオ要素が初期化されていません');
+  // 効果音付きメニュートグル（統一システム使用）
+  async function toggleMenu() {
+    await audioStore.play('menu');
+    isOpen = !isOpen;
   }
 
-  // 以下は既存のコード
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-  startProgressPolling();
-
-  // クリーンアップ関数
-  return () => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-    stopProgressPolling();
-  };
-});
-
-function toggleMenu() {
-  // 効果音を再生
-  if (menuSound) {
-    menuSound.currentTime = 0;
-    menuSound.volume = 1.0;
-    menuSound.play()
-      .then(() => console.log('メニュー効果音の再生に成功しました'))
-      .catch(e => console.error('メニュー効果音の再生に失敗しました:', e));
+  // 効果音付きトップページ遷移（統一システム使用）
+  async function goToTop() {
+    await audioStore.playWithDelay('click', () => {
+      goto('/');
+      isOpen = false;
+    }, 150);
   }
 
-  // メニュー状態を切り替え
-  isOpen = !isOpen;
-}
+  // 効果音付き単元選択（統一システム使用）
+  async function selectUnit(unitId) {
+    console.log(`単元選択: ${unitId}`);
 
-  function goToTop() {
-    goto('/');
-    isOpen = false;
+    // 効果音を再生して遅延後にページ遷移
+    await audioStore.playWithDelay('click', () => {
+      console.log(`ページ遷移を実行: /normal-mode/${unitId}`);
+      goto(`/normal-mode/${unitId}`);
+    }, 200);
   }
-
-// 効果音を再生してから遅延してページ遷移する関数
-function selectUnit(unitId) {
-  console.log(`単元選択: ${unitId}`);
-
-  // 効果音を再生
-  if (clickSound) {
-    clickSound.currentTime = 0;
-    clickSound.volume = 1.0;
-
-    // 音声再生をPromiseとして扱い、再生開始後に遅延してから遷移
-    clickSound.play()
-      .then(() => {
-        console.log('効果音の再生を開始しました');
-
-        // 音声が少なくとも100〜300ms程度再生されてから遷移
-        setTimeout(() => {
-          console.log(`ページ遷移を実行: /normal-mode/${unitId}`);
-          goto(`/normal-mode/${unitId}`);
-        }, 200); // 200msの遅延
-      })
-      .catch(e => {
-        console.error('効果音の再生に失敗しました:', e);
-        // 再生に失敗した場合はすぐに遷移
-        goto(`/normal-mode/${unitId}`);
-      });
-  } else {
-    // clickSoundが利用できない場合はすぐに遷移
-    console.warn('音声要素が利用できないため、すぐに遷移します');
-    goto(`/normal-mode/${unitId}`);
-  }
-}
 
   function getUnitButtonStyle(unit) {
     let baseStyle = "w-full text-left bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex2)] cursor-pointer hover:bg-stone-200 active:bg-stone-200 text-stone-700 font-bold py-2 px-4 rounded-md shadow-md text-lg transition duration-500 ease-out flex items-center justify-between";
@@ -224,38 +154,30 @@ function selectUnit(unitId) {
 
 <svelte:window on:progress-updated={handleProgressUpdate} />
 
-<!-- 効果音用のaudio要素を追加 -->
-<audio bind:this={clickSound} src="/sounds/tap.mp3" preload="auto"></audio>
-<audio bind:this={menuSound} src="/sounds/slide.mp3" preload="auto"></audio>
-
 <main class="flex flex-col items-center gap-8 min-h-screen bg-gradient-to-br from-stone-100 via-stone-100 to-stone-200 p-8">
-  <header class="
-  w-full p-6 rounded-md relative
-  bg-stone-100
-  [box-shadow:var(--shadow-neumorphic-convex)]
-">
+  <header class="w-full p-6 rounded-md relative bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)]">
     <div class="flex items-center justify-between">
       <h1 class="text-4xl font-bold text-stone-700">演習モード</h1>
-      <button class="focus:outline-none cursor-pointer" on:click={toggleMenu} aria-label="メニューを開閉">
+      <button
+        class="focus:outline-none cursor-pointer"
+        onclick={toggleMenu}
+        aria-label="メニューを開閉"
+      >
         <IconHamburger width="48" height="48" isOpen={isOpen} />
       </button>
     </div>
-    <AppNavigation isOpen={isOpen} />
+    <AppNavigation isOpen={isOpen} onNavigate={goToTop} />
   </header>
 
   <div class="w-full flex flex-col gap-8">
     <h2 class="text-3xl font-bold text-gray-700 text-center">単元選択</h2>
     {#each processedUnits as category (category.name)}
       <div>
-        <div class="
-        bg-teal-400 text-white rounded-full
-        flex items-center
-        px-6 py-2 mb-4
-      ">
-        <h3 class="text-xl m-0">
-          {category.name}
-        </h3>
-      </div>
+        <div class="bg-teal-400 text-white rounded-full flex items-center px-6 py-2 mb-4">
+          <h3 class="text-xl m-0">
+            {category.name}
+          </h3>
+        </div>
         {#if category.sub_units}
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {#each category.sub_units as subcategory (subcategory.name)}
@@ -267,7 +189,8 @@ function selectUnit(unitId) {
                       <li>
                         <button
                           class="{getUnitButtonStyle(unit)}"
-                          on:click={() => selectUnit(unit.id)}
+                          onclick={() => selectUnit(unit.id)}
+                          aria-label="単元 {unit.name} を選択"
                         >
                           <span class="text-base font-normal">{unit.name}</span>
                           {#if unit.isCompleted && unit.isPerfect}
