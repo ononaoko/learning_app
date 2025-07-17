@@ -1,8 +1,12 @@
 <script>
 	import '../app.css'; // グローバルCSS
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { isLoggedIn, nickname } from '$lib/authStore';
 	import AudioManager from '$lib/components/AudioManager.svelte';
+	import AuthGuard from '$lib/components/AuthGuard.svelte';
 	import { audioStore } from '$lib/stores/audioStore.js';
 
 	// ★重要: children プロパティを受け取る行を再追加します★
@@ -26,76 +30,72 @@
 	  }
 	});
 
-	// 効果音設定の表示/非表示 - Svelte 5のリアクティブ変数
-	let showAudioSettings = $state(false);
+	// 戻るボタンの表示判定 - Svelte 5 runes mode
+	let showBackButton = $derived(browser && $page.url.pathname !== '/');
 
-	function toggleAudioSettings() {
-		showAudioSettings = !showAudioSettings;
+	// 効果音付き戻るボタン
+	async function goBack() {
+		await audioStore.play('click');
+
+		// 戻る履歴があるかチェック
+		if (window.history.length > 1) {
+			window.history.back();
+		} else {
+			// 履歴がない場合はホームに遷移
+			goto('/');
+		}
 	}
 </script>
 
 <!-- 全ページ共通で効果音システムを初期化 -->
 <AudioManager />
 
+<!-- 全ページ共通で認証ガードを初期化 -->
+<AuthGuard />
+
 <!-- 各ページのコンテンツがここに表示される -->
 {@render children()}
 
-<!-- 効果音設定パネル -->
-<div class="fixed bottom-4 right-4 z-50">
-	{#if showAudioSettings}
-		<div class="bg-white rounded-lg shadow-lg p-4 mb-2 min-w-[200px] [box-shadow:var(--shadow-neumorphic-convex)]">
-			<h3 class="text-sm font-bold text-stone-700 mb-3">効果音設定</h3>
-
-			<div class="space-y-2">
-				<label class="flex items-center justify-between text-sm text-stone-600">
-					<span>効果音</span>
-					<button
-						class="relative inline-flex h-6 w-11 items-center rounded-full bg-stone-300 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-						class:bg-teal-500={$audioStore.isEnabled}
-						onclick={() => audioStore.toggle()}
-						aria-label="効果音のON/OFF切り替え"
-					>
-						<span
-							class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-							class:translate-x-6={$audioStore.isEnabled}
-							class:translate-x-1={!$audioStore.isEnabled}
-						></span>
-					</button>
-				</label>
-
-				<label class="flex items-center justify-between text-sm text-stone-600">
-					<span>音量</span>
-					<input
-						type="range"
-						min="0"
-						max="1"
-						step="0.1"
-						value={$audioStore.volume}
-						oninput={(e) => audioStore.setVolume(parseFloat(e.target.value))}
-						class="w-16 h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer"
-						aria-label="音量調整"
-					/>
-				</label>
-			</div>
-
-			<div class="mt-3 pt-2 border-t border-stone-200">
-				<button
-					class="text-xs text-teal-600 hover:text-teal-800"
-					onclick={() => audioStore.play('click')}
-					aria-label="効果音のテスト再生"
-				>
-					🔊 テスト再生
-				</button>
-			</div>
-		</div>
-	{/if}
-
+<!-- 曲線的な戻るボタン（画面右端に固定） -->
+{#if showBackButton}
+<div class="fixed right-0 bottom-1/20 transform -translate-y-1/2 z-40 flex flex-col items-end">
+	<span class="bg-teal-400 w-4 h-4 top-curve"></span>
 	<button
-		class="bg-stone-100 hover:bg-stone-200 p-3 rounded-full shadow-lg transition-all duration-200 [box-shadow:var(--shadow-neumorphic-convex)]"
-		class:bg-stone-200={showAudioSettings}
-		onclick={toggleAudioSettings}
-		aria-label="効果音設定を開く"
+		class="rounded-l-4xl bg-teal-400 text-white"
+		onclick={goBack}
+		aria-label="戻る"
+		style="
+			padding: 1rem 0.75rem;
+		"
 	>
-		<span class="text-lg">🔊</span>
+		<!-- 戻るアイコン（矢印） -->
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="3"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<path d="M19 12H5"/>
+			<path d="m12 19-7-7 7-7"/>
+		</svg>
 	</button>
+	<span class="bottom-curve bg-teal-400 w-4 h-4"></span>
 </div>
+{/if}
+
+<style>
+
+.top-curve {
+  mask: radial-gradient(circle at top left, transparent 70%, black 71%);
+  -webkit-mask: radial-gradient(circle at top left, transparent 70%, black 71%);
+}
+.bottom-curve {
+  mask: radial-gradient(circle at top left, transparent 70%, black 71%);
+  -webkit-mask: radial-gradient(circle at bottom left, transparent 70%, black 71%);
+}
+</style>

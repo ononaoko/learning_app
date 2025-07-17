@@ -1,9 +1,11 @@
 <script>
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { audioStore } from '$lib/stores/audioStore.js';
   import IconHamburger from '$lib/components/IconHamburger.svelte';
-  import AppNavigation from '$lib/components/AppNavigation.svelte'; // AppNavigationをインポート
+  import AppNavigation from '$lib/components/AppNavigation.svelte';
   import DiagonalFraction from '$lib/components/DiagonalFraction.svelte';
   import AvatarMessage from '$lib/components/AvatarMessage.svelte';
   import IconCircle2 from '$lib/components/IconCircle2.svelte';
@@ -21,26 +23,34 @@
 
   let isOpen = false;
 
-  function toggleMenu() {
+  // 効果音付きメニュートグル
+  async function toggleMenu() {
+    await audioStore.play('menu');
     isOpen = !isOpen;
   }
 
-  function goToDashboard() {
-    goto('/dashboard');
-    isOpen = false; // メニューを閉じる
+  // 効果音付きダッシュボード遷移
+  async function goToDashboard() {
+    await audioStore.playWithDelay('click', () => {
+      goto('/dashboard');
+      isOpen = false; // メニューを閉じる
+    }, 200);
   }
 
-  function goToNormalMode() {
-    // ユニット選択ページに戻る場合は、適切なパスを設定してください
-    // 例: goto('/normal-mode');
-    // 今回はダッシュボードに戻るボタンのみなので削除しました
-    goto('/normal-mode'); // ユニット選択ページへの遷移
-    isOpen = false;
+  // 効果音付きユニット選択遷移
+  async function goToNormalMode() {
+    await audioStore.playWithDelay('click', () => {
+      goto('/normal-mode'); // ユニット選択ページへの遷移
+      isOpen = false;
+    }, 200);
   }
 
-  function goToTop() {
-    goto('/');
-    isOpen = false;
+  // 効果音付きトップ遷移
+  async function goToTop() {
+    await audioStore.playWithDelay('click', () => {
+      goto('/');
+      isOpen = false;
+    }, 200);
   }
 
   // メッセージのロジック
@@ -56,6 +66,19 @@
       return '練習すればもっと上達するよ！';
     }
   })();
+
+  // ページマウント時に効果音を再生
+  onMount(async () => {
+    try {
+      // 少し遅延を入れてページが完全に読み込まれてから効果音を再生
+      setTimeout(async () => {
+        await audioStore.play('result');
+        console.log('結果ページ - result音を再生');
+      }, 300);
+    } catch (error) {
+      console.warn('効果音再生に失敗:', error);
+    }
+  });
 </script>
 
 <main class="bg-stone-100 flex flex-col items-center min-h-screen p-4">

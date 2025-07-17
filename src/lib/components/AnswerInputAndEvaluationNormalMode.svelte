@@ -7,6 +7,7 @@
   import IconCircle from '$lib/components/IconCircle.svelte';
   import TealButton from '$lib/components/TealButton.svelte';
   import { tick } from 'svelte';
+  import { audioStore } from '$lib/stores/audioStore.js';
 
   const dispatch = createEventDispatcher();
 
@@ -17,8 +18,10 @@
   let showResult = false;
   let isCorrect = false;
   let feedbackMessage = '';
-  let correctSound;
-  let incorrectSound;
+
+  // 削除: 個別の音声要素
+  // let correctSound;
+  // let incorrectSound;
 
   // currentProblemAnswer が変更されたときに数式部分を抽出する
   // このブロックはコンポーネトの状態をリセットするためにも使用します
@@ -26,17 +29,12 @@
     resetState(); // 新しい問題がロードされたときに状態をリセット
   }
 
-  function playSound(isCorrect) {
-    if (isCorrect) {
-      if (correctSound) {
-        correctSound.currentTime = 0;
-        correctSound.play().catch(e => console.error("正解音の再生エラー:", e));
-      }
-    } else { // 不正解の場合のみ再生
-      if (incorrectSound) {
-        incorrectSound.currentTime = 0;
-        incorrectSound.play().catch(e => console.error("不正解音の再生エラー:", e));
-      }
+  // 統一効果音システムを使用
+  async function playSound(isCorrectAnswer) {
+    if (isCorrectAnswer) {
+      await audioStore.play('correct'); // 正解時はcorrect.mp3
+    } else {
+      await audioStore.play('incorrect'); // 不正解時はincorrect.mp3
     }
   }
 
@@ -44,11 +42,19 @@
     userAnswer = event.detail.transcript;
   }
 
-  function handleSpeechError(event) {
+  // 効果音付き音声認識エラーハンドリング
+  async function handleSpeechError(event) {
     console.error('MicrophoneButtonからのエラー:', event.detail.error);
+    await audioStore.play('error'); // MicrophoneButtonエラー時にerror効果音
   }
 
-  function evaluateAnswer() {
+  // MicrophoneButton録音開始時の効果音
+  async function handleSpeechStart(event) {
+    console.log('音声認識が開始されました');
+    await audioStore.play('error'); // 録音開始時にerror効果音（名前がerrorですが気にしない）
+  }
+
+  async function evaluateAnswer() {
     // ユーザー入力を正規化
     const normalizedUserAnswer = userAnswer
       .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)) // 全角数字を半角に
@@ -64,7 +70,7 @@
     });
 
     showResult = true;
-    playSound(isCorrect);
+    await playSound(isCorrect); // 統一効果音システムを使用
 
     dispatch('recordAnswer', { isCorrect: isCorrect });
   }
@@ -76,22 +82,31 @@
     feedbackMessage = '';
   }
 
-  // イベントオブジェクトを受け取り、preventDefault() を呼び出す
-  function handleNextButtonClick() { // event 引数を削除
+  // 効果音付き次の問題ボタン
+  async function handleNextButtonClick() {
+    await audioStore.play('click'); // TealButtonにclick効果音
     dispatch('nextProblem');
   }
 
-  // 「ここまで」ボタンが押された時のハンドラ
+  // 効果音付きセッション終了ボタン
   async function handleFinishSessionClick() {
+    await audioStore.play('click'); // TealButtonにclick効果音
     // showResult が true の状態を確実に解除してからイベントをディスパッチ
     showResult = false;
     await tick(); // DOMの更新を待つ
     dispatch('finishSession');
   }
+
+  // 効果音付き回答送信ボタン
+  async function handleSubmitAnswer() {
+    await audioStore.play('click'); // TealButtonにclick効果音
+    await evaluateAnswer();
+  }
 </script>
 
-<audio bind:this={correctSound} src="/sounds/correct.mp3" preload="auto"></audio>
-<audio bind:this={incorrectSound} src="/sounds/incorrect.mp3" preload="auto"></audio>
+<!-- 削除: 個別のaudio要素 -->
+<!-- <audio bind:this={correctSound} src="/sounds/correct.mp3" preload="auto"></audio> -->
+<!-- <audio bind:this={incorrectSound} src="/sounds/incorrect.mp3" preload="auto"></audio> -->
 
 <div in:scale={{ start: 0.5 }} class="rounded-md p-8 bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] flex flex-col space-y-4 max-w-xl mx-auto mb-8">
   {#if !showResult}
@@ -102,18 +117,19 @@
         class="flex-grow p-2 rounded-md text-xl font-sans text-stone-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white bg-stone-100 [box-shadow:var(--shadow-neumorphic-concave)]"
         placeholder="ここに音声入力されます"
         bind:value={userAnswer}
-        on:keydown={(e) => { if (e.key === 'Enter') evaluateAnswer(); }}
+        on:keydown={(e) => { if (e.key === 'Enter') handleSubmitAnswer(); }}
       />
       <MicrophoneButton
         on:recognized={handleSpeechRecognized}
         on:error={handleSpeechError}
+        on:start={handleSpeechStart}
       />
     </div>
 
     <TealButton
       text="回答を送信"
       type="button"
-      onClick={evaluateAnswer}
+      onClick={handleSubmitAnswer}
       disabled={!userAnswer.trim() || showResult}
     />
 
@@ -145,7 +161,7 @@
         buttonColorClass="bg-gray-400"
         borderColorClass="border-gray-600"
         shadowColorClass="[box-shadow:0_5px_0_0_#6b7280]"
-        hoverShadowColorClass="hover:[box-box-shadow:0_0px_0_0_#6b7280]"
+        hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#6b7280]"
         textColorClass="text-white"
       />
           </div>
