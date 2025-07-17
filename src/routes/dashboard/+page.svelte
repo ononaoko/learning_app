@@ -78,8 +78,8 @@ function toggleMenu() {
   <main class="flex flex-col items-center min-h-screen bg-gray-100 p-8">
     <header class="
     w-full p-6 rounded-md relative
-    bg-stone-100 /* stone-200を直接指定 */
-    [box-shadow:var(--shadow-neumorphic-convex)] /* CSS変数を直接参照 */
+    bg-stone-100
+    [box-shadow:var(--shadow-neumorphic-convex)]
     mb-8
   ">
         <div class="flex items-center justify-between">
@@ -95,7 +95,7 @@ function toggleMenu() {
       </header>
 
 
-    <div class="w-full bg-white shadow-lg rounded-lg p-8 space-y-8">
+    <div class="w-full bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] shadow-lg rounded-lg p-8 space-y-8">
 
       <section class="flex flex-col items-center pb-8 border-b border-gray-200">
         <div class="max-w-2xl space-y-8 md:space-y-0 w-full">
@@ -104,9 +104,6 @@ function toggleMenu() {
             text="演習モード"
             onClick={goToNormalMode}
             widthClass="w-[300px]"
-            buttonColorClass="bg-teal-300"
-            borderColorClass="border-teal-500"     shadowColorClass="[box-shadow:0_5px_0_0_#14b8a6]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#14b8a6]"
-            textColorClass="text-stone-700"
           />
           <p class="text-stone-700">過去問を演習して実力を測定</p>
           </div>
@@ -115,10 +112,10 @@ function toggleMenu() {
             text="エビングハウスモード"
             onClick={goToReviewMode}
             widthClass="w-[300px]"
-            buttonColorClass="bg-yellow-300"
-            borderColorClass="border-yellow-400"
-            shadowColorClass="[box-shadow:0_5px_0_0_#eab308]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#eab308]"
-            textColorClass="text-stone-700"
+            buttonColorClass="bg-yellow-400"
+            borderColorClass="border-yellow-500"
+            shadowColorClass="[box-shadow:0_5px_0_0_#eab308,0_10px_0_0_#d1d5db]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#eab308,0_0_0_0_#d1d5db]"
+            textColorClass="text-white"
           />
           <p class="text-stone-700">忘却曲線に沿った最適な復習問題を出題（未実装）</p>
           </div>
@@ -127,8 +124,10 @@ function toggleMenu() {
             text="弱点克服モード"
             onClick={goToReviewMode}
             widthClass="w-[300px]"
-            buttonColorClass="bg-red-300"          borderColorClass="border-red-400"       shadowColorClass="[box-shadow:0_5px_0_0_#f87171]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#f87171]"
-            textColorClass="text-stone-700"
+            buttonColorClass="bg-red-400"
+            borderColorClass="border-red-400"
+            shadowColorClass="[box-shadow:0_5px_0_0_#ef4444,0_10px_0_0_#d1d5db]" hoverShadowColorClass="hover:[box-shadow:0_0px_0_0_#ef4444,0_0px_0_0_#d1d5db]"
+            textColorClass="text-white"
           />
           <p class="text-stone-700">正答率が低い問題を重点的に復習</p>
           </div>

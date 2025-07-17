@@ -3,12 +3,13 @@
   export let onClick = () => {};
   export let buttonColorClass = 'bg-teal-400';
   export let borderColorClass = 'border-teal-500';
-  export let shadowColorClass = '[box-shadow:0_5px_0_0_#14b8a6]'; // 従来のbox-shadowは残す
-  export let hoverShadowColorClass = 'hover:[box-shadow:0_0px_0_0_#14b8a6]'; // 従来のbox-shadowホバー効果も残す
+  export let shadowColorClass = '[box-shadow:0_5px_0_0_#14b8a6,0_10px_0_0_#d1d5db]'; // 従来のbox-shadowは残す
+  export let hoverShadowColorClass = 'hover:[box-shadow:0_0px_0_0_#14b8a6,0_0px_0_0_#d1d5db]'; // 従来のbox-shadowホバー効果も残す
   export let textColorClass = 'text-white';
   export let widthClass = '';
   export let minWidthClass = '';
   export let type = 'button';
+  export let disabled = false;
 </script>
 
 <button

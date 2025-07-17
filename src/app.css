@@ -10,10 +10,10 @@ body {
 /* --- ここから追加 --- */
 :root {
   /* ライトモード用のニューモーフィズム凹みシャドウ */
-  --shadow-neumorphic-concave: inset 0px 0px 5px #e7e5e4, inset -0px -0px 5px #e7e5e4;
+  --shadow-neumorphic-concave: inset 1px 1px 5px #a8a29e, inset -1px -1px 5px #ffffff;
 
   /* （参考）凸状のニューモーフィズムシャドウも必要なら追加 */
-  --shadow-neumorphic-convex: 5px 5px 10px #d6d3d1, -7.5px -7.5px 10px #ffffff;
+  --shadow-neumorphic-convex: 5px 5px 10px #d6d3d1, -5px -5px 10px #ffffff;
   --shadow-neumorphic-convex2: 2.5px 2.5px 5px #d6d3d1, -2.5px -2.5px 5px #ffffff;
 }
 

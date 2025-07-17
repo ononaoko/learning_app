@@ -93,13 +93,13 @@
 <audio bind:this={correctSound} src="/sounds/correct.mp3" preload="auto"></audio>
 <audio bind:this={incorrectSound} src="/sounds/incorrect.mp3" preload="auto"></audio>
 
-<div in:scale={{ start: 0.5 }} class="rounded-md p-4 bg-stone-50 [box-shadow:var(--shadow-neumorphic-convex)] flex flex-col space-y-4 max-w-xl mx-auto mb-8">
+<div in:scale={{ start: 0.5 }} class="rounded-md p-8 bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] flex flex-col space-y-4 max-w-xl mx-auto mb-8">
   {#if !showResult}
     <h2 class="text-2xl font-bold text-stone-700 text-center font-sans">回答を入力してください</h2>
     <div class="flex items-center space-x-4">
       <input
         type="text"
-        class="flex-grow p-3 border border-stone-300 rounded-md text-xl font-sans text-stone-700 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white [box-shadow:var(--shadow-neumorphic-concave)]"
+        class="flex-grow p-2 rounded-md text-xl font-sans text-stone-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white bg-stone-100 [box-shadow:var(--shadow-neumorphic-concave)]"
         placeholder="ここに音声入力されます"
         bind:value={userAnswer}
         on:keydown={(e) => { if (e.key === 'Enter') evaluateAnswer(); }}

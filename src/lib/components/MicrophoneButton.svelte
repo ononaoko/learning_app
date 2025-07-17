@@ -70,13 +70,13 @@
 
 <button
 class="{buttonClass} transition-all duration-150 rounded-full focus:outline-none flex items-center justify-center"
-class:bg-teal-500={!isListening}
+class:bg-teal-400={!isListening}
 class:hover_bg-teal-600={!isListening}
 class:bg-red-500={isListening}
 class:hover_bg-red-600={isListening}
-class:shadow-lg={true}
-class:shadow-teal-700={!isListening}
-class:shadow-red-700={isListening}
+class:shadow-md={true}
+class:shadow-teal-600={!isListening}
+class:shadow-red-600={isListening}
 on:click={isListening ? stopSpeechRecognition : startSpeechRecognition}
 {disabled}
 aria-label={isListening ? '音声入力停止' : '音声入力開始'}
