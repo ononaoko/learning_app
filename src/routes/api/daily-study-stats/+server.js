@@ -10,8 +10,13 @@ export async function GET({ url }) {
 	const userId = url.searchParams.get('userId')
 	const days = parseInt(url.searchParams.get('days') || '7', 10) // デフォルト7日間
 
-	if (!userId) {
-		return new Response('User ID is required', { status: 400 })
+	console.log('=== 日別学習統計取得開始 ===')
+	console.log('受信したuserId:', userId)
+	console.log('受信したdays:', days)
+
+	if (!userId || userId === 'null' || userId === 'undefined') {
+		console.error('Invalid userId:', userId)
+		return new Response('Valid User ID is required', { status: 400 })
 	}
 
 	try {
@@ -25,29 +30,59 @@ export async function GET({ url }) {
 
 		// 指定日数分の統計データを取得
 		for (let i = days - 1; i >= 0; i--) {
-			const date = new Date(today)
-			date.setDate(today.getDate() - i)
-			const dateString = date.toISOString().split('T')[0] // YYYY-MM-DD
+			try {
+				const date = new Date(today)
+				date.setDate(today.getDate() - i)
+				const dateString = date.toISOString().split('T')[0] // YYYY-MM-DD
 
-			// その日の統計データを取得
-			const dayData = await redis.hgetall(`${dailyStatsKey}:${dateString}`)
+				// その日の統計データを取得
+				const dayData = await redis.hgetall(`${dailyStatsKey}:${dateString}`)
 
-			const stats = {
-				date: dateString,
-				dateFormatted: date.toLocaleDateString('ja-JP', {
-					month: 'short',
-					day: 'numeric',
-					weekday: 'short'
-				}),
-				problemsSolved: parseInt(dayData.problemsSolved || '0', 10),
-				studyTimeMinutes: parseInt(dayData.studyTimeMinutes || '0', 10),
-				sessionsCount: parseInt(dayData.sessionsCount || '0', 10),
-				unitsCompleted: parseInt(dayData.unitsCompleted || '0', 10),
-				correctAnswers: parseInt(dayData.correctAnswers || '0', 10),
-				averageAccuracy: dayData.averageAccuracy ? parseFloat(dayData.averageAccuracy) : 0
+				console.log(`${dateString} のデータ:`, dayData)
+
+				// dayDataがnullまたは空オブジェクトかチェック
+				const hasData = dayData && typeof dayData === 'object' && Object.keys(dayData).length > 0
+
+				const stats = {
+					date: dateString,
+					dateFormatted: date.toLocaleDateString('ja-JP', {
+						month: 'numeric',
+						day: 'numeric'
+					}),
+					problemsSolved: hasData ? parseInt(dayData.problemsSolved || '0', 10) : 0,
+					studyTimeMinutes: hasData ? parseInt(dayData.studyTimeMinutes || '0', 10) : 0,
+					sessionsCount: hasData ? parseInt(dayData.sessionsCount || '0', 10) : 0,
+					unitsCompleted: hasData ? parseInt(dayData.unitsCompleted || '0', 10) : 0,
+					correctAnswers: hasData ? parseInt(dayData.correctAnswers || '0', 10) : 0,
+					averageAccuracy:
+						hasData && dayData.averageAccuracy ? parseFloat(dayData.averageAccuracy) : 0
+				}
+
+				dailyStats.push(stats)
+			} catch (error) {
+				console.error(`${dateString} のデータ取得でエラー:`, error)
+
+				// エラーが発生した場合はデフォルト値で統計を作成
+				const date = new Date(today)
+				date.setDate(today.getDate() - i)
+				const dateString = date.toISOString().split('T')[0]
+
+				const defaultStats = {
+					date: dateString,
+					dateFormatted: date.toLocaleDateString('ja-JP', {
+						month: 'numeric',
+						day: 'numeric'
+					}),
+					problemsSolved: 0,
+					studyTimeMinutes: 0,
+					sessionsCount: 0,
+					unitsCompleted: 0,
+					correctAnswers: 0,
+					averageAccuracy: 0
+				}
+
+				dailyStats.push(defaultStats)
 			}
-
-			dailyStats.push(stats)
 		}
 
 		console.log('取得した日別統計:', dailyStats)
