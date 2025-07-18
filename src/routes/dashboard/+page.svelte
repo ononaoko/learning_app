@@ -7,6 +7,8 @@
     import IconGhost from '$lib/components/IconGhost.svelte';
     import TealButton from '$lib/components/TealButton.svelte';
     import { audioStore } from '$lib/stores/audioStore.js';
+    import StudyStreakCard from '$lib/components/StudyStreakCard.svelte';
+    import DailyStudyChart from '$lib/components/DailyStudyChart.svelte';
 
     let isOpen = false; // メニューの開閉状態
 
@@ -25,6 +27,9 @@
     let achievements = [];
     let progressRates = [];
     let weakestProblems = [];
+
+    export let data;
+    let currentUserId = data.userId;
 
     // ★追加: 学習統計データをロードする関数★
     async function loadLearningStats() {
@@ -105,7 +110,7 @@
 
     <div class="w-full bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] shadow-lg rounded-lg p-8 space-y-8">
 
-      <section class="flex flex-col items-center pb-8 border-b border-gray-200">
+      <section class="flex flex-col items-center">
         <div class="max-w-2xl space-y-8 md:space-y-0 w-full">
           <h1><img src="/img/logo.svg" alt="ONOTE.APP" class="max-w-80 mx-auto mb-8"></h1>
           <div class="flex flex-col md:flex-row items-center gap-6 h-[8rem] md:h-[6rem]">
@@ -146,11 +151,11 @@
       </section>
 
       <section class="space-y-6">
-        <h2 class="text-3xl font-bold text-gray-700 text-center mb-6">{$nickname}さんの学習統計</h2>
+        <h2 class="bg-teal-400 rounded-full py-1 text-xl font-bold text-white text-center mb-6">{$nickname}さんの学習統計</h2>
 
-        <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
-          <h3 class="text-2xl font-semibold text-gray-700 mb-4">単元別パフォーマンス</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="flex flex-col gap-4">
+          <!-- <h3 class="text-2xl font-semibold text-gray-700 mb-4">単元別パフォーマンス</h3> -->
+          <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {#each unitStats as stat}
               <div class="p-4 bg-white rounded-lg shadow-sm text-center">
                 <p class="text-xl font-bold text-gray-700">{stat.unit}</p>
@@ -159,7 +164,9 @@
                 <p class="text-lg text-gray-600">ヒント使用率: {stat.hintsUsed}回/問</p>
               </div>
             {/each}
-          </div>
+          </div> -->
+          <StudyStreakCard userId={currentUserId} />
+          <DailyStudyChart userId={currentUserId} days={7} />
         </div>
 
         <!-- <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
@@ -172,6 +179,7 @@
         </div> -->
 
         <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
+
           <h3 class="text-2xl font-semibold text-gray-700 mb-4">達成バッジ</h3>
           <div class="flex flex-wrap justify-center gap-4">
             {#each achievements as badge}
