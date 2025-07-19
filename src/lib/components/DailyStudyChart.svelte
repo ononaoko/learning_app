@@ -4,37 +4,92 @@
 
   export let userId;
   export let days = 7; // デフォルト7日間
+  export let dailyStats = null; // 親から渡されるデータ
 
   let chartData = [];
-  let loading = true;
+  let loading = false;
   let selectedMetric = 'both'; // 'problems', 'time', 'both'
 
-  // 日別学習統計を取得
+  // 親から渡されたデータを使用するか、APIから取得するかを判定
+  function shouldUsePropsData() {
+    return dailyStats && Array.isArray(dailyStats) && dailyStats.length > 0;
+  }
+
+  // 日別学習統計を取得（フォールバック用）
   async function loadDailyStats() {
-    // userIdのバリデーション
-    if (!userId || userId === 'undefined' || userId === '') {
-      console.error('userId が無効です:', userId);
-      loading = false;
+    // 親からデータが渡されている場合は、それを使用
+    if (shouldUsePropsData()) {
+      chartData = convertToChartFormat(dailyStats);
+      console.log('親から渡されたデータを使用:', chartData);
       return;
     }
 
+    // userIdのバリデーション
+    if (!userId || userId === 'undefined' || userId === '') {
+      console.error('userId が無効です:', userId);
+      return;
+    }
+
+    loading = true;
     try {
       console.log('日別学習統計を取得中...', { userId, days });
-      const response = await fetch(`/api/daily-study-stats?userId=${userId}&days=${days}`);
+
+      // 拡張されたlearning-stats APIを使用
+      const response = await fetch(`/api/learning-stats?type=daily&days=${days}`);
       if (response.ok) {
         const data = await response.json();
-        chartData = data;
+        chartData = convertToChartFormat(data);
         console.log('日別学習統計を取得:', chartData);
       } else {
         console.error('日別学習統計の取得に失敗:', response.status, response.statusText);
         const errorText = await response.text();
         console.error('エラー詳細:', errorText);
+        // エラー時は空のデータを生成
+        chartData = generateEmptyChartData();
       }
     } catch (error) {
       console.error('日別学習統計の取得エラー:', error);
+      // エラー時は空のデータを生成
+      chartData = generateEmptyChartData();
     } finally {
       loading = false;
     }
+  }
+
+  // API形式のデータをチャート用のデータに変換
+  function convertToChartFormat(data) {
+    if (!data || !Array.isArray(data)) {
+      return generateEmptyChartData();
+    }
+
+    return data.map(day => ({
+      date: day.date,
+      problemsSolved: day.studyCount || day.totalAnswers || 0,
+      studyTimeMinutes: Math.round((day.totalTime || 0) / 60), // 秒を分に変換
+      sessionsCount: day.studyCount || day.newProblems || 0,
+      averageAccuracy: Math.round(day.accuracy || 0)
+    }));
+  }
+
+  // 空のチャートデータを生成
+  function generateEmptyChartData() {
+    const data = [];
+    const today = new Date();
+
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+
+      data.push({
+        date: date.toISOString().split('T')[0],
+        problemsSolved: 0,
+        studyTimeMinutes: 0,
+        sessionsCount: 0,
+        averageAccuracy: 0
+      });
+    }
+
+    return data;
   }
 
   // 統計サマリーを計算
@@ -90,32 +145,47 @@
     });
   }
 
+  // daysが変更された時の処理
+  async function onDaysChange() {
+    if (!shouldUsePropsData()) {
+      await loadDailyStats();
+    } else {
+      // 親からのデータが日数変更に対応していない場合は、空データを生成
+      chartData = generateEmptyChartData();
+    }
+  }
+
   onMount(async () => {
     console.log('DailyStudyChart マウント開始, userId:', userId);
     if (userId && userId !== 'undefined') {
       await loadDailyStats();
     } else {
       console.warn('userId が設定されていません');
-      loading = false;
+      chartData = generateEmptyChartData();
     }
   });
+
+  // リアクティブな更新
+  $: if (dailyStats) {
+    chartData = convertToChartFormat(dailyStats);
+  }
 
   $: summary = calculateSummary();
 </script>
 
 <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
   <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">学習統計グラフ</h2>
+    <h2 class="text-2xl font-bold text-gray-800">📊 学習統計グラフ</h2>
     <div class="flex gap-2">
       <!-- 表示期間選択 -->
-      <select bind:value={days} on:change={loadDailyStats} class="px-3 py-1 border rounded">
+      <select bind:value={days} on:change={onDaysChange} class="px-3 py-1 border rounded text-sm">
         <option value={7}>7日間</option>
         <option value={14}>14日間</option>
         <option value={30}>30日間</option>
       </select>
 
       <!-- 表示項目選択 -->
-      <select bind:value={selectedMetric} class="px-3 py-1 border rounded">
+      <select bind:value={selectedMetric} class="px-3 py-1 border rounded text-sm">
         <option value="both">問題数・時間</option>
         <option value="problems">問題数のみ</option>
         <option value="time">時間のみ</option>
@@ -135,6 +205,14 @@
       <p class="text-gray-600">ログインしてから再度お試しください</p>
     </div>
   {:else}
+    <!-- データソース表示（デバッグ用） -->
+    {#if false} <!-- 本番では非表示 -->
+      <div class="mb-4 p-2 bg-gray-100 text-xs rounded">
+        データソース: {shouldUsePropsData() ? '親コンポーネント' : 'API取得'}
+        | データ数: {chartData.length}件
+      </div>
+    {/if}
+
     <!-- 統計サマリー -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <div class="text-center p-3 bg-teal-50 rounded-lg">
@@ -163,7 +241,7 @@
     </div>
 
     <!-- 簡易グラフ -->
-    {#if chartData.length > 0}
+    {#if chartData.length > 0 && summary.totalProblems > 0}
       <div class="mb-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">日別推移</h3>
 
