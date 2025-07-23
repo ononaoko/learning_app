@@ -250,7 +250,7 @@
     <AppNavigation isOpen={isOpen} />
   </header>
 
-  <div class="w-full bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] shadow-lg rounded-lg p-8 space-y-8">
+  <div class="w-full space-y-8">
 
     <section class="flex flex-col items-center">
       <div class="max-w-2xl space-y-8 md:space-y-0 w-full">

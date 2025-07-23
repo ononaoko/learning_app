@@ -243,7 +243,7 @@ export async function POST({ request }) {
 
 		// Redisに一括更新
 		if (Object.keys(updateData).length > 0) {
-			await redis.hmset(progressKey, updateData)
+			await redis.hset(progressKey, updateData)
 			console.log('Redisに保存されたデータ:', updateData)
 		}
 

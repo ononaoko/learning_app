@@ -173,10 +173,10 @@
   $: summary = calculateSummary();
 </script>
 
-<div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-  <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">📊 学習統計グラフ</h2>
-    <div class="flex gap-2">
+<div class="bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] rounded-lg p-6 mb-6">
+  <div class="flex justify-between items-start mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">学習統計グラフ</h2>
+    <div class="flex gap-2 sm:flex-row flex-col">
       <!-- 表示期間選択 -->
       <select bind:value={days} on:change={onDaysChange} class="px-3 py-1 border rounded text-sm">
         <option value={7}>7日間</option>
@@ -215,28 +215,28 @@
 
     <!-- 統計サマリー -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <div class="text-center p-3 bg-teal-50 rounded-lg">
-        <div class="text-2xl font-bold text-teal-600">{summary.totalProblems}</div>
-        <div class="text-sm text-gray-600">総問題数</div>
-        <div class="text-xs text-teal-500">平均{summary.avgProblemsPerDay}問/日</div>
+      <div class="text-center p-3 bg-teal-400 rounded-lg">
+        <div class="text-sm text-teal-800 font-sans">総問題数</div>
+        <div class="text-2xl font-bold text-white">{summary.totalProblems}</div>
+        <div class="text-xs text-white">平均{summary.avgProblemsPerDay}問/日</div>
       </div>
 
-      <div class="text-center p-3 bg-amber-50 rounded-lg">
-        <div class="text-2xl font-bold text-amber-600">{formatTime(summary.totalTime)}</div>
-        <div class="text-sm text-gray-600">総学習時間</div>
-        <div class="text-xs text-amber-500">平均{formatTime(summary.avgTimePerDay)}/日</div>
+      <div class="text-center p-3 bg-yellow-400 rounded-lg">
+        <div class="text-sm text-yellow-800 font-sans">総学習時間</div>
+        <div class="text-2xl font-bold text-white">{formatTime(summary.totalTime)}</div>
+        <div class="text-xs text-white">平均{formatTime(summary.avgTimePerDay)}/日</div>
       </div>
 
-      <div class="text-center p-3 bg-blue-50 rounded-lg">
-        <div class="text-2xl font-bold text-blue-600">{summary.totalSessions}</div>
-        <div class="text-sm text-gray-600">総セッション数</div>
-        <div class="text-xs text-blue-500">平均{Math.round(summary.totalSessions / days)}回/日</div>
+      <div class="text-center p-3 bg-blue-400 rounded-lg">
+        <div class="text-sm text-blue-800 font-sans">総セッション数</div>
+        <div class="text-2xl font-bold text-white">{summary.totalSessions}</div>
+        <div class="text-xs text-white">平均{Math.round(summary.totalSessions / days)}回/日</div>
       </div>
 
-      <div class="text-center p-3 bg-red-50 rounded-lg">
-        <div class="text-2xl font-bold text-red-600">{summary.avgAccuracy}%</div>
-        <div class="text-sm text-gray-600">平均正解率</div>
-        <div class="text-xs text-red-500">過去{days}日間</div>
+      <div class="text-center p-3 bg-red-400 rounded-lg">
+        <div class="text-sm text-red-800 font-sans">平均正解率</div>
+        <div class="text-2xl font-bold text-white">{summary.avgAccuracy}%</div>
+        <div class="text-xs text-white">過去{days}日間</div>
       </div>
     </div>
 

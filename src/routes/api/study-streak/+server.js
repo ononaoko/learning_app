@@ -74,13 +74,16 @@ export async function POST({ request }) {
 		const currentData = await redis.hgetall(streakKey)
 		console.log('現在の連続学習データ:', currentData)
 
-		const lastStudyDate = currentData.lastStudyDate || null
-		const currentStreak = parseInt(currentData.currentStreak || '0', 10)
-		const maxStreak = parseInt(currentData.maxStreak || '0', 10)
-		const totalStudyDays = parseInt(currentData.totalStudyDays || '0', 10)
-		const firstStudyDate = currentData.firstStudyDate || null
-		const todayProblems = parseInt(currentData.todayProblems || '0', 10)
-		const totalProblems = parseInt(currentData.totalProblems || '0', 10)
+		// 🔧 currentDataがnullの場合の対応を追加
+		const safeCurrentData = currentData || {}
+
+		const lastStudyDate = safeCurrentData.lastStudyDate || null
+		const currentStreak = parseInt(safeCurrentData.currentStreak || '0', 10)
+		const maxStreak = parseInt(safeCurrentData.maxStreak || '0', 10)
+		const totalStudyDays = parseInt(safeCurrentData.totalStudyDays || '0', 10)
+		const firstStudyDate = safeCurrentData.firstStudyDate || null
+		const todayProblems = parseInt(safeCurrentData.todayProblems || '0', 10)
+		const totalProblems = parseInt(safeCurrentData.totalProblems || '0', 10)
 
 		// 今日の問題数を更新
 		let newTodayProblems = todayProblems
@@ -155,7 +158,7 @@ export async function POST({ request }) {
 			totalProblems: newTotalProblems.toString()
 		}
 
-		await redis.hmset(streakKey, updateData)
+		await redis.hset(streakKey, updateData)
 		console.log('更新されたデータ:', updateData)
 
 		return json({

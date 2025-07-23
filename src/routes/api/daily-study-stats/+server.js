@@ -131,14 +131,17 @@ export async function POST({ request }) {
 		const currentStats = await redis.hgetall(dailyStatsKey)
 		console.log('現在の統計:', currentStats)
 
+		// 🔧 currentStatsがnullの場合の対応
+		const safeCurrentStats = currentStats || {}
+
 		// 新しい統計を計算
 		const newStats = {
-			problemsSolved: parseInt(currentStats.problemsSolved || '0', 10) + problemsSolved,
-			studyTimeMinutes: parseInt(currentStats.studyTimeMinutes || '0', 10) + studyTimeMinutes,
-			sessionsCount: parseInt(currentStats.sessionsCount || '0', 10) + 1,
-			unitsCompleted: parseInt(currentStats.unitsCompleted || '0', 10) + unitsCompleted,
-			correctAnswers: parseInt(currentStats.correctAnswers || '0', 10) + correctAnswers,
-			totalAnswers: parseInt(currentStats.totalAnswers || '0', 10) + totalAnswers
+			problemsSolved: parseInt(safeCurrentStats.problemsSolved || '0', 10) + problemsSolved,
+			studyTimeMinutes: parseInt(safeCurrentStats.studyTimeMinutes || '0', 10) + studyTimeMinutes,
+			sessionsCount: parseInt(safeCurrentStats.sessionsCount || '0', 10) + 1,
+			unitsCompleted: parseInt(safeCurrentStats.unitsCompleted || '0', 10) + unitsCompleted,
+			correctAnswers: parseInt(safeCurrentStats.correctAnswers || '0', 10) + correctAnswers,
+			totalAnswers: parseInt(safeCurrentStats.totalAnswers || '0', 10) + totalAnswers
 		}
 
 		// 正解率を計算
@@ -147,8 +150,8 @@ export async function POST({ request }) {
 				? Math.round((newStats.correctAnswers / newStats.totalAnswers) * 100)
 				: 0
 
-		// Redisに保存
-		await redis.hmset(dailyStatsKey, {
+		// 🔧 hmset を hset に変更
+		await redis.hset(dailyStatsKey, {
 			problemsSolved: newStats.problemsSolved.toString(),
 			studyTimeMinutes: newStats.studyTimeMinutes.toString(),
 			sessionsCount: newStats.sessionsCount.toString(),

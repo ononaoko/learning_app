@@ -237,9 +237,9 @@
   $: progressToNext = getProgressToNextLevel();
 </script>
 
-<div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+<div class="bg-stone-100 [box-shadow:var(--shadow-neumorphic-convex)] rounded-lg shadow-lg p-6 mb-6">
   <div class="flex items-center justify-between mb-4">
-    <h2 class="text-2xl font-bold text-gray-800">🔥 連続学習記録</h2>
+    <h2 class="text-2xl font-bold text-gray-800">連続学習記録</h2>
     {#if isNewStudyDay}
       <div class="animate-bounce">
         <span class="text-2xl">🎉</span>
@@ -262,7 +262,7 @@
     {/if}
 
     <!-- 今日の進捗 -->
-    <div class="mb-6 p-4 bg-gradient-to-r from-teal-50 to-blue-50 rounded-lg">
+    <div class="mb-6 p-4 bg-stone-100 [box-shadow:var(--shadow-neumorphic-concave2)] rounded-lg">
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-lg font-semibold text-gray-800">今日の学習進捗</h3>
         <div class="text-right">
@@ -403,9 +403,9 @@
 
     <!-- 学習のヒント -->
     {#if localStreakData.totalStudyDays > 0}
-      <div class="mt-4 p-3 bg-blue-50 rounded-lg">
-        <h4 class="font-semibold text-blue-800 mb-1 text-sm">💡 学習のコツ</h4>
-        <div class="text-xs text-blue-700">
+      <div class="mt-4 p-3 bg-white rounded-lg">
+        <h4 class="font-semibold text-stone-700 mb-1 text-sm">💡 学習のコツ</h4>
+        <div class="text-xs text-stone-700">
           {#if localStreakData.currentStreak >= 7}
             <p>• 素晴らしい継続力です！短い休憩を挟みながら続けましょう</p>
           {:else if localStreakData.currentStreak >= 3}

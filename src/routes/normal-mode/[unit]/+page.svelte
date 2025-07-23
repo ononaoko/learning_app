@@ -276,6 +276,7 @@ async function loadProblemResults() {
       totalProblemsAttempted = 0;
       console.log('問題結果なし - 新規開始');
     }
+
   } catch (error) {
     console.error('問題結果の読み込みに失敗:', error);
     problemResults = {};
@@ -310,6 +311,7 @@ async function saveProblemResults() {
   function startAutoSave() {
     if (intervalId) {
       clearInterval(intervalId);
+      console.log('AutoSave を停止しました');
     }
     intervalId = setInterval(async () => {
       if (currentUserId && unitId && currentProblemIndex !== undefined && !isUnitCompleted) {
@@ -372,20 +374,20 @@ async function saveProblemResults() {
 
     // 🆕 連続学習記録を更新
     try {
-      await fetch('/api/study-streak', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          userId: currentUserId,
-          problemsSolved: 1
-        })
-      });
-      console.log('連続学習記録を更新しました');
-    } catch (error) {
-      console.error('連続学習記録の更新に失敗:', error);
-    }
+  await fetch('/api/study-streak', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      userId: currentUserId,
+      problemsSolved: 1
+    })
+  });
+  console.log('連続学習記録を更新しました');
+} catch (error) {
+  console.error('連続学習記録の更新に失敗:', error);
+}
 
     // 学習記録の保存
     const recordData = {
@@ -531,13 +533,22 @@ async function saveProblemResults() {
   }, 200);
 }
 
-  async function nextProblem() {
+async function nextProblem() {
+  console.log('🚨 nextProblem() が呼び出されました！');
+  console.log('現在のcurrentProblemIndex:', currentProblemIndex);
+  console.log('problems.length:', problems.length);
+
   currentProblemIndex++;
+
+  console.log('インクリメント後のcurrentProblemIndex:', currentProblemIndex);
+  console.log('条件チェック: currentProblemIndex < problems.length =', currentProblemIndex < problems.length);
+
   showAnswerArea = false;
   currentHintIndex = 0;
   showAllHints = false;
 
   if (currentProblemIndex < problems.length) {
+    console.log('🔄 次の問題へ進む');
     currentProblem = problems[currentProblemIndex];
     problemStartTime = Date.now();
 
@@ -549,7 +560,13 @@ async function saveProblemResults() {
       }
     }
   } else {
+    console.log('🏁 単元完了条件に入った');
     // 単元完了時の処理
+    console.log('=== 単元完了処理開始 ===');
+    console.log('currentProblemIndex:', currentProblemIndex);
+    console.log('problems.length:', problems.length);
+    console.log('results.length:', results.length);
+
     const sessionEndTime = Date.now();
     const totalSessionDurationSeconds = Math.round((sessionEndTime - sessionStartTime) / 1000);
     const totalSessionDurationMinutes = Math.round(totalSessionDurationSeconds / 60);
@@ -561,6 +578,7 @@ async function saveProblemResults() {
     console.log('セッション時間:', totalSessionDurationMinutes, '分');
     console.log('解いた問題数:', results.length);
     console.log('正解数:', correctCount);
+    console.log('allCorrect:', allCorrect);
 
     // 🆕 日別学習統計を更新
     try {
@@ -585,7 +603,7 @@ async function saveProblemResults() {
       console.error('日別学習統計の更新に失敗:', error);
     }
 
-    // 既存のセッション記録保存
+    // セッション記録保存
     try {
       const sessionRecordResponse = await fetch('/api/session-record', {
         method: 'POST',
@@ -600,11 +618,77 @@ async function saveProblemResults() {
           timestamp: new Date().toISOString()
         })
       });
+
+      if (!sessionRecordResponse.ok) {
+        console.error('セッション記録の保存に失敗:', sessionRecordResponse.statusText);
+      }
     } catch (error) {
       console.error('セッション記録の保存に失敗:', error);
     }
 
-    // 既存のコード（進捗保存、画面遷移など）...
+    // 🔧 進捗保存（単元完了）
+    try {
+      const progressData = {
+        userId: currentUserId,
+        unitId: unitId,
+        lastProblemIndex: problems.length - 1, // 最後の問題のインデックス
+        isCompleted: true,
+        isPerfect: allCorrect
+      };
+
+      console.log('🔧 単元完了 - 送信予定のデータ:', progressData);
+
+      const response = await fetch('/api/user-progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(progressData)
+      });
+
+      if (!response.ok) {
+        console.error('進捗の保存に失敗しました:', response.status, response.statusText);
+      } else {
+        const responseData = await response.json();
+        console.log('単元完了保存成功 - サーバーからの応答:', responseData);
+
+        // 完了フラグを設定
+        isUnitCompleted = true;
+
+        // 進捗更新イベントを発火
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('progress-updated', {
+            detail: {
+              unitId: unitId,
+              progress: progressData
+            }
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('進捗保存中にエラー:', error);
+    }
+
+    // 🎯 結果画面への遷移
+    console.log('🎯 結果画面への遷移開始');
+    await audioStore.play('click'); // 完了時の効果音
+
+    // 200ms遅延後に結果画面へ遷移
+    setTimeout(() => {
+      console.log('🎯 結果画面へ遷移実行');
+      goto('/normal-mode/result', {
+        state: {
+          results: results,
+          unitName: unitDisplayName,
+          isComplete: true,
+          isIncomplete: false,
+          sessionDuration: totalSessionDurationMinutes,
+          correctCount: correctCount,
+          totalProblems: results.length,
+          isPerfect: allCorrect
+        }
+      });
+    }, 200);
   }
 }
 
@@ -629,6 +713,7 @@ async function saveProblemResults() {
   onDestroy(() => {
     if (intervalId) {
       clearInterval(intervalId);
+      console.log('AutoSave を停止しました');
     }
 
     if (browser && !isUnitCompleted && currentUserId && unitId && currentProblemIndex !== undefined) {
